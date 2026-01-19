@@ -2,13 +2,22 @@
  * UserPromptSubmit hook entry point for Claude Prompt Improver Plugin
  * Handles stdin parsing, orchestration, and stdout output
  */
-import type { BypassReason, ClassificationLevel, HookInput, HookOutput } from '../src/core/types.ts';
+import type {
+  BypassReason,
+  ClassificationLevel,
+  HookInput,
+  HookOutput,
+  VisibilityInfo,
+} from '../src/core/types.ts';
 import { detectBypass, type BypassCheckInput } from '../src/core/bypass-detector.ts';
 import { classifyPrompt } from '../src/services/classifier.ts';
 import { improvePrompt, type ImprovementContext } from '../src/services/improver.ts';
 import { buildContext, formatContextForInjection } from '../src/context/context-builder.ts';
 import type { SkillRule } from '../src/context/skill-matcher.ts';
 import type { AgentDefinition } from '../src/context/agent-suggester.ts';
+import { loadConfigFromStandardPaths } from '../src/core/config-loader.ts';
+import { formatSystemMessage } from '../src/utils/message-formatter.ts';
+import { countTokens } from '../src/utils/token-counter.ts';
 
 /**
  * Result of parsing hook input
@@ -23,8 +32,16 @@ export interface ParseResult {
  * Options for creating hook output
  */
 export type HookOutputOptions =
-  | { type: 'passthrough' }
-  | { type: 'improved'; improvedPrompt: string; classification: ClassificationLevel };
+  | { type: 'passthrough'; bypassReason?: BypassReason }
+  | {
+      type: 'improved';
+      improvedPrompt: string;
+      classification: ClassificationLevel;
+      tokensBefore: number;
+      tokensAfter: number;
+      summary?: readonly string[];
+      latencyMs: number;
+    };
 
 /**
  * Parses hook stdin JSON into structured input
@@ -129,13 +146,33 @@ export function serializeHookOutput(output: HookOutput): string {
  */
 export function createHookOutput(options: HookOutputOptions): HookOutput {
   if (options.type === 'passthrough') {
+    // Create bypass visibility info if reason provided
+    if (options.bypassReason) {
+      const visibilityInfo: VisibilityInfo = {
+        status: 'bypassed',
+        bypassReason: options.bypassReason,
+      };
+      return {
+        continue: true,
+        systemMessage: formatSystemMessage(visibilityInfo),
+      };
+    }
     return { continue: true };
   }
 
-  // Improved output
+  // Create applied visibility info
+  const visibilityInfo: VisibilityInfo = {
+    status: 'applied',
+    classification: options.classification,
+    tokensBefore: options.tokensBefore,
+    tokensAfter: options.tokensAfter,
+    latencyMs: options.latencyMs,
+    ...(options.summary !== undefined && { summary: options.summary }),
+  };
+
   return {
     continue: true,
-    systemMessage: `🎯 Prompt improved (${options.classification})`,
+    systemMessage: formatSystemMessage(visibilityInfo),
     additionalContext: `<improved_prompt>\n${options.improvedPrompt}\n</improved_prompt>`,
   };
 }
@@ -148,6 +185,7 @@ export interface ProcessPromptOptions {
   readonly sessionId: string;
   readonly permissionMode?: string;
   readonly pluginDisabled?: boolean;
+  readonly forceImprove?: boolean;
   readonly contextUsage?: {
     readonly used: number;
     readonly max: number;
@@ -169,7 +207,15 @@ export interface ProcessPromptOptions {
  */
 export type ProcessPromptResult =
   | { type: 'passthrough'; bypassReason?: BypassReason }
-  | { type: 'improved'; improvedPrompt: string; classification: ClassificationLevel };
+  | {
+      type: 'improved';
+      improvedPrompt: string;
+      classification: ClassificationLevel;
+      tokensBefore: number;
+      tokensAfter: number;
+      summary?: readonly string[];
+      latencyMs: number;
+    };
 
 /**
  * Processes a prompt through classification and improvement
@@ -181,6 +227,7 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
     sessionId,
     permissionMode,
     pluginDisabled,
+    forceImprove,
     contextUsage,
     availableTools,
     skillRules,
@@ -199,6 +246,9 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
   }
   if (pluginDisabled !== undefined) {
     (bypassInput as { pluginDisabled?: boolean }).pluginDisabled = pluginDisabled;
+  }
+  if (forceImprove !== undefined) {
+    (bypassInput as { forceImprove?: boolean }).forceImprove = forceImprove;
   }
   if (contextUsage !== undefined) {
     (bypassInput as { contextUsage?: { used: number; max: number } }).contextUsage = contextUsage;
@@ -272,6 +322,9 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
     (improveOptions as { context?: ImprovementContext }).context = improvementContext;
   }
 
+  // Count tokens before improvement
+  const tokensBefore = countTokens(prompt);
+
   // Improve the prompt
   const improvement = await improvePrompt(improveOptions);
 
@@ -280,10 +333,17 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
     return { type: 'passthrough' };
   }
 
+  // Count tokens after improvement
+  const tokensAfter = countTokens(improvement.improvedPrompt);
+
   return {
     type: 'improved',
     improvedPrompt: improvement.improvedPrompt,
     classification: classification.level,
+    tokensBefore,
+    tokensAfter,
+    latencyMs: improvement.latencyMs,
+    ...(improvement.summary !== undefined && { summary: improvement.summary }),
   };
 }
 
@@ -292,6 +352,9 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
  * Reads stdin, processes prompt, writes stdout
  */
 async function main(): Promise<void> {
+  // Load configuration
+  const config = await loadConfigFromStandardPaths();
+
   // Read stdin
   const stdin = await Bun.stdin.text();
 
@@ -311,6 +374,8 @@ async function main(): Promise<void> {
   const processOptions: ProcessPromptOptions = {
     prompt,
     sessionId: context.conversation_id,
+    pluginDisabled: !config.enabled,
+    forceImprove: config.forceImprove,
   };
 
   if (context.permission_mode) {
@@ -328,14 +393,23 @@ async function main(): Promise<void> {
   const result = await processPrompt(processOptions);
 
   // Create output based on processing result
-  const output =
-    result.type === 'improved'
-      ? createHookOutput({
-          type: 'improved',
-          improvedPrompt: result.improvedPrompt,
-          classification: result.classification,
-        })
-      : createHookOutput({ type: 'passthrough' });
+  let output: HookOutput;
+  if (result.type === 'improved') {
+    output = createHookOutput({
+      type: 'improved',
+      improvedPrompt: result.improvedPrompt,
+      classification: result.classification,
+      tokensBefore: result.tokensBefore,
+      tokensAfter: result.tokensAfter,
+      latencyMs: result.latencyMs,
+      ...(result.summary !== undefined && { summary: result.summary }),
+    });
+  } else {
+    output = createHookOutput({
+      type: 'passthrough',
+      ...(result.bypassReason !== undefined && { bypassReason: result.bypassReason }),
+    });
+  }
 
   console.log(serializeHookOutput(output));
 }

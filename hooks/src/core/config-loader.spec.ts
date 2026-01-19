@@ -121,14 +121,14 @@ compaction_threshold: 10
   });
 
   describe('T011: loadConfig - configuration loading with defaults', () => {
-    it('should return default configuration when no config file exists', () => {
-      const config = loadConfig(join(testDir, 'nonexistent', 'config.md'));
+    it('should return default configuration when no config file exists', async () => {
+      const config = await loadConfig(join(testDir, 'nonexistent', 'config.md'));
 
       expect(config).toEqual(DEFAULT_CONFIG);
     });
 
-    it('should have sensible default values', () => {
-      const config = loadConfig(join(testDir, 'nonexistent', 'config.md'));
+    it('should have sensible default values', async () => {
+      const config = await loadConfig(join(testDir, 'nonexistent', 'config.md'));
 
       expect(config.enabled).toBe(true);
       expect(config.shortPromptThreshold).toBe(10);
@@ -137,8 +137,8 @@ compaction_threshold: 10
       expect(config.defaultComplexModel).toBe('sonnet');
     });
 
-    it('should have default logging configuration', () => {
-      const config = loadConfig(join(testDir, 'nonexistent', 'config.md'));
+    it('should have default logging configuration', async () => {
+      const config = await loadConfig(join(testDir, 'nonexistent', 'config.md'));
 
       expect(config.logging.enabled).toBe(true);
       expect(config.logging.logFilePath).toBe('.claude/logs/prompt-improver-latest.log');
@@ -149,7 +149,7 @@ compaction_threshold: 10
   });
 
   describe('T012: loadConfig - configuration loading from markdown file', () => {
-    it('should load configuration from markdown file with YAML frontmatter', () => {
+    it('should load configuration from markdown file with YAML frontmatter', async () => {
       const markdownConfig = `---
 enabled: false
 shortPromptThreshold: 15
@@ -160,13 +160,13 @@ This file configures the prompt improver plugin.`;
 
       writeFileSync(testConfigPathMd, markdownConfig);
 
-      const config = loadConfig(testConfigPathMd);
+      const config = await loadConfig(testConfigPathMd);
 
       expect(config.enabled).toBe(false);
       expect(config.shortPromptThreshold).toBe(15);
     });
 
-    it('should merge partial markdown config with defaults', () => {
+    it('should merge partial markdown config with defaults', async () => {
       const markdownConfig = `---
 enabled: false
 integrations:
@@ -175,7 +175,7 @@ integrations:
 
       writeFileSync(testConfigPathMd, markdownConfig);
 
-      const config = loadConfig(testConfigPathMd);
+      const config = await loadConfig(testConfigPathMd);
 
       // Overridden values
       expect(config.enabled).toBe(false);
@@ -187,15 +187,15 @@ integrations:
       expect(config.integrations.spec).toBe(true);
     });
 
-    it('should handle invalid markdown gracefully and return defaults', () => {
+    it('should handle invalid markdown gracefully and return defaults', async () => {
       writeFileSync(testConfigPathMd, '# No frontmatter here\nJust text');
 
-      const config = loadConfig(testConfigPathMd);
+      const config = await loadConfig(testConfigPathMd);
 
       expect(config).toEqual(DEFAULT_CONFIG);
     });
 
-    it('should load nested logging configuration from markdown', () => {
+    it('should load nested logging configuration from markdown', async () => {
       const markdownConfig = `---
 logging:
   enabled: false
@@ -204,7 +204,7 @@ logging:
 
       writeFileSync(testConfigPathMd, markdownConfig);
 
-      const config = loadConfig(testConfigPathMd);
+      const config = await loadConfig(testConfigPathMd);
 
       expect(config.logging.enabled).toBe(false);
       expect(config.logging.maxLogSizeMB).toBe(50);
@@ -212,7 +212,7 @@ logging:
       expect(config.logging.logFilePath).toBe('.claude/logs/prompt-improver-latest.log');
     });
 
-    it('should support snake_case keys in markdown', () => {
+    it('should support snake_case keys in markdown', async () => {
       const markdownConfig = `---
 short_prompt_threshold: 20
 compaction_threshold: 8
@@ -221,7 +221,7 @@ simple_model: sonnet
 
       writeFileSync(testConfigPathMd, markdownConfig);
 
-      const config = loadConfig(testConfigPathMd);
+      const config = await loadConfig(testConfigPathMd);
 
       expect(config.shortPromptThreshold).toBe(20);
       expect(config.compactionThreshold).toBe(8);
@@ -230,7 +230,7 @@ simple_model: sonnet
   });
 
   describe('T012: loadConfig - legacy JSON format support', () => {
-    it('should load configuration from JSON file', () => {
+    it('should load configuration from JSON file', async () => {
       const customConfig = {
         enabled: false,
         shortPromptThreshold: 15,
@@ -238,13 +238,13 @@ simple_model: sonnet
 
       writeFileSync(testConfigPathJson, JSON.stringify(customConfig));
 
-      const config = loadConfig(testConfigPathJson);
+      const config = await loadConfig(testConfigPathJson);
 
       expect(config.enabled).toBe(false);
       expect(config.shortPromptThreshold).toBe(15);
     });
 
-    it('should merge partial JSON config with defaults', () => {
+    it('should merge partial JSON config with defaults', async () => {
       const partialConfig = {
         enabled: false,
         integrations: {
@@ -254,7 +254,7 @@ simple_model: sonnet
 
       writeFileSync(testConfigPathJson, JSON.stringify(partialConfig));
 
-      const config = loadConfig(testConfigPathJson);
+      const config = await loadConfig(testConfigPathJson);
 
       // Overridden values
       expect(config.enabled).toBe(false);
@@ -265,22 +265,22 @@ simple_model: sonnet
       expect(config.integrations.lsp).toBe(true);
     });
 
-    it('should handle invalid JSON gracefully and return defaults', () => {
+    it('should handle invalid JSON gracefully and return defaults', async () => {
       writeFileSync(testConfigPathJson, 'not valid json {{{');
 
-      const config = loadConfig(testConfigPathJson);
+      const config = await loadConfig(testConfigPathJson);
 
       expect(config).toEqual(DEFAULT_CONFIG);
     });
   });
 
   describe('loadConfigFromStandardPaths', () => {
-    it('should check paths in order of precedence', () => {
+    it('should check paths in order of precedence', async () => {
       expect(CONFIG_PATHS[0]).toBe('.claude/prompt-improver.local.md');
       expect(CONFIG_PATHS[1]).toBe('.claude/prompt-improver-config.json');
     });
 
-    it('should prefer markdown over JSON when both exist', () => {
+    it('should prefer markdown over JSON when both exist', async () => {
       const mdConfig = `---
 shortPromptThreshold: 25
 ---`;
@@ -289,40 +289,40 @@ shortPromptThreshold: 25
       writeFileSync(testConfigPathMd, mdConfig);
       writeFileSync(testConfigPathJson, JSON.stringify(jsonConfig));
 
-      const config = loadConfigFromStandardPaths(testDir);
+      const config = await loadConfigFromStandardPaths(testDir);
 
       expect(config.shortPromptThreshold).toBe(25); // From markdown
     });
 
-    it('should fall back to JSON when markdown does not exist', () => {
+    it('should fall back to JSON when markdown does not exist', async () => {
       const jsonConfig = { shortPromptThreshold: 30 };
       writeFileSync(testConfigPathJson, JSON.stringify(jsonConfig));
 
-      const config = loadConfigFromStandardPaths(testDir);
+      const config = await loadConfigFromStandardPaths(testDir);
 
       expect(config.shortPromptThreshold).toBe(30);
     });
 
-    it('should return defaults when no config files exist', () => {
-      const config = loadConfigFromStandardPaths(testDir);
+    it('should return defaults when no config files exist', async () => {
+      const config = await loadConfigFromStandardPaths(testDir);
 
       expect(config).toEqual(DEFAULT_CONFIG);
     });
   });
 
   describe('Config caching with mtime check', () => {
-    it('should return cached config when file unchanged', () => {
+    it('should return cached config when file unchanged', async () => {
       const mdConfig = `---
 shortPromptThreshold: 42
 ---`;
       writeFileSync(testConfigPathMd, mdConfig);
 
       // First load
-      const config1 = loadConfig(testConfigPathMd);
+      const config1 = await loadConfig(testConfigPathMd);
       expect(config1.shortPromptThreshold).toBe(42);
 
       // Second load should use cache (same result)
-      const config2 = loadConfig(testConfigPathMd);
+      const config2 = await loadConfig(testConfigPathMd);
       expect(config2.shortPromptThreshold).toBe(42);
       expect(config2).toEqual(config1);
     });
@@ -333,7 +333,7 @@ shortPromptThreshold: 42
 ---`;
       writeFileSync(testConfigPathMd, mdConfig1);
 
-      const config1 = loadConfig(testConfigPathMd);
+      const config1 = await loadConfig(testConfigPathMd);
       expect(config1.shortPromptThreshold).toBe(42);
 
       // Wait a moment to ensure mtime changes
@@ -346,21 +346,21 @@ shortPromptThreshold: 99
       writeFileSync(testConfigPathMd, mdConfig2);
 
       // Should detect mtime change and reload
-      const config2 = loadConfig(testConfigPathMd);
+      const config2 = await loadConfig(testConfigPathMd);
       expect(config2.shortPromptThreshold).toBe(99);
     });
 
-    it('should clear cache when clearConfigCache is called', () => {
+    it('should clear cache when clearConfigCache is called', async () => {
       const mdConfig = `---
 shortPromptThreshold: 42
 ---`;
       writeFileSync(testConfigPathMd, mdConfig);
 
-      loadConfig(testConfigPathMd);
+      await loadConfig(testConfigPathMd);
       clearConfigCache();
 
       // After clearing, should still work (reloads from disk)
-      const config = loadConfig(testConfigPathMd);
+      const config = await loadConfig(testConfigPathMd);
       expect(config.shortPromptThreshold).toBe(42);
     });
   });
@@ -450,8 +450,8 @@ shortPromptThreshold: 42
   });
 
   describe('T014: loadConfig - integration toggles default to true', () => {
-    it('should have all integration toggles default to true', () => {
-      const config = loadConfig(join(testDir, 'nonexistent', 'config.md'));
+    it('should have all integration toggles default to true', async () => {
+      const config = await loadConfig(join(testDir, 'nonexistent', 'config.md'));
 
       expect(config.integrations.git).toBe(true);
       expect(config.integrations.lsp).toBe(true);
@@ -460,7 +460,7 @@ shortPromptThreshold: 42
       expect(config.integrations.session).toBe(true);
     });
 
-    it('should allow individual integration toggles to be disabled via markdown', () => {
+    it('should allow individual integration toggles to be disabled via markdown', async () => {
       const markdownConfig = `---
 integrations:
   git: true
@@ -472,7 +472,7 @@ integrations:
 
       writeFileSync(testConfigPathMd, markdownConfig);
 
-      const config = loadConfig(testConfigPathMd);
+      const config = await loadConfig(testConfigPathMd);
 
       expect(config.integrations.git).toBe(true);
       expect(config.integrations.lsp).toBe(false);
@@ -481,7 +481,7 @@ integrations:
       expect(config.integrations.session).toBe(true);
     });
 
-    it('should merge partial integration toggles with defaults', () => {
+    it('should merge partial integration toggles with defaults', async () => {
       const markdownConfig = `---
 integrations:
   session: false
@@ -489,7 +489,7 @@ integrations:
 
       writeFileSync(testConfigPathMd, markdownConfig);
 
-      const config = loadConfig(testConfigPathMd);
+      const config = await loadConfig(testConfigPathMd);
 
       // Only session should be changed
       expect(config.integrations.git).toBe(true);
@@ -497,6 +497,265 @@ integrations:
       expect(config.integrations.spec).toBe(true);
       expect(config.integrations.memory).toBe(true);
       expect(config.integrations.session).toBe(false);
+    });
+  });
+
+  describe('Configuration - forceImprove field', () => {
+    it('should default forceImprove to false', async () => {
+      const config = await loadConfig(join(testDir, 'nonexistent', 'config.md'));
+
+      expect(config.forceImprove).toBe(false);
+    });
+
+    it('should parse forceImprove from camelCase', async () => {
+      const markdownConfig = `---
+forceImprove: true
+---`;
+
+      writeFileSync(testConfigPathMd, markdownConfig);
+
+      const config = await loadConfig(testConfigPathMd);
+
+      expect(config.forceImprove).toBe(true);
+    });
+
+    it('should parse forceImprove from snake_case', async () => {
+      const markdownConfig = `---
+force_improve: true
+---`;
+
+      writeFileSync(testConfigPathMd, markdownConfig);
+
+      const config = await loadConfig(testConfigPathMd);
+
+      expect(config.forceImprove).toBe(true);
+    });
+
+    it('should merge forceImprove with defaults', async () => {
+      const markdownConfig = `---
+enabled: true
+forceImprove: true
+---`;
+
+      writeFileSync(testConfigPathMd, markdownConfig);
+
+      const config = await loadConfig(testConfigPathMd);
+
+      expect(config.enabled).toBe(true);
+      expect(config.forceImprove).toBe(true);
+    });
+  });
+
+  describe('Configuration - logging.logLevel field', () => {
+    it('should default logLevel to INFO', async () => {
+      const config = await loadConfig(join(testDir, 'nonexistent', 'config.md'));
+
+      expect(config.logging.logLevel).toBe('INFO');
+    });
+
+    it('should parse logLevel ERROR', async () => {
+      const markdownConfig = `---
+logging:
+  logLevel: ERROR
+---`;
+
+      writeFileSync(testConfigPathMd, markdownConfig);
+
+      const config = await loadConfig(testConfigPathMd);
+
+      expect(config.logging.logLevel).toBe('ERROR');
+    });
+
+    it('should parse logLevel INFO', async () => {
+      const markdownConfig = `---
+logging:
+  logLevel: INFO
+---`;
+
+      writeFileSync(testConfigPathMd, markdownConfig);
+
+      const config = await loadConfig(testConfigPathMd);
+
+      expect(config.logging.logLevel).toBe('INFO');
+    });
+
+    it('should parse logLevel DEBUG', async () => {
+      const markdownConfig = `---
+logging:
+  logLevel: DEBUG
+---`;
+
+      writeFileSync(testConfigPathMd, markdownConfig);
+
+      const config = await loadConfig(testConfigPathMd);
+
+      expect(config.logging.logLevel).toBe('DEBUG');
+    });
+
+    it('should parse logLevel from snake_case', async () => {
+      const markdownConfig = `---
+logging:
+  log_level: ERROR
+---`;
+
+      writeFileSync(testConfigPathMd, markdownConfig);
+
+      const config = await loadConfig(testConfigPathMd);
+
+      expect(config.logging.logLevel).toBe('ERROR');
+    });
+
+    it('should handle invalid logLevel gracefully', async () => {
+      const markdownConfig = `---
+logging:
+  logLevel: INVALID
+---`;
+
+      writeFileSync(testConfigPathMd, markdownConfig);
+
+      // Should either throw or default to INFO
+      const config = await loadConfig(testConfigPathMd);
+
+      // Should default to INFO for invalid values
+      expect(config.logging.logLevel).toBe('INFO');
+    });
+
+    it('should merge logLevel with other logging config', async () => {
+      const markdownConfig = `---
+logging:
+  enabled: true
+  logLevel: ERROR
+  logFilePath: ".claude/logs/test.log"
+---`;
+
+      writeFileSync(testConfigPathMd, markdownConfig);
+
+      const config = await loadConfig(testConfigPathMd);
+
+      expect(config.logging.enabled).toBe(true);
+      expect(config.logging.logLevel).toBe('ERROR');
+      expect(config.logging.logFilePath).toBe('.claude/logs/test.log');
+    });
+  });
+
+  describe('Configuration - logging.useTimestampedLogs field', () => {
+    it('should default useTimestampedLogs to false', async () => {
+      const config = await loadConfig(join(testDir, 'nonexistent', 'config.md'));
+
+      expect(config.logging.useTimestampedLogs).toBe(false);
+    });
+
+    it('should parse useTimestampedLogs true', async () => {
+      const markdownConfig = `---
+logging:
+  useTimestampedLogs: true
+---`;
+
+      writeFileSync(testConfigPathMd, markdownConfig);
+
+      const config = await loadConfig(testConfigPathMd);
+
+      expect(config.logging.useTimestampedLogs).toBe(true);
+    });
+
+    it('should parse useTimestampedLogs false', async () => {
+      const markdownConfig = `---
+logging:
+  useTimestampedLogs: false
+---`;
+
+      writeFileSync(testConfigPathMd, markdownConfig);
+
+      const config = await loadConfig(testConfigPathMd);
+
+      expect(config.logging.useTimestampedLogs).toBe(false);
+    });
+
+    it('should parse useTimestampedLogs from snake_case', async () => {
+      const markdownConfig = `---
+logging:
+  use_timestamped_logs: true
+---`;
+
+      writeFileSync(testConfigPathMd, markdownConfig);
+
+      const config = await loadConfig(testConfigPathMd);
+
+      expect(config.logging.useTimestampedLogs).toBe(true);
+    });
+
+    it('should merge useTimestampedLogs with other logging config', async () => {
+      const markdownConfig = `---
+logging:
+  enabled: true
+  useTimestampedLogs: true
+  logLevel: DEBUG
+---`;
+
+      writeFileSync(testConfigPathMd, markdownConfig);
+
+      const config = await loadConfig(testConfigPathMd);
+
+      expect(config.logging.enabled).toBe(true);
+      expect(config.logging.useTimestampedLogs).toBe(true);
+      expect(config.logging.logLevel).toBe('DEBUG');
+    });
+  });
+
+  describe('Configuration - all new fields together', () => {
+    it('should parse all new fields in one config', async () => {
+      const markdownConfig = `---
+enabled: true
+forceImprove: true
+logging:
+  enabled: true
+  logLevel: ERROR
+  useTimestampedLogs: true
+  logFilePath: ".claude/logs/custom.log"
+---`;
+
+      writeFileSync(testConfigPathMd, markdownConfig);
+
+      const config = await loadConfig(testConfigPathMd);
+
+      expect(config.enabled).toBe(true);
+      expect(config.forceImprove).toBe(true);
+      expect(config.logging.enabled).toBe(true);
+      expect(config.logging.logLevel).toBe('ERROR');
+      expect(config.logging.useTimestampedLogs).toBe(true);
+      expect(config.logging.logFilePath).toBe('.claude/logs/custom.log');
+    });
+
+    it('should use defaults for omitted new fields', async () => {
+      const markdownConfig = `---
+enabled: true
+---`;
+
+      writeFileSync(testConfigPathMd, markdownConfig);
+
+      const config = await loadConfig(testConfigPathMd);
+
+      expect(config.enabled).toBe(true);
+      expect(config.forceImprove).toBe(false); // default
+      expect(config.logging.logLevel).toBe('INFO'); // default
+      expect(config.logging.useTimestampedLogs).toBe(false); // default
+    });
+  });
+
+  describe('DEFAULT_CONFIG validation', () => {
+    it('should have forceImprove in defaults', () => {
+      expect(DEFAULT_CONFIG).toHaveProperty('forceImprove');
+      expect(DEFAULT_CONFIG.forceImprove).toBe(false);
+    });
+
+    it('should have logLevel in logging defaults', () => {
+      expect(DEFAULT_CONFIG.logging).toHaveProperty('logLevel');
+      expect(DEFAULT_CONFIG.logging.logLevel).toBe('INFO');
+    });
+
+    it('should have useTimestampedLogs in logging defaults', () => {
+      expect(DEFAULT_CONFIG.logging).toHaveProperty('useTimestampedLogs');
+      expect(DEFAULT_CONFIG.logging.useTimestampedLogs).toBe(false);
     });
   });
 });

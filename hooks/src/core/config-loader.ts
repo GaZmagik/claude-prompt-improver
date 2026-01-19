@@ -3,9 +3,9 @@
  * Loads and validates user configuration from markdown files with YAML frontmatter
  * Similar to claude-memory-plugin's local.md pattern
  */
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { access, readFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { Configuration, IntegrationToggles, LoggingConfig } from './types.ts';
+import type { Configuration, IntegrationToggles, LoggingConfig, LogLevel } from './types.ts';
 
 /**
  * Validation error for configuration fields
@@ -14,6 +14,13 @@ export interface ConfigValidationError {
   readonly field: string;
   readonly message: string;
   readonly value: unknown;
+}
+
+/**
+ * Validates if a string is a valid LogLevel
+ */
+function isValidLogLevel(value: string): value is LogLevel {
+  return value === 'ERROR' || value === 'INFO' || value === 'DEBUG';
 }
 
 /**
@@ -33,9 +40,11 @@ const DEFAULT_INTEGRATIONS: IntegrationToggles = {
 const DEFAULT_LOGGING: LoggingConfig = {
   enabled: true,
   logFilePath: '.claude/logs/prompt-improver-latest.log',
+  logLevel: 'INFO',
   maxLogSizeMB: 10,
   maxLogAgeDays: 7,
   displayImprovedPrompt: true,
+  useTimestampedLogs: false,
 };
 
 /**
@@ -43,6 +52,7 @@ const DEFAULT_LOGGING: LoggingConfig = {
  */
 export const DEFAULT_CONFIG: Configuration = {
   enabled: true,
+  forceImprove: false,
   shortPromptThreshold: 10,
   compactionThreshold: 5,
   defaultSimpleModel: 'haiku',
@@ -75,9 +85,10 @@ const configCache = new Map<string, ConfigCacheEntry>();
  * Gets the modification time of a file in milliseconds
  * Returns -1 if file doesn't exist or can't be accessed
  */
-function getFileMtime(filePath: string): number {
+async function getFileMtime(filePath: string): Promise<number> {
   try {
-    return statSync(filePath).mtimeMs;
+    const stats = await stat(filePath);
+    return stats.mtimeMs;
   } catch {
     return -1;
   }
@@ -216,6 +227,11 @@ function yamlToConfig(yaml: Record<string, unknown>): Partial<Configuration> {
     config.defaultComplexModel = complexModel;
   }
 
+  const forceImprove = yaml.forceImprove ?? yaml.force_improve;
+  if (typeof forceImprove === 'boolean') {
+    config.forceImprove = forceImprove;
+  }
+
   // Parse integrations section
   if (yaml.integrations && typeof yaml.integrations === 'object') {
     const src = yaml.integrations as Record<string, unknown>;
@@ -239,6 +255,12 @@ function yamlToConfig(yaml: Record<string, unknown>): Partial<Configuration> {
           : typeof src.log_file_path === 'string'
             ? src.log_file_path
             : undefined,
+      logLevel:
+        typeof src.logLevel === 'string' && isValidLogLevel(src.logLevel)
+          ? (src.logLevel as LogLevel)
+          : typeof src.log_level === 'string' && isValidLogLevel(src.log_level)
+            ? (src.log_level as LogLevel)
+            : undefined,
       maxLogSizeMB:
         typeof src.maxLogSizeMB === 'number'
           ? src.maxLogSizeMB
@@ -257,6 +279,12 @@ function yamlToConfig(yaml: Record<string, unknown>): Partial<Configuration> {
           : typeof src.display_improved_prompt === 'boolean'
             ? src.display_improved_prompt
             : undefined,
+      useTimestampedLogs:
+        typeof src.useTimestampedLogs === 'boolean'
+          ? src.useTimestampedLogs
+          : typeof src.use_timestamped_logs === 'boolean'
+            ? src.use_timestamped_logs
+            : undefined,
     };
   }
 
@@ -269,6 +297,7 @@ function yamlToConfig(yaml: Record<string, unknown>): Partial<Configuration> {
 function mergeConfig(defaults: Configuration, partial: Partial<Configuration>): Configuration {
   return {
     enabled: partial.enabled ?? defaults.enabled,
+    forceImprove: partial.forceImprove ?? defaults.forceImprove,
     shortPromptThreshold: partial.shortPromptThreshold ?? defaults.shortPromptThreshold,
     compactionThreshold: partial.compactionThreshold ?? defaults.compactionThreshold,
     defaultSimpleModel: partial.defaultSimpleModel ?? defaults.defaultSimpleModel,
@@ -283,10 +312,13 @@ function mergeConfig(defaults: Configuration, partial: Partial<Configuration>): 
     logging: {
       enabled: partial.logging?.enabled ?? defaults.logging.enabled,
       logFilePath: partial.logging?.logFilePath ?? defaults.logging.logFilePath,
+      logLevel: partial.logging?.logLevel ?? defaults.logging.logLevel,
       maxLogSizeMB: partial.logging?.maxLogSizeMB ?? defaults.logging.maxLogSizeMB,
       maxLogAgeDays: partial.logging?.maxLogAgeDays ?? defaults.logging.maxLogAgeDays,
       displayImprovedPrompt:
         partial.logging?.displayImprovedPrompt ?? defaults.logging.displayImprovedPrompt,
+      useTimestampedLogs:
+        partial.logging?.useTimestampedLogs ?? defaults.logging.useTimestampedLogs,
     },
   };
 }
@@ -297,13 +329,16 @@ function mergeConfig(defaults: Configuration, partial: Partial<Configuration>): 
  * Supports both markdown (with YAML frontmatter) and JSON formats
  * Returns defaults if file doesn't exist or is invalid
  */
-export function loadConfig(filePath: string): Configuration {
-  if (!existsSync(filePath)) {
+export async function loadConfig(filePath: string): Promise<Configuration> {
+  // Check if file exists (async)
+  try {
+    await access(filePath);
+  } catch {
     return DEFAULT_CONFIG;
   }
 
   // Check mtime for cache validity
-  const currentMtime = getFileMtime(filePath);
+  const currentMtime = await getFileMtime(filePath);
   const cached = configCache.get(filePath);
 
   if (cached && cached.mtimeMs === currentMtime && currentMtime !== -1) {
@@ -311,7 +346,7 @@ export function loadConfig(filePath: string): Configuration {
   }
 
   try {
-    const content = readFileSync(filePath, 'utf-8');
+    const content = await readFile(filePath, 'utf-8');
     let config: Configuration;
 
     // Detect format by file extension or content
@@ -341,11 +376,15 @@ export function loadConfig(filePath: string): Configuration {
  * Finds and loads configuration from standard locations
  * Checks paths in order of precedence
  */
-export function loadConfigFromStandardPaths(baseDir: string = '.'): Configuration {
+export async function loadConfigFromStandardPaths(baseDir: string = '.'): Promise<Configuration> {
   for (const configPath of CONFIG_PATHS) {
     const fullPath = join(baseDir, configPath);
-    if (existsSync(fullPath)) {
-      return loadConfig(fullPath);
+    try {
+      await access(fullPath);
+      return await loadConfig(fullPath);
+    } catch {
+      // File doesn't exist, try next path
+      continue;
     }
   }
   return DEFAULT_CONFIG;
