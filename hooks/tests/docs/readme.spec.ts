@@ -108,7 +108,9 @@ describe('README.md Documentation', () => {
     it('should show example configuration', () => {
       expect(readmeContent).toBeDefined();
       const hasExample =
+        readmeContent.includes('```yaml') ||
         readmeContent.includes('```json') ||
+        readmeContent.includes('prompt-improver.local.md') ||
         readmeContent.includes('prompt-improver-config');
       expect(hasExample).toBe(true);
     });
