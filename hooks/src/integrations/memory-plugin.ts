@@ -168,7 +168,7 @@ export function matchMemoriesByTags(memories: Memory[], prompt: string): Memory[
  * @returns Scored memories with relevance scores
  */
 function scoreMemories(
-  memories: Memory[],
+  memories: readonly Memory[],
   prompt: string
 ): Array<{ memory: Memory; score: number }> {
   const promptLower = prompt.toLowerCase();
@@ -264,12 +264,28 @@ export async function gatherMemoryContext(
   }
 
   // Score and filter memories
-  const scored = scoreMemories([...index.memories], prompt);
-  const filtered = scored
-    .filter((s) => s.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, MAX_MEMORIES)
-    .map((s) => s.memory);
+  // Optimization: Avoid unnecessary array copy and full sort
+  // Only keep top N scored memories (O(n) scoring + O(n log k) partial sort where k=MAX_MEMORIES)
+  const scored = scoreMemories(index.memories, prompt);
+
+  // Filter out zero-score memories first (cheaper than sorting everything)
+  const nonZero = scored.filter((s) => s.score > 0);
+
+  // If we have fewer than MAX_MEMORIES, no need to sort
+  if (nonZero.length <= MAX_MEMORIES) {
+    const filtered = nonZero.map((s) => s.memory);
+    return {
+      success: true,
+      context: {
+        memories: filtered,
+      },
+    };
+  }
+
+  // Use partial sort: only sort enough to get top MAX_MEMORIES
+  // Sort in descending order by score
+  nonZero.sort((a, b) => b.score - a.score);
+  const filtered = nonZero.slice(0, MAX_MEMORIES).map((s) => s.memory);
 
   return {
     success: true,
