@@ -39,7 +39,8 @@ describe('Classifier', () => {
 
   describe('T032: parseClassificationResponse - returns SIMPLE for moderately unclear prompts', () => {
     it('should parse SIMPLE classification from response', () => {
-      const response = 'SIMPLE: The prompt mentions testing but lacks specifics about what to test.';
+      const response =
+        'SIMPLE: The prompt mentions testing but lacks specifics about what to test.';
 
       const result = parseClassificationResponse(response);
 

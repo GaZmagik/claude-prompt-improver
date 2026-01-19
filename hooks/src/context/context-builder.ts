@@ -3,16 +3,97 @@
  * Orchestrates tool detection, skill matching, agent suggestion, and git context
  */
 import { detectTools, formatToolsContext, type DetectedTools } from './tool-detector.ts';
-import { matchSkills, formatSkillsContext, type SkillRule, type MatchedSkill } from './skill-matcher.ts';
-import { suggestAgents, formatAgentsContext, type AgentDefinition, type SuggestedAgent } from './agent-suggester.ts';
-import { gatherGitContext, formatGitContext, type GitContext, type GitContextOptions } from '../integrations/git-context.ts';
-import { gatherLspDiagnostics, formatLspContext, type LspContext, type LspDiagnosticsOptions } from '../integrations/lsp-diagnostics.ts';
-import { gatherSpecContext, formatSpecContext, type SpecContext, type SpecAwarenessOptions } from '../integrations/spec-awareness.ts';
-import { gatherMemoryContext, formatMemoryContext, type MemoryContext, type MemoryPluginOptions } from '../integrations/memory-plugin.ts';
-import { gatherSessionContext, formatSessionContext, type SessionContext, type SessionContextOptions } from '../integrations/session-context.ts';
+import {
+  matchSkills,
+  formatSkillsContext,
+  type SkillRule,
+  type MatchedSkill,
+} from './skill-matcher.ts';
+import {
+  suggestAgents,
+  formatAgentsContext,
+  type AgentDefinition,
+  type SuggestedAgent,
+} from './agent-suggester.ts';
+import {
+  gatherGitContext,
+  formatGitContext,
+  type GitContext,
+  type GitContextOptions,
+} from '../integrations/git-context.ts';
+import {
+  gatherLspDiagnostics,
+  formatLspContext,
+  type LspContext,
+  type LspDiagnosticsOptions,
+} from '../integrations/lsp-diagnostics.ts';
+import {
+  gatherSpecContext,
+  formatSpecContext,
+  type SpecContext,
+  type SpecAwarenessOptions,
+} from '../integrations/spec-awareness.ts';
+import {
+  gatherMemoryContext,
+  formatMemoryContext,
+  type MemoryContext,
+  type MemoryPluginOptions,
+} from '../integrations/memory-plugin.ts';
+import {
+  gatherSessionContext,
+  formatSessionContext,
+  type SessionContext,
+  type SessionContextOptions,
+} from '../integrations/session-context.ts';
+
+/**
+ * Helper type for async context gatherers
+ */
+interface AsyncContextResult<T> {
+  readonly success: boolean;
+  readonly context?: T;
+}
+
+/**
+ * Creates an async task that gathers context and updates state on success
+ */
+function createAsyncTask<T>(
+  gather: () => Promise<AsyncContextResult<T>>,
+  onSuccess: (context: T) => void
+): Promise<void> {
+  return gather().then((result) => {
+    if (result.success && result.context) {
+      onSuccess(result.context);
+    }
+  });
+}
+
+/**
+ * Formats a context field if present
+ */
+function formatField<T>(
+  context: T | undefined,
+  sources: readonly ContextSource[],
+  source: ContextSource,
+  formatter: (ctx: T) => string
+): string | undefined {
+  if (context && sources.includes(source)) {
+    const formatted = formatter(context);
+    return formatted || undefined;
+  }
+  return undefined;
+}
 
 /** Context source types */
-export type ContextSource = 'tools' | 'skills' | 'agents' | 'git' | 'lsp' | 'spec' | 'memory' | 'session';
+export type ContextSource =
+  | 'tools'
+  | 'skills'
+  | 'agents'
+  | 'git'
+  | 'lsp'
+  | 'spec'
+  | 'memory'
+  | 'session';
 
 /**
  * Input for building context
@@ -63,180 +144,195 @@ export interface FormattedContext {
  * Builds context from multiple sources
  */
 export async function buildContext(input: ContextBuilderInput): Promise<BuiltContext> {
-  const { prompt, availableTools, skillRules, agentDefinitions, gitOptions, lspOptions, specOptions, memoryOptions, sessionOptions } = input;
+  const {
+    prompt,
+    availableTools,
+    skillRules,
+    agentDefinitions,
+    gitOptions,
+    lspOptions,
+    specOptions,
+    memoryOptions,
+    sessionOptions,
+  } = input;
   const sources: ContextSource[] = [];
 
-  let tools: DetectedTools | undefined;
-  let skills: MatchedSkill[] | undefined;
-  let agents: SuggestedAgent[] | undefined;
-  let git: GitContext | undefined;
-  let lsp: LspContext | undefined;
-  let spec: SpecContext | undefined;
-  let memory: MemoryContext | undefined;
-  let session: SessionContext | undefined;
+  // Results container (mutable during gathering)
+  const results: {
+    tools?: DetectedTools;
+    skills?: MatchedSkill[];
+    agents?: SuggestedAgent[];
+    git?: GitContext;
+    lsp?: LspContext;
+    spec?: SpecContext;
+    memory?: MemoryContext;
+    session?: SessionContext;
+  } = {};
 
-  // Detect tools
+  // Gather synchronous context
+  gatherSyncContext(prompt, availableTools, skillRules, agentDefinitions, sources, results);
+
+  // Gather async context sources in parallel
+  const asyncTasks = buildAsyncTasks(
+    prompt,
+    gitOptions,
+    lspOptions,
+    specOptions,
+    memoryOptions,
+    sessionOptions,
+    sources,
+    results
+  );
+  await Promise.allSettled(asyncTasks);
+
+  return { sources, ...results };
+}
+
+/**
+ * Gathers synchronous context (tools, skills, agents)
+ */
+function gatherSyncContext(
+  prompt: string,
+  availableTools: readonly string[] | undefined,
+  skillRules: SkillRule[] | undefined,
+  agentDefinitions: AgentDefinition[] | undefined,
+  sources: ContextSource[],
+  results: { tools?: DetectedTools; skills?: MatchedSkill[]; agents?: SuggestedAgent[] }
+): void {
   if (availableTools && availableTools.length > 0) {
-    tools = detectTools(availableTools);
+    const tools = detectTools(availableTools);
     if (tools.count > 0) {
+      results.tools = tools;
       sources.push('tools');
     }
   }
 
-  // Match skills
   if (skillRules && skillRules.length > 0) {
     const matched = matchSkills(prompt, skillRules);
     if (matched.length > 0) {
-      skills = matched;
+      results.skills = matched;
       sources.push('skills');
     }
   }
 
-  // Suggest agents
   if (agentDefinitions && agentDefinitions.length > 0) {
     const suggested = suggestAgents(prompt, agentDefinitions);
     if (suggested.length > 0) {
-      agents = suggested;
+      results.agents = suggested;
       sources.push('agents');
     }
   }
+}
 
-  // Gather git context
+/**
+ * Builds array of async tasks for parallel context gathering
+ */
+function buildAsyncTasks(
+  prompt: string,
+  gitOptions: GitContextOptions | undefined,
+  lspOptions: LspDiagnosticsOptions | undefined,
+  specOptions: SpecAwarenessOptions | undefined,
+  memoryOptions: MemoryPluginOptions | undefined,
+  sessionOptions: SessionContextOptions | undefined,
+  sources: ContextSource[],
+  results: {
+    git?: GitContext;
+    lsp?: LspContext;
+    spec?: SpecContext;
+    memory?: MemoryContext;
+    session?: SessionContext;
+  }
+): Promise<void>[] {
+  const tasks: Promise<void>[] = [];
+
   if (gitOptions && gitOptions.enabled !== false) {
-    const gitResult = await gatherGitContext(gitOptions);
-    if (gitResult.success && gitResult.context) {
-      git = gitResult.context;
-      sources.push('git');
-    }
+    tasks.push(
+      createAsyncTask(
+        () => gatherGitContext(gitOptions),
+        (ctx) => {
+          results.git = ctx;
+          sources.push('git');
+        }
+      )
+    );
   }
 
-  // Gather LSP diagnostics
   if (lspOptions && lspOptions.enabled !== false) {
-    const lspResult = await gatherLspDiagnostics({ ...lspOptions, prompt });
-    if (lspResult.success && lspResult.context) {
-      lsp = lspResult.context;
-      sources.push('lsp');
-    }
+    tasks.push(
+      createAsyncTask(
+        () => gatherLspDiagnostics({ ...lspOptions, prompt }),
+        (ctx) => {
+          results.lsp = ctx;
+          sources.push('lsp');
+        }
+      )
+    );
   }
 
-  // Gather spec context
   if (specOptions && specOptions.enabled !== false) {
-    const specResult = await gatherSpecContext(specOptions);
-    if (specResult.success && specResult.context) {
-      spec = specResult.context;
-      sources.push('spec');
-    }
+    tasks.push(
+      createAsyncTask(
+        () => gatherSpecContext(specOptions),
+        (ctx) => {
+          results.spec = ctx;
+          sources.push('spec');
+        }
+      )
+    );
   }
 
-  // Gather memory context
   if (memoryOptions && memoryOptions.enabled !== false) {
-    const memoryResult = await gatherMemoryContext({ ...memoryOptions, prompt });
-    if (memoryResult.success && memoryResult.context) {
-      memory = memoryResult.context;
-      sources.push('memory');
-    }
+    tasks.push(
+      createAsyncTask(
+        () => gatherMemoryContext({ ...memoryOptions, prompt }),
+        (ctx) => {
+          results.memory = ctx;
+          sources.push('memory');
+        }
+      )
+    );
   }
 
-  // Gather session context
   if (sessionOptions && sessionOptions.enabled !== false) {
-    const sessionResult = await gatherSessionContext({ ...sessionOptions, prompt });
-    if (sessionResult.success && sessionResult.context) {
-      session = sessionResult.context;
-      sources.push('session');
-    }
+    tasks.push(
+      createAsyncTask(
+        () => gatherSessionContext({ ...sessionOptions, prompt }),
+        (ctx) => {
+          results.session = ctx;
+          sources.push('session');
+        }
+      )
+    );
   }
 
-  const result: BuiltContext = { sources };
-
-  if (tools) {
-    (result as { tools?: DetectedTools }).tools = tools;
-  }
-  if (skills) {
-    (result as { skills?: readonly MatchedSkill[] }).skills = skills;
-  }
-  if (agents) {
-    (result as { agents?: readonly SuggestedAgent[] }).agents = agents;
-  }
-  if (git) {
-    (result as { git?: GitContext }).git = git;
-  }
-  if (lsp) {
-    (result as { lsp?: LspContext }).lsp = lsp;
-  }
-  if (spec) {
-    (result as { spec?: SpecContext }).spec = spec;
-  }
-  if (memory) {
-    (result as { memory?: MemoryContext }).memory = memory;
-  }
-  if (session) {
-    (result as { session?: SessionContext }).session = session;
-  }
-
-  return result;
+  return tasks;
 }
 
 /**
  * Formats built context for injection into improvement prompt
  */
 export function formatContextForInjection(context: BuiltContext): FormattedContext {
-  const result: FormattedContext = {};
+  const { sources } = context;
 
-  if (context.tools && context.sources.includes('tools')) {
-    const formatted = formatToolsContext(context.tools);
-    if (formatted) {
-      (result as { tools?: string }).tools = formatted;
-    }
-  }
+  // Format each field
+  const tools = formatField(context.tools, sources, 'tools', formatToolsContext);
+  const skills = formatField(context.skills, sources, 'skills', (s) => formatSkillsContext([...s]));
+  const agents = formatField(context.agents, sources, 'agents', (a) => formatAgentsContext([...a]));
+  const git = formatField(context.git, sources, 'git', formatGitContext);
+  const lsp = formatField(context.lsp, sources, 'lsp', formatLspContext);
+  const spec = formatField(context.spec, sources, 'spec', formatSpecContext);
+  const memory = formatField(context.memory, sources, 'memory', formatMemoryContext);
+  const session = formatField(context.session, sources, 'session', formatSessionContext);
 
-  if (context.skills && context.sources.includes('skills')) {
-    const formatted = formatSkillsContext([...context.skills]);
-    if (formatted) {
-      (result as { skills?: string }).skills = formatted;
-    }
-  }
-
-  if (context.agents && context.sources.includes('agents')) {
-    const formatted = formatAgentsContext([...context.agents]);
-    if (formatted) {
-      (result as { agents?: string }).agents = formatted;
-    }
-  }
-
-  if (context.git && context.sources.includes('git')) {
-    const formatted = formatGitContext(context.git);
-    if (formatted) {
-      (result as { git?: string }).git = formatted;
-    }
-  }
-
-  if (context.lsp && context.sources.includes('lsp')) {
-    const formatted = formatLspContext(context.lsp);
-    if (formatted) {
-      (result as { lsp?: string }).lsp = formatted;
-    }
-  }
-
-  if (context.spec && context.sources.includes('spec')) {
-    const formatted = formatSpecContext(context.spec);
-    if (formatted) {
-      (result as { spec?: string }).spec = formatted;
-    }
-  }
-
-  if (context.memory && context.sources.includes('memory')) {
-    const formatted = formatMemoryContext(context.memory);
-    if (formatted) {
-      (result as { memory?: string }).memory = formatted;
-    }
-  }
-
-  if (context.session && context.sources.includes('session')) {
-    const formatted = formatSessionContext(context.session);
-    if (formatted) {
-      (result as { session?: string }).session = formatted;
-    }
-  }
-
-  return result;
+  // Build result with conditional property inclusion (exactOptionalPropertyTypes)
+  return {
+    ...(tools !== undefined && { tools }),
+    ...(skills !== undefined && { skills }),
+    ...(agents !== undefined && { agents }),
+    ...(git !== undefined && { git }),
+    ...(lsp !== undefined && { lsp }),
+    ...(spec !== undefined && { spec }),
+    ...(memory !== undefined && { memory }),
+    ...(session !== undefined && { session }),
+  };
 }

@@ -35,10 +35,7 @@ export interface BypassCheckResult {
  */
 function removeSkipTags(prompt: string): string {
   // Remove all occurrences of #skip (case-insensitive, with surrounding whitespace)
-  return prompt
-    .replace(new RegExp(SKIP_TAG, 'gi'), '')
-    .replace(/\s+/g, ' ')
-    .trim();
+  return prompt.replace(new RegExp(SKIP_TAG, 'gi'), '').replace(/\s+/g, ' ').trim();
 }
 
 /**

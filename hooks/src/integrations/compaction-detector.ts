@@ -59,10 +59,7 @@ export function parseContextUsage(stdin: unknown): ContextUsage | undefined {
   // Check for direct context_usage
   if (obj.context_usage && typeof obj.context_usage === 'object') {
     const contextUsage = obj.context_usage as Record<string, unknown>;
-    if (
-      typeof contextUsage.used === 'number' &&
-      typeof contextUsage.total === 'number'
-    ) {
+    if (typeof contextUsage.used === 'number' && typeof contextUsage.total === 'number') {
       return {
         used: contextUsage.used,
         total: contextUsage.total,
@@ -75,10 +72,7 @@ export function parseContextUsage(stdin: unknown): ContextUsage | undefined {
     const session = obj.session as Record<string, unknown>;
     if (session.context_usage && typeof session.context_usage === 'object') {
       const contextUsage = session.context_usage as Record<string, unknown>;
-      if (
-        typeof contextUsage.used === 'number' &&
-        typeof contextUsage.total === 'number'
-      ) {
+      if (typeof contextUsage.used === 'number' && typeof contextUsage.total === 'number') {
         return {
           used: contextUsage.used,
           total: contextUsage.total,

@@ -2,6 +2,7 @@
  * Memory plugin integration for enriching prompts with relevant memories
  * Detects claude-memory-plugin and retrieves matching memories from index.json
  */
+import { existsSync, readFileSync } from 'node:fs';
 
 /** Maximum number of memories to include */
 const MAX_MEMORIES = 5;
@@ -86,7 +87,14 @@ export function checkMemoryPluginInstalled(options: MemoryPluginOptions): Plugin
     return { found: false };
   }
 
-  // Real implementation would check fs
+  // Real implementation - check filesystem for known paths
+  for (const path of PLUGIN_PATHS) {
+    // Expand ~ to home directory
+    const expandedPath = path.startsWith('~/') ? path.replace('~', process.env.HOME ?? '') : path;
+    if (existsSync(expandedPath)) {
+      return { found: true, path: expandedPath };
+    }
+  }
   return { found: false };
 }
 
@@ -110,9 +118,9 @@ export function parseMemoryIndex(content: string): MemoryIndex {
  */
 export function matchMemoriesByTitle(memories: Memory[], prompt: string): Memory[] {
   const promptLower = prompt.toLowerCase();
-  const words = promptLower.split(/\s+/).filter(w => w.length > 2);
+  const words = promptLower.split(/\s+/).filter((w) => w.length > 2);
 
-  return memories.filter(memory => {
+  return memories.filter((memory) => {
     const titleLower = memory.title.toLowerCase();
     for (const word of words) {
       if (titleLower.includes(word)) {
@@ -128,15 +136,15 @@ export function matchMemoriesByTitle(memories: Memory[], prompt: string): Memory
  */
 export function matchMemoriesByTags(memories: Memory[], prompt: string): Memory[] {
   const promptLower = prompt.toLowerCase();
-  const words = promptLower.split(/\s+/).filter(w => w.length > 2);
+  const words = promptLower.split(/\s+/).filter((w) => w.length > 2);
 
-  return memories.filter(memory => {
+  return memories.filter((memory) => {
     if (!memory.tags || memory.tags.length === 0) {
       return false;
     }
-    const tagsLower = memory.tags.map(t => t.toLowerCase());
+    const tagsLower = memory.tags.map((t) => t.toLowerCase());
     for (const word of words) {
-      if (tagsLower.some(tag => tag.includes(word) || word.includes(tag))) {
+      if (tagsLower.some((tag) => tag.includes(word) || word.includes(tag))) {
         return true;
       }
     }
@@ -147,20 +155,23 @@ export function matchMemoriesByTags(memories: Memory[], prompt: string): Memory[
 /**
  * Scores and ranks memories by relevance to prompt
  */
-function scoreMemories(memories: Memory[], prompt: string): Array<{ memory: Memory; score: number }> {
+function scoreMemories(
+  memories: Memory[],
+  prompt: string
+): Array<{ memory: Memory; score: number }> {
   const promptLower = prompt.toLowerCase();
-  const words = promptLower.split(/\s+/).filter(w => w.length > 2);
+  const words = promptLower.split(/\s+/).filter((w) => w.length > 2);
 
-  return memories.map(memory => {
+  return memories.map((memory) => {
     let score = 0;
     const titleLower = memory.title.toLowerCase();
-    const tagsLower = memory.tags.map(t => t.toLowerCase());
+    const tagsLower = memory.tags.map((t) => t.toLowerCase());
 
     for (const word of words) {
       // Title matches are worth more
       if (titleLower.includes(word)) score += 3;
       // Tag matches
-      if (tagsLower.some(tag => tag.includes(word) || word.includes(tag))) score += 2;
+      if (tagsLower.some((tag) => tag.includes(word) || word.includes(tag))) score += 2;
     }
 
     // Boost certain types
@@ -178,8 +189,15 @@ function readFile(path: string, mockFs?: Record<string, string | null>): string 
   if (mockFs) {
     return mockFs[path] ?? null;
   }
-  // Real implementation would use fs
-  return null;
+  // Real implementation - read from filesystem
+  try {
+    if (!existsSync(path)) {
+      return null;
+    }
+    return readFileSync(path, 'utf-8');
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -225,7 +243,11 @@ export async function gatherMemoryContext(
   const index = parseMemoryIndex(indexContent);
 
   // Check for parse error (empty memories from invalid JSON)
-  if (index.memories.length === 0 && indexContent.trim() !== '{"memories":[]}' && indexContent.trim() !== '{ "memories": [] }') {
+  if (
+    index.memories.length === 0 &&
+    indexContent.trim() !== '{"memories":[]}' &&
+    indexContent.trim() !== '{ "memories": [] }'
+  ) {
     // Could be invalid JSON or truly empty - try to detect
     try {
       const parsed = JSON.parse(indexContent);
@@ -248,10 +270,10 @@ export async function gatherMemoryContext(
   // Score and filter memories
   const scored = scoreMemories([...index.memories], prompt);
   const filtered = scored
-    .filter(s => s.score > 0)
+    .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, MAX_MEMORIES)
-    .map(s => s.memory);
+    .map((s) => s.memory);
 
   return {
     success: true,

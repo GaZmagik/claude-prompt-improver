@@ -48,7 +48,9 @@ export function detectTools(availableTools: readonly string[] | undefined): Dete
     };
   }
 
-  const coreTools = availableTools.filter(t => CORE_TOOLS.includes(t as typeof CORE_TOOLS[number]));
+  const coreTools = availableTools.filter((t) =>
+    CORE_TOOLS.includes(t as (typeof CORE_TOOLS)[number])
+  );
   const mcpTools = availableTools.filter(isMcpTool);
 
   return {

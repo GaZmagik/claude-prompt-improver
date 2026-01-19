@@ -25,9 +25,9 @@ describe('Claude Client', () => {
         sessionId: 'session-123',
       };
 
-      const cmd = buildClaudeCommand(options);
+      const { args } = buildClaudeCommand(options);
 
-      expect(cmd).toContain('--print');
+      expect(args).toContain('--print');
     });
 
     it('should build command with --fork-session flag', () => {
@@ -37,9 +37,9 @@ describe('Claude Client', () => {
         sessionId: 'session-123',
       };
 
-      const cmd = buildClaudeCommand(options);
+      const { args } = buildClaudeCommand(options);
 
-      expect(cmd).toContain('--fork-session');
+      expect(args).toContain('--fork-session');
     });
 
     it('should build command with --resume flag and session ID', () => {
@@ -49,63 +49,61 @@ describe('Claude Client', () => {
         sessionId: 'session-abc-123',
       };
 
-      const cmd = buildClaudeCommand(options);
+      const { args } = buildClaudeCommand(options);
 
-      expect(cmd).toContain('--resume');
-      expect(cmd).toContain('session-abc-123');
+      expect(args).toContain('--resume');
+      expect(args).toContain('session-abc-123');
     });
 
-    it('should include the prompt in the command', () => {
+    it('should include the prompt in the command args', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Classify this prompt',
         model: 'haiku',
         sessionId: 'session-123',
       };
 
-      const cmd = buildClaudeCommand(options);
+      const { args } = buildClaudeCommand(options);
 
-      expect(cmd).toContain('Classify this prompt');
+      expect(args).toContain('Classify this prompt');
     });
 
-    it('should escape special characters in prompt', () => {
+    it('should preserve special characters in prompt (array-based prevents injection)', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test "quotes" and $variables',
         model: 'haiku',
         sessionId: 'session-123',
       };
 
-      const cmd = buildClaudeCommand(options);
+      const { args } = buildClaudeCommand(options);
 
-      // Should not have unescaped quotes that break the command
-      expect(cmd).toBeDefined();
+      // Array-based approach passes prompt directly - no escaping needed
+      expect(args).toContain('Test "quotes" and $variables');
     });
 
-    it('should escape special characters in sessionId to prevent command injection', () => {
+    it('should preserve special characters in sessionId (array-based prevents injection)', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
         model: 'haiku',
         sessionId: 'session-123; rm -rf /',
       };
 
-      const cmd = buildClaudeCommand(options);
+      const { args } = buildClaudeCommand(options);
 
-      // SessionId should be wrapped in quotes to prevent injection
-      expect(cmd).toContain("'session-123; rm -rf /'");
-      // Should not have unquoted semicolon that would execute additional commands
-      expect(cmd).not.toMatch(/--resume session-123;/);
+      // Array-based approach passes sessionId directly - no shell interpretation
+      // The malicious payload is passed as a literal string argument, not executed
+      expect(args).toContain('session-123; rm -rf /');
     });
 
-    it('should escape single quotes in sessionId', () => {
+    it('should set cwd to /tmp to avoid project hooks', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
         model: 'haiku',
-        sessionId: "session'inject",
+        sessionId: 'session-123',
       };
 
-      const cmd = buildClaudeCommand(options);
+      const { cwd } = buildClaudeCommand(options);
 
-      // Single quotes in sessionId should be escaped
-      expect(cmd).toContain("'session'\\''inject'");
+      expect(cwd).toBe('/tmp');
     });
   });
 
@@ -184,10 +182,10 @@ describe('Claude Client', () => {
         sessionId: 'session-123',
       };
 
-      const cmd = buildClaudeCommand(options);
+      const { args } = buildClaudeCommand(options);
 
-      expect(cmd).toContain('--model');
-      expect(cmd).toMatch(/haiku/i);
+      expect(args).toContain('--model');
+      expect(args.some((arg) => /haiku/i.test(arg))).toBe(true);
     });
 
     it('should include --model flag with sonnet', () => {
@@ -197,10 +195,10 @@ describe('Claude Client', () => {
         sessionId: 'session-123',
       };
 
-      const cmd = buildClaudeCommand(options);
+      const { args } = buildClaudeCommand(options);
 
-      expect(cmd).toContain('--model');
-      expect(cmd).toMatch(/sonnet/i);
+      expect(args).toContain('--model');
+      expect(args.some((arg) => /sonnet/i.test(arg))).toBe(true);
     });
 
     it('should use correct model name format for Claude CLI', () => {
@@ -216,12 +214,12 @@ describe('Claude Client', () => {
         sessionId: 'session-123',
       };
 
-      const haikuCmd = buildClaudeCommand(haikuOptions);
-      const sonnetCmd = buildClaudeCommand(sonnetOptions);
+      const { args: haikuArgs } = buildClaudeCommand(haikuOptions);
+      const { args: sonnetArgs } = buildClaudeCommand(sonnetOptions);
 
       // Claude CLI uses claude-3-5-haiku and claude-sonnet-4-5 format
-      expect(haikuCmd).toMatch(/claude.*haiku/i);
-      expect(sonnetCmd).toMatch(/claude.*sonnet/i);
+      expect(haikuArgs.some((arg) => /haiku/i.test(arg))).toBe(true);
+      expect(sonnetArgs.some((arg) => /sonnet/i.test(arg))).toBe(true);
     });
   });
 

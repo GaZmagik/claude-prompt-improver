@@ -9,9 +9,10 @@
  * T106: Test spec awareness gracefully skips if .specify/ missing
  * T107: Test spec awareness gracefully skips if configuration.integrations.spec=false
  */
-import { describe, expect, it } from 'bun:test';
+import { beforeEach, describe, expect, it } from 'bun:test';
 import {
   checkSpecifyDirectory,
+  clearSpecFileCache,
   extractUserStories,
   formatSpecContext,
   gatherSpecContext,
@@ -19,13 +20,14 @@ import {
   parseFrontmatter,
   parsePlanPhases,
   parseTasks,
-  type PlanPhase,
   type SpecContext,
-  type SpecTask,
   type UserStory,
 } from './spec-awareness.ts';
 
 describe('Specification Awareness Integration', () => {
+  beforeEach(() => {
+    clearSpecFileCache();
+  });
   describe('T100: checkSpecifyDirectory - checks for .specify/ directory', () => {
     it('should return true when .specify/ directory exists', () => {
       const result = checkSpecifyDirectory({
@@ -118,10 +120,10 @@ As a user, I want to register so that I can create an account.`;
       const stories = extractUserStories(content);
 
       expect(stories.length).toBe(2);
-      expect(stories[0].id).toBe('US1');
-      expect(stories[0].title).toBe('User Login');
-      expect(stories[1].id).toBe('US2');
-      expect(stories[1].title).toBe('User Registration');
+      expect(stories[0]!.id).toBe('US1');
+      expect(stories[0]!.title).toBe('User Login');
+      expect(stories[1]!.id).toBe('US2');
+      expect(stories[1]!.title).toBe('User Registration');
     });
 
     it('should handle user stories with descriptions', () => {
@@ -135,7 +137,7 @@ This is a detailed description of the login process.`;
       const stories = extractUserStories(content);
 
       expect(stories.length).toBe(1);
-      expect(stories[0].description).toContain('detailed description');
+      expect(stories[0]!.description).toContain('detailed description');
     });
 
     it('should return empty array when no user stories found', () => {
@@ -165,11 +167,11 @@ Status: pending`;
       const phases = parsePlanPhases(content);
 
       expect(phases.length).toBe(3);
-      expect(phases[0].id).toBe('1');
-      expect(phases[0].name).toBe('Foundation');
-      expect(phases[0].status).toBe('completed');
-      expect(phases[1].status).toBe('in_progress');
-      expect(phases[2].status).toBe('pending');
+      expect(phases[0]!.id).toBe('1');
+      expect(phases[0]!.name).toBe('Foundation');
+      expect(phases[0]!.status).toBe('completed');
+      expect(phases[1]!.status).toBe('in_progress');
+      expect(phases[2]!.status).toBe('pending');
     });
 
     it('should handle phases without explicit status', () => {
@@ -184,7 +186,7 @@ Description of build phase.`;
       const phases = parsePlanPhases(content);
 
       expect(phases.length).toBe(2);
-      expect(phases[0].name).toBe('Setup');
+      expect(phases[0]!.name).toBe('Setup');
     });
 
     it('should return empty array when no phases found', () => {
@@ -208,7 +210,7 @@ No phases defined.`;
 
       const tasks = parseTasks(content);
 
-      const completed = tasks.filter(t => t.status === 'completed');
+      const completed = tasks.filter((t) => t.status === 'completed');
       expect(completed.length).toBe(2);
     });
 
@@ -220,9 +222,9 @@ No phases defined.`;
 
       const tasks = parseTasks(content);
 
-      const pending = tasks.filter(t => t.status === 'pending');
+      const pending = tasks.filter((t) => t.status === 'pending');
       expect(pending.length).toBe(1);
-      expect(pending[0].id).toBe('T001');
+      expect(pending[0]!.id).toBe('T001');
     });
 
     it('should extract task IDs and titles', () => {
@@ -231,9 +233,9 @@ No phases defined.`;
 
       const tasks = parseTasks(content);
 
-      expect(tasks[0].id).toBe('T001');
-      expect(tasks[0].title).toContain('Implement login form');
-      expect(tasks[1].id).toBe('T002');
+      expect(tasks[0]!.id).toBe('T001');
+      expect(tasks[0]!.title).toContain('Implement login form');
+      expect(tasks[1]!.id).toBe('T002');
     });
 
     it('should extract user story references', () => {
@@ -242,8 +244,8 @@ No phases defined.`;
 
       const tasks = parseTasks(content);
 
-      expect(tasks[0].userStory).toBe('US1');
-      expect(tasks[1].userStory).toBe('US2');
+      expect(tasks[0]!.userStory).toBe('US1');
+      expect(tasks[1]!.userStory).toBe('US2');
     });
 
     it('should return empty array when no tasks found', () => {
@@ -268,7 +270,7 @@ No tasks yet.`;
       const matched = matchUserStoriesToPrompt(stories, 'fix the login authentication');
 
       expect(matched.length).toBeGreaterThan(0);
-      expect(matched.some(s => s.id === 'US1')).toBe(true);
+      expect(matched.some((s) => s.id === 'US1')).toBe(true);
     });
 
     it('should return empty array when no stories match', () => {
@@ -293,9 +295,7 @@ No tasks yet.`;
     });
 
     it('should be case insensitive', () => {
-      const stories: UserStory[] = [
-        { id: 'US1', title: 'USER LOGIN' },
-      ];
+      const stories: UserStory[] = [{ id: 'US1', title: 'USER LOGIN' }];
 
       const matched = matchUserStoriesToPrompt(stories, 'user login');
 

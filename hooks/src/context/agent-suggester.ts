@@ -2,6 +2,7 @@
  * Agent suggester for matching prompts to available agents
  * Reads agent definitions and suggests relevant agents based on prompt content
  */
+import { matchItemsByKeywords } from '../utils/keyword-matcher.ts';
 
 /**
  * Agent definition parsed from markdown
@@ -29,8 +30,21 @@ function extractKeywords(text: string): string[] {
   // Extract meaningful words (3+ chars, lowercase)
   const words = text.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
   // Filter common stop words
-  const stopWords = new Set(['the', 'and', 'for', 'use', 'with', 'this', 'that', 'from', 'are', 'was', 'has', 'have']);
-  return [...new Set(words.filter(w => !stopWords.has(w)))];
+  const stopWords = new Set([
+    'the',
+    'and',
+    'for',
+    'use',
+    'with',
+    'this',
+    'that',
+    'from',
+    'are',
+    'was',
+    'has',
+    'have',
+  ]);
+  return [...new Set(words.filter((w) => !stopWords.has(w)))];
 }
 
 /**
@@ -83,29 +97,14 @@ export function suggestAgents(
     return [];
   }
 
-  const promptLower = prompt.toLowerCase();
-  const suggestions: SuggestedAgent[] = [];
+  // Use shared keyword matching utility
+  const results = matchItemsByKeywords(prompt, agents, (agent) => agent.keywords);
 
-  for (const agent of agents) {
-    const matchedKeywords: string[] = [];
-
-    for (const keyword of agent.keywords) {
-      if (promptLower.includes(keyword.toLowerCase())) {
-        matchedKeywords.push(keyword);
-      }
-    }
-
-    if (matchedKeywords.length > 0) {
-      suggestions.push({
-        agent,
-        score: matchedKeywords.length,
-        matchedKeywords,
-      });
-    }
-  }
-
-  // Sort by score (most relevant first)
-  return suggestions.sort((a, b) => b.score - a.score);
+  return results.map(({ item, matchedKeywords, score }) => ({
+    agent: item,
+    score,
+    matchedKeywords,
+  }));
 }
 
 /**
@@ -116,7 +115,5 @@ export function formatAgentsContext(suggestions: SuggestedAgent[]): string {
     return '';
   }
 
-  return suggestions
-    .map(s => `- ${s.agent.name}: ${s.agent.description}`)
-    .join('\n');
+  return suggestions.map((s) => `- ${s.agent.name}: ${s.agent.description}`).join('\n');
 }

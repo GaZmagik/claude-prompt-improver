@@ -100,7 +100,8 @@ describe('Improver', () => {
         },
       });
 
-      expect(prompt).toContain('Property "foo"');
+      // Quotes are escaped to prevent XML/prompt injection
+      expect(prompt).toContain('Property &quot;foo&quot;');
     });
 
     it('should include multiple context sources', () => {

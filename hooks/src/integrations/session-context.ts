@@ -22,13 +22,21 @@ export interface CommandResult {
 }
 
 /**
+ * Fork command arguments (array-based to prevent injection)
+ */
+export interface ForkCommandArgs {
+  readonly args: readonly string[];
+  readonly commandString: string; // For logging/debugging only
+}
+
+/**
  * Options for gathering session context
  */
 export interface SessionContextOptions {
   readonly enabled?: boolean;
   readonly stdin?: Record<string, unknown>;
   readonly prompt?: string;
-  /** For testing - mock command execution */
+  /** For testing - mock command execution (receives command string for verification) */
   readonly _mockCommandExecution?: (cmd: string) => Promise<CommandResult | null>;
 }
 
@@ -94,10 +102,11 @@ export async function gatherSessionContext(
   }
 
   // Execute fork command
-  const command = buildForkCommand(prompt);
+  const { args, commandString } = buildForkCommand(prompt);
 
   if (_mockCommandExecution) {
-    const result = await _mockCommandExecution(command);
+    // Pass command string to mock for verification (actual execution would use args array)
+    const result = await _mockCommandExecution(commandString);
 
     // null result indicates timeout
     if (result === null) {
@@ -124,8 +133,9 @@ export async function gatherSessionContext(
     };
   }
 
-  // Real implementation would use Bun.spawn with timeout
-  // For now, return a placeholder
+  // Real implementation using Bun.spawn with args array (no shell interpretation)
+  // Example: const proc = Bun.spawn(args, { timeout: SESSION_FORK_TIMEOUT_MS });
+  void args; // Mark as used - will be passed to Bun.spawn in real implementation
   return {
     success: false,
     skipped: true,
@@ -134,13 +144,28 @@ export async function gatherSessionContext(
 }
 
 /**
- * Builds the fork session command
- * @param prompt The prompt to process
- * @returns Command string
+ * Builds the fork session command arguments
+ * Uses array-based approach to prevent command injection
+ * @param prompt The prompt to process (passed directly, no shell interpretation)
+ * @returns Fork command arguments with args array and debug string
  */
-function buildForkCommand(prompt: string): string {
-  // Basic command structure for forking session
-  return `claude --fork-session --timeout ${SESSION_FORK_TIMEOUT_MS} --prompt "${prompt.replace(/"/g, '\\"')}"`;
+export function buildForkCommand(prompt: string): ForkCommandArgs {
+  // Array-based arguments prevent shell injection
+  // The prompt is passed directly to Bun.spawn without shell interpretation
+  const args = [
+    'claude',
+    '--fork-session',
+    '--timeout',
+    String(SESSION_FORK_TIMEOUT_MS),
+    '--prompt',
+    prompt, // No escaping needed - passed directly to process, not through shell
+  ];
+
+  return {
+    args,
+    // Command string for logging/debugging only (not executed)
+    commandString: `claude --fork-session --timeout ${SESSION_FORK_TIMEOUT_MS} --prompt <prompt>`,
+  };
 }
 
 /**

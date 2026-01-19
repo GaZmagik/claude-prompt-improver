@@ -18,8 +18,16 @@ describe('Skill Matcher', () => {
     it('should parse skill rules from JSON content', () => {
       const rulesJson = JSON.stringify({
         skills: [
-          { name: 'commit', keywords: ['commit', 'git', 'push'], description: 'Git commit workflow' },
-          { name: 'memory', keywords: ['remember', 'recall', 'memory'], description: 'Memory operations' },
+          {
+            name: 'commit',
+            keywords: ['commit', 'git', 'push'],
+            description: 'Git commit workflow',
+          },
+          {
+            name: 'memory',
+            keywords: ['remember', 'recall', 'memory'],
+            description: 'Memory operations',
+          },
         ],
       });
 
@@ -32,9 +40,7 @@ describe('Skill Matcher', () => {
 
     it('should extract keywords from skill rules', () => {
       const rulesJson = JSON.stringify({
-        skills: [
-          { name: 'test', keywords: ['test', 'testing', 'spec'], description: 'Run tests' },
-        ],
+        skills: [{ name: 'test', keywords: ['test', 'testing', 'spec'], description: 'Run tests' }],
       });
 
       const result = loadSkillRules(rulesJson);
@@ -70,7 +76,11 @@ describe('Skill Matcher', () => {
   describe('T065: matchSkills - matches prompt keywords to skills', () => {
     const sampleRules: SkillRule[] = [
       { name: 'commit', keywords: ['commit', 'git', 'push'], description: 'Git commit workflow' },
-      { name: 'memory', keywords: ['remember', 'recall', 'memory', 'store'], description: 'Memory operations' },
+      {
+        name: 'memory',
+        keywords: ['remember', 'recall', 'memory', 'store'],
+        description: 'Memory operations',
+      },
       { name: 'review', keywords: ['review', 'pr', 'pull request'], description: 'Code review' },
     ];
 
@@ -93,7 +103,7 @@ describe('Skill Matcher', () => {
       const result = matchSkills('commit the changes and remember to review', sampleRules);
 
       expect(result.length).toBe(3);
-      const names = result.map(r => r.skill.name);
+      const names = result.map((r) => r.skill.name);
       expect(names).toContain('commit');
       expect(names).toContain('memory');
       expect(names).toContain('review');

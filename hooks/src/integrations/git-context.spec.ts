@@ -74,7 +74,8 @@ describe('Git Context Integration', () => {
 
   describe('T081: executeGitCommand - executes git diff', () => {
     it('should execute git diff with stat format', async () => {
-      const mockDiff = ' src/file.ts | 10 +++++-----\n 1 file changed, 5 insertions(+), 5 deletions(-)';
+      const mockDiff =
+        ' src/file.ts | 10 +++++-----\n 1 file changed, 5 insertions(+), 5 deletions(-)';
       const result = await executeGitCommand('diff --stat', {
         _mockCommandResults: {
           'diff --stat': mockDiff,
@@ -117,12 +118,13 @@ describe('Git Context Integration', () => {
 
   describe('T083: parseGitLog - parses recent commits', () => {
     it('should parse commits from git log output', () => {
-      const output = 'abc1234 Fix authentication bug\ndef5678 Add user login\nghi9012 Initial commit';
+      const output =
+        'abc1234 Fix authentication bug\ndef5678 Add user login\nghi9012 Initial commit';
       const commits = parseGitLog(output);
 
       expect(commits.length).toBe(3);
-      expect(commits[0].hash).toBe('abc1234');
-      expect(commits[0].message).toBe('Fix authentication bug');
+      expect(commits[0]!.hash).toBe('abc1234');
+      expect(commits[0]!.message).toBe('Fix authentication bug');
     });
 
     it('should handle single commit', () => {
@@ -130,7 +132,7 @@ describe('Git Context Integration', () => {
       const commits = parseGitLog(output);
 
       expect(commits.length).toBe(1);
-      expect(commits[0].hash).toBe('abc1234');
+      expect(commits[0]!.hash).toBe('abc1234');
     });
 
     it('should handle empty log', () => {
@@ -143,7 +145,7 @@ describe('Git Context Integration', () => {
       const output = 'abc1234 This is a longer commit message with spaces';
       const commits = parseGitLog(output);
 
-      expect(commits[0].message).toBe('This is a longer commit message with spaces');
+      expect(commits[0]!.message).toBe('This is a longer commit message with spaces');
     });
   });
 
@@ -153,8 +155,8 @@ describe('Git Context Integration', () => {
       const files = parseGitStatus(output);
 
       expect(files.length).toBe(2);
-      expect(files[0].path).toBe('src/file.ts');
-      expect(files[0].status).toBe('modified');
+      expect(files[0]!.path).toBe('src/file.ts');
+      expect(files[0]!.status).toBe('modified');
     });
 
     it('should parse added files', () => {
@@ -162,28 +164,28 @@ describe('Git Context Integration', () => {
       const files = parseGitStatus(output);
 
       expect(files.length).toBe(1);
-      expect(files[0].status).toBe('added');
+      expect(files[0]!.status).toBe('added');
     });
 
     it('should parse deleted files', () => {
       const output = ' D src/removed.ts';
       const files = parseGitStatus(output);
 
-      expect(files[0].status).toBe('deleted');
+      expect(files[0]!.status).toBe('deleted');
     });
 
     it('should parse untracked files', () => {
       const output = '?? src/untracked.ts';
       const files = parseGitStatus(output);
 
-      expect(files[0].status).toBe('untracked');
+      expect(files[0]!.status).toBe('untracked');
     });
 
     it('should parse renamed files', () => {
       const output = 'R  old-name.ts -> new-name.ts';
       const files = parseGitStatus(output);
 
-      expect(files[0].status).toBe('renamed');
+      expect(files[0]!.status).toBe('renamed');
     });
 
     it('should handle mixed status types', () => {

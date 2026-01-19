@@ -8,6 +8,7 @@ import {
   COMPLEX_IMPROVEMENT_TIMEOUT_MS,
 } from '../core/constants.ts';
 import { executeClaudeCommand } from './claude-client.ts';
+import { escapeXmlContent } from '../utils/xml-builder.ts';
 
 /**
  * Context gathered from various sources
@@ -84,35 +85,37 @@ function getContextSources(context?: ImprovementContext): ContextSource[] {
 
 /**
  * Builds context section for improvement prompt
+ * Context values are escaped to prevent XML injection
  */
 function buildContextSection(context?: ImprovementContext): string {
   if (!context) return '';
 
   const sections: string[] = [];
 
+  // Escape all context values to prevent XML/prompt injection
   if (context.git) {
-    sections.push(`<git_context>\n${context.git}\n</git_context>`);
+    sections.push(`<git_context>\n${escapeXmlContent(context.git)}\n</git_context>`);
   }
   if (context.lsp) {
-    sections.push(`<lsp_diagnostics>\n${context.lsp}\n</lsp_diagnostics>`);
+    sections.push(`<lsp_diagnostics>\n${escapeXmlContent(context.lsp)}\n</lsp_diagnostics>`);
   }
   if (context.spec) {
-    sections.push(`<specification>\n${context.spec}\n</specification>`);
+    sections.push(`<specification>\n${escapeXmlContent(context.spec)}\n</specification>`);
   }
   if (context.tools) {
-    sections.push(`<available_tools>\n${context.tools}\n</available_tools>`);
+    sections.push(`<available_tools>\n${escapeXmlContent(context.tools)}\n</available_tools>`);
   }
   if (context.skills) {
-    sections.push(`<available_skills>\n${context.skills}\n</available_skills>`);
+    sections.push(`<available_skills>\n${escapeXmlContent(context.skills)}\n</available_skills>`);
   }
   if (context.agents) {
-    sections.push(`<suggested_agents>\n${context.agents}\n</suggested_agents>`);
+    sections.push(`<suggested_agents>\n${escapeXmlContent(context.agents)}\n</suggested_agents>`);
   }
   if (context.memory) {
-    sections.push(`<relevant_memories>\n${context.memory}\n</relevant_memories>`);
+    sections.push(`<relevant_memories>\n${escapeXmlContent(context.memory)}\n</relevant_memories>`);
   }
   if (context.session) {
-    sections.push(`<session_context>\n${context.session}\n</session_context>`);
+    sections.push(`<session_context>\n${escapeXmlContent(context.session)}\n</session_context>`);
   }
 
   return sections.length > 0 ? sections.join('\n\n') : '';
@@ -144,6 +147,7 @@ Output ONLY the improved prompt, nothing else.`;
 
 /**
  * Builds the improvement prompt with context
+ * User content is escaped to prevent XML/prompt injection
  */
 export function buildImprovementPrompt(options: {
   originalPrompt: string;
@@ -153,12 +157,12 @@ export function buildImprovementPrompt(options: {
   const { originalPrompt, classification, context } = options;
   const contextSection = buildContextSection(context);
 
+  // Escape user prompt to prevent XML/prompt injection
+  const escapedPrompt = escapeXmlContent(originalPrompt);
+
   return IMPROVEMENT_PROMPT_TEMPLATE.replace('{CLASSIFICATION}', classification)
-    .replace('{ORIGINAL_PROMPT}', originalPrompt)
-    .replace(
-      '{CONTEXT_SECTION}',
-      contextSection ? `Available context:\n${contextSection}` : ''
-    );
+    .replace('{ORIGINAL_PROMPT}', escapedPrompt)
+    .replace('{CONTEXT_SECTION}', contextSection ? `Available context:\n${contextSection}` : '');
 }
 
 /**

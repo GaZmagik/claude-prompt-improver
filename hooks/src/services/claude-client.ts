@@ -38,26 +38,39 @@ function getModelIdentifier(model: ClaudeModel): string {
 }
 
 /**
- * Escapes a string for safe use in shell commands
+ * Command arguments for array-based spawn (no shell interpretation)
  */
-function escapeForShell(str: string): string {
-  // Use single quotes and escape any single quotes in the string
-  return `'${str.replace(/'/g, "'\\''")}'`;
+export interface ClaudeCommandArgs {
+  readonly args: string[]; // Mutable for Bun.spawn compatibility
+  readonly cwd: string;
 }
 
 /**
- * Builds the claude command with fork-session for API isolation
+ * Builds the claude command arguments for array-based spawn
  * Per gotcha: Must run from /tmp to avoid project hook interference
+ * Uses array-based approach to prevent shell injection
  */
-export function buildClaudeCommand(options: ClaudeClientOptions): string {
+export function buildClaudeCommand(options: ClaudeClientOptions): ClaudeCommandArgs {
   const { prompt, model, sessionId } = options;
   const modelId = getModelIdentifier(model);
-  const escapedPrompt = escapeForShell(prompt);
-  const escapedSessionId = escapeForShell(sessionId);
 
-  // Build command: cd /tmp to avoid project hooks, then execute claude
-  // Using --fork-session to prevent recursion, --print for output only
-  return `cd /tmp && claude --resume ${escapedSessionId} --fork-session --print --model ${modelId} ${escapedPrompt}`;
+  // Array-based arguments prevent shell injection
+  // Arguments are passed directly to process, not through shell
+  const args = [
+    'claude',
+    '--resume',
+    sessionId,
+    '--fork-session',
+    '--print',
+    '--model',
+    modelId,
+    prompt, // No escaping needed - passed directly to process
+  ];
+
+  return {
+    args,
+    cwd: '/tmp', // Run from /tmp to avoid project hooks
+  };
 }
 
 /**
@@ -67,17 +80,23 @@ export async function executeClaudeCommand(
   options: ClaudeClientOptions
 ): Promise<ClaudeCommandResult> {
   const { timeoutMs = 30_000, _mockExecution } = options;
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
   try {
     // Use mock execution for testing
     if (_mockExecution) {
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('Command timeout')), timeoutMs);
+        timeoutId = setTimeout(() => reject(new Error('Command timeout')), timeoutMs);
       });
 
       const executionPromise = _mockExecution();
 
       const result = await Promise.race([executionPromise, timeoutPromise]);
+
+      // Clean up timeout if execution completed first
+      if (timeoutId !== undefined) {
+        clearTimeout(timeoutId);
+      }
 
       if (result.exitCode !== 0) {
         return {
@@ -92,17 +111,18 @@ export async function executeClaudeCommand(
       };
     }
 
-    // Real execution using Bun.spawn
-    const command = buildClaudeCommand(options);
+    // Real execution using Bun.spawn with array-based args (no shell interpretation)
+    const { args, cwd } = buildClaudeCommand(options);
 
-    const proc = Bun.spawn(['bash', '-c', command], {
+    const proc = Bun.spawn(args, {
       stdout: 'pipe',
       stderr: 'pipe',
+      cwd,
     });
 
     // Create timeout promise
     const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         proc.kill();
         reject(new Error('Command timeout'));
       }, timeoutMs);
@@ -110,6 +130,11 @@ export async function executeClaudeCommand(
 
     // Wait for process completion or timeout
     const exitCode = await Promise.race([proc.exited, timeoutPromise]);
+
+    // Clean up timeout if process completed first
+    if (timeoutId !== undefined) {
+      clearTimeout(timeoutId);
+    }
 
     const stdout = await new Response(proc.stdout).text();
     const stderr = await new Response(proc.stderr).text();
@@ -126,6 +151,11 @@ export async function executeClaudeCommand(
       output: stdout.trim(),
     };
   } catch (err) {
+    // Clean up timeout on error
+    if (timeoutId !== undefined) {
+      clearTimeout(timeoutId);
+    }
+
     const message = err instanceof Error ? err.message : String(err);
 
     if (message.includes('timeout')) {

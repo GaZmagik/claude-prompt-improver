@@ -1,8 +1,10 @@
 /**
  * Logger utility for Claude Prompt Improver Plugin
  * Provides JSON logging to file with JSONL format
+ * Uses async fire-and-forget pattern to avoid blocking the event loop
  */
-import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
+import { appendFile, mkdir } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { dirname } from 'node:path';
 import type {
   BypassReason,
@@ -63,15 +65,30 @@ export function formatLogEntry(entry: LogEntry): string {
 /**
  * Writes a log entry to the specified file path (JSONL format)
  * Creates parent directories if they don't exist
+ * Uses fire-and-forget async pattern to avoid blocking the event loop
  */
 export function writeLogEntry(entry: LogEntry, filePath: string): void {
-  const dir = dirname(filePath);
+  // Fire-and-forget async logging - don't await to avoid blocking
+  void writeLogEntryAsync(entry, filePath);
+}
 
-  // Create parent directories if needed
-  if (!existsSync(dir)) {
-    mkdirSync(dir, { recursive: true });
+/**
+ * Async implementation of log writing
+ * Errors are silently ignored to prevent logging from affecting hook execution
+ * Exported for testing - production code should use writeLogEntry (fire-and-forget)
+ */
+export async function writeLogEntryAsync(entry: LogEntry, filePath: string): Promise<void> {
+  try {
+    const dir = dirname(filePath);
+
+    // Create parent directories if needed (sync check, async create)
+    if (!existsSync(dir)) {
+      await mkdir(dir, { recursive: true });
+    }
+
+    const json = formatLogEntry(entry);
+    await appendFile(filePath, json + '\n', 'utf-8');
+  } catch {
+    // Silently ignore logging errors - logging should never break the hook
   }
-
-  const json = formatLogEntry(entry);
-  appendFileSync(filePath, json + '\n', 'utf-8');
 }

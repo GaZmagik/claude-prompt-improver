@@ -121,7 +121,7 @@ describe('XML Builder', () => {
       expect(result).toBe('say &quot;hello&quot;');
     });
 
-    it('should escape \' character', () => {
+    it("should escape ' character", () => {
       const result = escapeXmlContent("it's");
       expect(result).toBe('it&apos;s');
     });

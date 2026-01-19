@@ -11,6 +11,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { Configuration } from './types.ts';
 import {
+  clearConfigCache,
   CONFIG_PATHS,
   DEFAULT_CONFIG,
   loadConfig,
@@ -25,6 +26,7 @@ describe('Config Loader', () => {
   const testConfigPathJson = join(testDir, '.claude', 'prompt-improver-config.json');
 
   beforeEach(() => {
+    clearConfigCache(); // Clear cache before each test
     mkdirSync(join(testDir, '.claude'), { recursive: true });
   });
 
@@ -305,6 +307,61 @@ shortPromptThreshold: 25
       const config = loadConfigFromStandardPaths(testDir);
 
       expect(config).toEqual(DEFAULT_CONFIG);
+    });
+  });
+
+  describe('Config caching with mtime check', () => {
+    it('should return cached config when file unchanged', () => {
+      const mdConfig = `---
+shortPromptThreshold: 42
+---`;
+      writeFileSync(testConfigPathMd, mdConfig);
+
+      // First load
+      const config1 = loadConfig(testConfigPathMd);
+      expect(config1.shortPromptThreshold).toBe(42);
+
+      // Second load should use cache (same result)
+      const config2 = loadConfig(testConfigPathMd);
+      expect(config2.shortPromptThreshold).toBe(42);
+      expect(config2).toEqual(config1);
+    });
+
+    it('should reload config when file mtime changes', async () => {
+      const mdConfig1 = `---
+shortPromptThreshold: 42
+---`;
+      writeFileSync(testConfigPathMd, mdConfig1);
+
+      const config1 = loadConfig(testConfigPathMd);
+      expect(config1.shortPromptThreshold).toBe(42);
+
+      // Wait a moment to ensure mtime changes
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      // Update file with new content
+      const mdConfig2 = `---
+shortPromptThreshold: 99
+---`;
+      writeFileSync(testConfigPathMd, mdConfig2);
+
+      // Should detect mtime change and reload
+      const config2 = loadConfig(testConfigPathMd);
+      expect(config2.shortPromptThreshold).toBe(99);
+    });
+
+    it('should clear cache when clearConfigCache is called', () => {
+      const mdConfig = `---
+shortPromptThreshold: 42
+---`;
+      writeFileSync(testConfigPathMd, mdConfig);
+
+      loadConfig(testConfigPathMd);
+      clearConfigCache();
+
+      // After clearing, should still work (reloads from disk)
+      const config = loadConfig(testConfigPathMd);
+      expect(config.shortPromptThreshold).toBe(42);
     });
   });
 

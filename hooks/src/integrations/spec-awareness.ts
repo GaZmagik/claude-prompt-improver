@@ -2,6 +2,36 @@
  * Specification awareness integration for enriching prompts with spec context
  * Parses .specify/ directory for spec.md, plan.md, and tasks.md
  */
+import { existsSync, readFileSync, statSync } from 'node:fs';
+
+/**
+ * Cache entry for spec file content with mtime validation
+ */
+interface SpecFileCacheEntry {
+  readonly content: string;
+  readonly mtimeMs: number;
+}
+
+/** Cache for spec file contents keyed by path */
+const specFileCache = new Map<string, SpecFileCacheEntry>();
+
+/**
+ * Gets file modification time, returns -1 if file doesn't exist
+ */
+function getFileMtime(filePath: string): number {
+  try {
+    return statSync(filePath).mtimeMs;
+  } catch {
+    return -1;
+  }
+}
+
+/**
+ * Clears the spec file cache (useful for testing)
+ */
+export function clearSpecFileCache(): void {
+  specFileCache.clear();
+}
 
 /** Spec file types */
 export type SpecFileType = 'spec' | 'plan' | 'tasks';
@@ -79,8 +109,8 @@ export function checkSpecifyDirectory(options: SpecAwarenessOptions): boolean {
     return dirKey in _mockFileSystem;
   }
 
-  // Real implementation would check fs
-  return false;
+  // Real implementation - check filesystem
+  return existsSync(specifyPath);
 }
 
 /**
@@ -88,7 +118,7 @@ export function checkSpecifyDirectory(options: SpecAwarenessOptions): boolean {
  */
 export function parseFrontmatter(content: string): Record<string, unknown> {
   const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
-  if (!frontmatterMatch) {
+  if (!frontmatterMatch || !frontmatterMatch[1]) {
     return {};
   }
 
@@ -102,24 +132,22 @@ export function parseFrontmatter(content: string): Record<string, unknown> {
 
   for (const line of lines) {
     // Check for array item
-    if (line.match(/^\s+-\s+(.+)$/)) {
-      const match = line.match(/^\s+-\s+(.+)$/);
-      if (match && currentKey && currentArray) {
-        currentArray.push(match[1].trim());
-      }
+    const arrayMatch = line.match(/^\s+-\s+(.+)$/);
+    if (arrayMatch && arrayMatch[1] && currentKey && currentArray) {
+      currentArray.push(arrayMatch[1].trim());
       continue;
     }
 
     // Check for key: value
     const kvMatch = line.match(/^(\w+):\s*(.*)$/);
-    if (kvMatch) {
+    if (kvMatch && kvMatch[1]) {
       // Save previous array if exists
       if (currentKey && currentArray) {
         result[currentKey] = currentArray;
       }
 
       currentKey = kvMatch[1];
-      const value = kvMatch[2].trim();
+      const value = (kvMatch[2] ?? '').trim();
 
       if (value === '') {
         // Could be array or nested object starting
@@ -151,19 +179,23 @@ export function extractUserStories(content: string): UserStory[] {
 
   while ((match = storyRegex.exec(content)) !== null) {
     const id = match[1];
-    const titleAndContent = match[2].trim();
-    const lines = titleAndContent.split('\n');
-    const title = lines[0].trim();
+    const titleAndContent = match[2];
+    if (!id || !titleAndContent) continue;
+
+    const lines = titleAndContent.trim().split('\n');
+    const title = (lines[0] ?? '').trim();
+    if (!title) continue;
 
     // Everything after the first line and "As a user..." line is description
-    const descriptionLines = lines.slice(1).filter(l => l.trim() && !l.trim().startsWith('As a'));
-    const description = descriptionLines.length > 0 ? descriptionLines.join('\n').trim() : undefined;
+    const descriptionLines = lines.slice(1).filter((l) => l.trim() && !l.trim().startsWith('As a'));
+    const description =
+      descriptionLines.length > 0 ? descriptionLines.join('\n').trim() : undefined;
 
-    const story: UserStory = { id, title };
     if (description) {
-      (story as { description?: string }).description = description;
+      stories.push({ id, title, description });
+    } else {
+      stories.push({ id, title });
     }
-    stories.push(story);
   }
 
   return stories;
@@ -181,15 +213,18 @@ export function parsePlanPhases(content: string): PlanPhase[] {
 
   while ((match = phaseRegex.exec(content)) !== null) {
     const id = match[1];
-    const nameAndContent = match[2].trim();
-    const lines = nameAndContent.split('\n');
-    const name = lines[0].trim();
+    const nameAndContent = match[2];
+    if (!id || !nameAndContent) continue;
+
+    const lines = nameAndContent.trim().split('\n');
+    const name = (lines[0] ?? '').trim();
+    if (!name) continue;
 
     // Look for Status: line
     let status: 'pending' | 'in_progress' | 'completed' | undefined;
     for (const line of lines) {
       const statusMatch = line.match(/Status:\s*(\w+)/i);
-      if (statusMatch) {
+      if (statusMatch && statusMatch[1]) {
         const rawStatus = statusMatch[1].toLowerCase();
         if (rawStatus === 'completed') status = 'completed';
         else if (rawStatus === 'in_progress') status = 'in_progress';
@@ -197,11 +232,11 @@ export function parsePlanPhases(content: string): PlanPhase[] {
       }
     }
 
-    const phase: PlanPhase = { id, name };
     if (status) {
-      (phase as { status?: string }).status = status;
+      phases.push({ id, name, status });
+    } else {
+      phases.push({ id, name });
     }
-    phases.push(phase);
   }
 
   return phases;
@@ -218,13 +253,16 @@ export function parseTasks(content: string): SpecTask[] {
   let match;
 
   while ((match = taskRegex.exec(content)) !== null) {
-    const completed = match[1].toLowerCase() === 'x';
+    const checkMark = match[1];
     const id = match[2];
-    const rest = match[3].trim();
+    const rest = match[3];
+    if (!checkMark || !id || !rest) continue;
+
+    const completed = checkMark.toLowerCase() === 'x';
 
     // Extract user story reference [US{n}]
     const usMatch = rest.match(/\[US(\d+)\]/);
-    const userStory = usMatch ? `US${usMatch[1]}` : undefined;
+    const userStory = usMatch && usMatch[1] ? `US${usMatch[1]}` : undefined;
 
     // Extract title - remove [P], [US{n}], and path references
     const title = rest
@@ -233,15 +271,11 @@ export function parseTasks(content: string): SpecTask[] {
       .replace(/in\s+\/[\w/./-]+/g, '')
       .trim();
 
-    const task: SpecTask = {
-      id,
-      title,
-      status: completed ? 'completed' : 'pending',
-    };
     if (userStory) {
-      (task as { userStory?: string }).userStory = userStory;
+      tasks.push({ id, title, status: completed ? 'completed' : 'pending', userStory });
+    } else {
+      tasks.push({ id, title, status: completed ? 'completed' : 'pending' });
     }
-    tasks.push(task);
   }
 
   return tasks;
@@ -252,9 +286,9 @@ export function parseTasks(content: string): SpecTask[] {
  */
 export function matchUserStoriesToPrompt(stories: UserStory[], prompt: string): UserStory[] {
   const promptLower = prompt.toLowerCase();
-  const words = promptLower.split(/\s+/).filter(w => w.length > 2);
+  const words = promptLower.split(/\s+/).filter((w) => w.length > 2);
 
-  return stories.filter(story => {
+  return stories.filter((story) => {
     const titleLower = story.title.toLowerCase();
     const descLower = (story.description || '').toLowerCase();
 
@@ -269,14 +303,34 @@ export function matchUserStoriesToPrompt(stories: UserStory[], prompt: string): 
 }
 
 /**
- * Helper to read file from mock or real filesystem
+ * Helper to read file from mock or real filesystem with mtime-based caching
  */
 function readFile(path: string, mockFs?: Record<string, string | null>): string | null {
   if (mockFs) {
     return mockFs[path] ?? null;
   }
-  // Real implementation would use fs
-  return null;
+
+  // Check cache with mtime validation
+  const currentMtime = getFileMtime(path);
+  if (currentMtime === -1) {
+    // File doesn't exist
+    specFileCache.delete(path);
+    return null;
+  }
+
+  const cached = specFileCache.get(path);
+  if (cached && cached.mtimeMs === currentMtime) {
+    return cached.content;
+  }
+
+  // Read fresh content and update cache
+  try {
+    const content = readFileSync(path, 'utf-8');
+    specFileCache.set(path, { content, mtimeMs: currentMtime });
+    return content;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -329,7 +383,7 @@ export async function gatherSpecContext(
 
   // Determine current phase
   let currentPhase: string | undefined;
-  const inProgressPhase = phases.find(p => p.status === 'in_progress');
+  const inProgressPhase = phases.find((p) => p.status === 'in_progress');
   if (inProgressPhase) {
     currentPhase = inProgressPhase.name;
   }
@@ -339,16 +393,9 @@ export async function gatherSpecContext(
   const tasksContent = readFile(tasksPath, _mockFileSystem);
   const tasks = tasksContent ? parseTasks(tasksContent) : [];
 
-  const context: SpecContext = {
-    featureName,
-    userStories,
-    phases,
-    tasks,
-  };
-
-  if (currentPhase) {
-    (context as { currentPhase?: string }).currentPhase = currentPhase;
-  }
+  const context: SpecContext = currentPhase
+    ? { featureName, userStories, phases, tasks, currentPhase }
+    : { featureName, userStories, phases, tasks };
 
   return {
     success: true,
@@ -392,7 +439,7 @@ export function formatSpecContext(context: SpecContext): string {
   }
 
   if (context.tasks.length > 0) {
-    const completed = context.tasks.filter(t => t.status === 'completed').length;
+    const completed = context.tasks.filter((t) => t.status === 'completed').length;
     const total = context.tasks.length;
     lines.push('');
     lines.push(`Tasks: ${completed}/${total} complete`);

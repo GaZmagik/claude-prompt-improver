@@ -3,7 +3,7 @@
  * Loads and validates user configuration from markdown files with YAML frontmatter
  * Similar to claude-memory-plugin's local.md pattern
  */
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Configuration, IntegrationToggles, LoggingConfig } from './types.ts';
 
@@ -56,6 +56,40 @@ export const CONFIG_PATHS = [
   '.claude/prompt-improver.local.md', // Primary: project-local config
   '.claude/prompt-improver-config.json', // Legacy: JSON format (backwards compat)
 ] as const;
+
+/**
+ * Cache entry for configuration
+ */
+interface ConfigCacheEntry {
+  readonly config: Configuration;
+  readonly mtimeMs: number;
+}
+
+/**
+ * Configuration cache - keyed by absolute file path
+ * Uses mtime to detect file changes and avoid re-parsing unchanged configs
+ */
+const configCache = new Map<string, ConfigCacheEntry>();
+
+/**
+ * Gets the modification time of a file in milliseconds
+ * Returns -1 if file doesn't exist or can't be accessed
+ */
+function getFileMtime(filePath: string): number {
+  try {
+    return statSync(filePath).mtimeMs;
+  } catch {
+    return -1;
+  }
+}
+
+/**
+ * Clears the configuration cache
+ * Useful for testing or forcing a reload
+ */
+export function clearConfigCache(): void {
+  configCache.clear();
+}
 
 /**
  * Parses YAML frontmatter from markdown content
@@ -140,8 +174,10 @@ function parseYamlValue(value: string): unknown {
   if (/^-?\d+\.\d+$/.test(trimmed)) return parseFloat(trimmed);
 
   // Quoted string - remove quotes
-  if ((trimmed.startsWith('"') && trimmed.endsWith('"')) ||
-      (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
     return trimmed.slice(1, -1);
   }
 
@@ -197,14 +233,30 @@ function yamlToConfig(yaml: Record<string, unknown>): Partial<Configuration> {
     const src = yaml.logging as Record<string, unknown>;
     config.logging = {
       enabled: typeof src.enabled === 'boolean' ? src.enabled : undefined,
-      logFilePath: typeof src.logFilePath === 'string' ? src.logFilePath :
-                   typeof src.log_file_path === 'string' ? src.log_file_path : undefined,
-      maxLogSizeMB: typeof src.maxLogSizeMB === 'number' ? src.maxLogSizeMB :
-                    typeof src.max_log_size_mb === 'number' ? src.max_log_size_mb : undefined,
-      maxLogAgeDays: typeof src.maxLogAgeDays === 'number' ? src.maxLogAgeDays :
-                     typeof src.max_log_age_days === 'number' ? src.max_log_age_days : undefined,
-      displayImprovedPrompt: typeof src.displayImprovedPrompt === 'boolean' ? src.displayImprovedPrompt :
-                             typeof src.display_improved_prompt === 'boolean' ? src.display_improved_prompt : undefined,
+      logFilePath:
+        typeof src.logFilePath === 'string'
+          ? src.logFilePath
+          : typeof src.log_file_path === 'string'
+            ? src.log_file_path
+            : undefined,
+      maxLogSizeMB:
+        typeof src.maxLogSizeMB === 'number'
+          ? src.maxLogSizeMB
+          : typeof src.max_log_size_mb === 'number'
+            ? src.max_log_size_mb
+            : undefined,
+      maxLogAgeDays:
+        typeof src.maxLogAgeDays === 'number'
+          ? src.maxLogAgeDays
+          : typeof src.max_log_age_days === 'number'
+            ? src.max_log_age_days
+            : undefined,
+      displayImprovedPrompt:
+        typeof src.displayImprovedPrompt === 'boolean'
+          ? src.displayImprovedPrompt
+          : typeof src.display_improved_prompt === 'boolean'
+            ? src.display_improved_prompt
+            : undefined,
     };
   }
 
@@ -214,10 +266,7 @@ function yamlToConfig(yaml: Record<string, unknown>): Partial<Configuration> {
 /**
  * Merges partial configuration with defaults
  */
-function mergeConfig(
-  defaults: Configuration,
-  partial: Partial<Configuration>
-): Configuration {
+function mergeConfig(defaults: Configuration, partial: Partial<Configuration>): Configuration {
   return {
     enabled: partial.enabled ?? defaults.enabled,
     shortPromptThreshold: partial.shortPromptThreshold ?? defaults.shortPromptThreshold,
@@ -244,6 +293,7 @@ function mergeConfig(
 
 /**
  * Loads configuration from file, merging with defaults
+ * Uses mtime-based caching to avoid re-parsing unchanged files
  * Supports both markdown (with YAML frontmatter) and JSON formats
  * Returns defaults if file doesn't exist or is invalid
  */
@@ -252,19 +302,35 @@ export function loadConfig(filePath: string): Configuration {
     return DEFAULT_CONFIG;
   }
 
+  // Check mtime for cache validity
+  const currentMtime = getFileMtime(filePath);
+  const cached = configCache.get(filePath);
+
+  if (cached && cached.mtimeMs === currentMtime && currentMtime !== -1) {
+    return cached.config;
+  }
+
   try {
     const content = readFileSync(filePath, 'utf-8');
+    let config: Configuration;
 
     // Detect format by file extension or content
     if (filePath.endsWith('.md')) {
       const yaml = parseYamlFrontmatter(content);
       const partial = yamlToConfig(yaml);
-      return mergeConfig(DEFAULT_CONFIG, partial);
+      config = mergeConfig(DEFAULT_CONFIG, partial);
+    } else {
+      // Legacy JSON format
+      const parsed = JSON.parse(content) as Partial<Configuration>;
+      config = mergeConfig(DEFAULT_CONFIG, parsed);
     }
 
-    // Legacy JSON format
-    const parsed = JSON.parse(content) as Partial<Configuration>;
-    return mergeConfig(DEFAULT_CONFIG, parsed);
+    // Cache the result with current mtime
+    if (currentMtime !== -1) {
+      configCache.set(filePath, { config, mtimeMs: currentMtime });
+    }
+
+    return config;
   } catch {
     // Invalid content or read error - return defaults
     return DEFAULT_CONFIG;
