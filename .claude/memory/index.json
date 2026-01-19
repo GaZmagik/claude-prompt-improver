@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-19T18:16:28.321Z",
+  "lastUpdated": "2026-01-19T19:05:27.311Z",
   "memories": [
     {
       "id": "learning-retro-agent-first-sdd-workflow-reduces-iteration",
@@ -217,23 +217,6 @@
       "updated": "2026-01-19T01:10:45.429Z",
       "scope": "project",
       "relativePath": "permanent/learning-bun-typescript-requires-allowimportingtsextensions-for-ts-imports.md"
-    },
-    {
-      "id": "artifact-sdd-tdd-phase-completion-pattern",
-      "type": "artifact",
-      "title": "SDD + TDD phase completion pattern",
-      "tags": [
-        "sdd",
-        "tdd",
-        "workflow",
-        "phase-management",
-        "quality",
-        "project"
-      ],
-      "created": "2026-01-19T01:11:02.426Z",
-      "updated": "2026-01-19T01:11:02.426Z",
-      "scope": "project",
-      "relativePath": "permanent/artifact-sdd-tdd-phase-completion-pattern.md"
     },
     {
       "id": "learning-fork-session-execution-requires-tmp-working-directory",
@@ -1438,23 +1421,6 @@
       "severity": "medium"
     },
     {
-      "id": "gotcha-gotcha-improved-prompt-logging-can-expose-sensitive-injected-context",
-      "type": "gotcha",
-      "title": "Gotcha - Improved prompt logging can expose sensitive injected context",
-      "tags": [
-        "retrospective",
-        "security",
-        "logging",
-        "privacy",
-        "project"
-      ],
-      "created": "2026-01-19T15:56:53.078Z",
-      "updated": "2026-01-19T15:56:53.078Z",
-      "scope": "project",
-      "relativePath": "permanent/gotcha-gotcha-improved-prompt-logging-can-expose-sensitive-injected-context.md",
-      "severity": "high"
-    },
-    {
       "id": "learning-learning-post-compaction-session-restore-workflow-effective-for-context-recovery",
       "type": "learning",
       "title": "Learning - Post-compaction session-restore workflow effective for context recovery",
@@ -1614,22 +1580,6 @@
       "relativePath": "permanent/learning-tdd-hook-enforcement-requires-stub-file-creation.md"
     },
     {
-      "id": "learning-integration-tests-must-validate-interface-signatures-before-writing-assertions",
-      "type": "learning",
-      "title": "Integration tests must validate interface signatures before writing assertions",
-      "tags": [
-        "testing",
-        "integration-tests",
-        "typescript",
-        "tdd",
-        "project"
-      ],
-      "created": "2026-01-19T18:16:00.480Z",
-      "updated": "2026-01-19T18:16:00.480Z",
-      "scope": "project",
-      "relativePath": "permanent/learning-integration-tests-must-validate-interface-signatures-before-writing-assertions.md"
-    },
-    {
       "id": "artifact-promise-race-timeout-cleanup",
       "type": "artifact",
       "title": "Promise.race timeout cleanup pattern",
@@ -1647,7 +1597,7 @@
       "relativePath": "permanent/artifact-promise-race-timeout-cleanup.md"
     },
     {
-      "id": "learning-file-reader-utility-extraction-pattern-for-shared-readfile-helpers",
+      "id": "learning-file-reader-extraction-discovered-during-m6-refactor",
       "type": "learning",
       "title": "File-reader utility extraction pattern for shared readFile helpers",
       "tags": [
@@ -1661,7 +1611,104 @@
       "created": "2026-01-19T18:16:28.300Z",
       "updated": "2026-01-19T18:16:28.300Z",
       "scope": "project",
-      "relativePath": "permanent/learning-file-reader-utility-extraction-pattern-for-shared-readfile-helpers.md"
+      "relativePath": "permanent/learning-file-reader-extraction-discovered-during-m6-refactor.md"
+    },
+    {
+      "id": "learning-retro-memory-driven-gotcha-prevention-in-repeated-task-patterns",
+      "type": "learning",
+      "title": "Retro - Memory-driven gotcha prevention in repeated task patterns",
+      "tags": [
+        "retrospective",
+        "process",
+        "memory-driven-development",
+        "project"
+      ],
+      "created": "2026-01-19T18:53:28.729Z",
+      "updated": "2026-01-19T18:53:28.729Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-memory-driven-gotcha-prevention-in-repeated-task-patterns.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-retro-early-code-review-prevents-planning-misdirected-effort",
+      "type": "learning",
+      "title": "Retro - Early code review prevents planning misdirected effort",
+      "tags": [
+        "retrospective",
+        "process",
+        "planning",
+        "project"
+      ],
+      "created": "2026-01-19T18:53:32.471Z",
+      "updated": "2026-01-19T18:53:32.471Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-early-code-review-prevents-planning-misdirected-effort.md",
+      "severity": "low"
+    },
+    {
+      "id": "learning-integration-tests-must-validate-interface-signatures-before-writing-assertions",
+      "type": "learning",
+      "title": "Integration tests must validate interface signatures before writing assertions",
+      "tags": [
+        "tdd",
+        "integration-tests",
+        "testing",
+        "project"
+      ],
+      "created": "2026-01-19T18:53:34.982Z",
+      "updated": "2026-01-19T18:53:34.982Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-integration-tests-must-validate-interface-signatures-before-writing-assertions.md"
+    },
+    {
+      "id": "gotcha-gotcha-tdd-touch-stub-files-must-be-non-empty-or-tests-wont-run",
+      "type": "gotcha",
+      "title": "Gotcha - TDD touch stub files must be non-empty or tests won't run",
+      "tags": [
+        "retrospective",
+        "tdd",
+        "test-runners",
+        "typescript",
+        "project"
+      ],
+      "created": "2026-01-19T18:53:36.874Z",
+      "updated": "2026-01-19T18:53:36.874Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-gotcha-tdd-touch-stub-files-must-be-non-empty-or-tests-wont-run.md",
+      "severity": "medium"
+    },
+    {
+      "id": "artifact-file-reader-utility-extraction-pattern",
+      "type": "artifact",
+      "title": "File-reader utility extraction pattern for shared readFile helpers",
+      "tags": [
+        "refactoring",
+        "code-reuse",
+        "utilities",
+        "typescript",
+        "project"
+      ],
+      "created": "2026-01-19T18:53:44.942Z",
+      "updated": "2026-01-19T18:53:44.942Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-file-reader-utility-extraction-pattern.md"
+    },
+    {
+      "id": "artifact-sdd-tdd-phase-completion-pattern",
+      "type": "artifact",
+      "title": "SDD/TDD phase completion pattern with 6 systematic remediation phases",
+      "tags": [
+        "sdd",
+        "tdd",
+        "remediation",
+        "post-mvp",
+        "refactoring",
+        "project"
+      ],
+      "created": "2026-01-19T18:53:50.298Z",
+      "updated": "2026-01-19T18:53:50.298Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-sdd-tdd-phase-completion-pattern.md"
     }
   ]
 }

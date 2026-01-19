@@ -447,11 +447,6 @@
       "title": "Retro - Memory curator agent identified 4 duplicate memories and 6 orphaned nodes"
     },
     {
-      "id": "gotcha-gotcha-improved-prompt-logging-can-expose-sensitive-injected-context",
-      "type": "gotcha",
-      "title": "Gotcha - Improved prompt logging can expose sensitive injected context"
-    },
-    {
       "id": "learning-learning-post-compaction-session-restore-workflow-effective-for-context-recovery",
       "type": "learning",
       "title": "Learning - Post-compaction session-restore workflow effective for context recovery"
@@ -503,8 +498,24 @@
       "type": "artifact"
     },
     {
-      "id": "learning-file-reader-utility-extraction-pattern-for-shared-readfile-helpers",
+      "id": "learning-file-reader-extraction-discovered-during-m6-refactor",
       "type": "learning"
+    },
+    {
+      "id": "learning-retro-memory-driven-gotcha-prevention-in-repeated-task-patterns",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-early-code-review-prevents-planning-misdirected-effort",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-gotcha-tdd-touch-stub-files-must-be-non-empty-or-tests-wont-run",
+      "type": "gotcha"
+    },
+    {
+      "id": "artifact-file-reader-utility-extraction-pattern",
+      "type": "artifact"
     }
   ],
   "edges": [
@@ -974,16 +985,6 @@
       "label": "relates-to"
     },
     {
-      "source": "gotcha-gotcha-improved-prompt-logging-can-expose-sensitive-injected-context",
-      "target": "learning-security-pattern-50-char-prompt-preview-for-logging",
-      "label": "relates-to"
-    },
-    {
-      "source": "gotcha-gotcha-improved-prompt-logging-can-expose-sensitive-injected-context",
-      "target": "learning-retro-security-fix-blocked-pr-merge-until-resolved",
-      "label": "relates-to"
-    },
-    {
       "source": "learning-learning-post-compaction-session-restore-workflow-effective-for-context-recovery",
       "target": "learning-session-restoration-coordinates-3-parallel-agents-for-context-recovery",
       "label": "relates-to"
@@ -1006,6 +1007,86 @@
     {
       "source": "learning-post-compaction-context-restoration-via-memory-system-effective",
       "target": "learning-retro-parallel-multi-agent-restoration-after-compaction-accelerates-context-recovery",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-file-reader-extraction-discovered-during-m6-refactor",
+      "target": "artifact-file-reader-utility-extraction-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-post-mvp-remediation-completed-6-phases-systematically",
+      "target": "learning-retro-parallel-expert-agent-review-uncovered-4-critical-issues-post-implementation",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-post-mvp-remediation-completed-6-phases-systematically",
+      "target": "gotcha-improved-prompt-logging-can-expose-sensitive-injected-context",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-post-mvp-remediation-completed-6-phases-systematically",
+      "target": "learning-retro-memory-curator-agent-identified-4-duplicate-memories-and-6-orphaned-nodes",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-post-mvp-remediation-completed-6-phases-systematically",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "artifact-file-reader-utility-extraction-pattern",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "artifact-promise-race-timeout-cleanup",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-tdd-hook-enforcement-requires-stub-file-creation",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-integration-tests-must-validate-interface-signatures-before-writing-assertions",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-retro-read-function-signatures-before-writing-test-code-to-avoid-iteration",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-memory-driven-work-prevents-duplication-and-maintains-context",
+      "target": "learning-post-compaction-context-restoration-via-memory-system-effective",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-early-code-review-prevents-planning-misdirected-effort",
+      "target": "learning-retro-review-report-recommendations-need-upfront-scoping-before-implementation",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-gotcha-tdd-touch-stub-files-must-be-non-empty-or-tests-wont-run",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-progressive-cleanup-strategy-must-should-nice-to-have-enables-user-agency",
+      "target": "learning-retro-tdd-integration-tests-achieved-100-pass-rate-first-run-with-clear-structure",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-tdd-integration-tests-achieved-100-pass-rate-first-run-with-clear-structure",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-memory-driven-gotcha-prevention-in-repeated-task-patterns",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
       "label": "relates-to"
     }
   ]

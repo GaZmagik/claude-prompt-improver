@@ -3,14 +3,13 @@ id: learning-integration-tests-must-validate-interface-signatures-before-writing
 title: Integration tests must validate interface signatures before writing assertions
 type: learning
 scope: project
-created: "2026-01-19T18:16:00.480Z"
-updated: "2026-01-19T18:16:00.480Z"
+created: "2026-01-19T18:53:34.982Z"
+updated: "2026-01-19T18:53:34.982Z"
 tags:
-  - testing
-  - integration-tests
-  - typescript
   - tdd
+  - integration-tests
+  - testing
   - project
 ---
 
-When writing integration tests that call real implementations, read the actual function signatures and types first. Discovered in full-flow.spec.ts: type mismatches between test assertions and actual function parameters required iterative fixes. Read implementation before test to prevent assertion rewrites.
+When writing integration tests, validate that the interface signatures match before writing assertions. This prevents test failures due to mismatched function signatures rather than actual logic errors. Discovered during M3 phase when test file was created with stub but assertions weren't written against actual interfaces.

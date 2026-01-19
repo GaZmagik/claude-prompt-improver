@@ -4,7 +4,7 @@ title: File-reader utility extraction pattern for shared readFile helpers
 type: learning
 scope: project
 created: "2026-01-19T18:16:28.300Z"
-updated: "2026-01-19T18:16:28.300Z"
+updated: "2026-01-19T19:05:27.303Z"
 tags:
   - refactoring
   - utilities
