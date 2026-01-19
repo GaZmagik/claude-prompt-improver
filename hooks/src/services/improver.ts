@@ -46,6 +46,7 @@ export interface ImprovementResult {
   readonly modelUsed: ClaudeModel;
   readonly latencyMs: number;
   readonly contextSources: readonly ContextSource[];
+  readonly summary?: readonly string[];
 }
 
 /**
@@ -81,6 +82,46 @@ function getContextSources(context?: ImprovementContext): ContextSource[] {
   if (context.session) sources.push('session');
 
   return sources;
+}
+
+/**
+ * Generate improvement summary by detecting changes
+ * Returns max 3 bullets describing what changed
+ */
+export function generateImprovementSummary(
+  originalPrompt: string,
+  improvedPrompt: string,
+): readonly string[] {
+  const changes: string[] = [];
+
+  // Detect XML structuring added
+  const hasXmlTags = /<(task|context|constraints|output_format|examples)>/.test(improvedPrompt);
+  const originalHasXmlTags = /<(task|context|constraints|output_format|examples)>/.test(originalPrompt);
+  if (hasXmlTags && !originalHasXmlTags) {
+    changes.push('Added XML structure');
+  }
+
+  // Detect context injection (both specific and generic context tags)
+  const hasContextTags = /<(context|git_context|lsp_diagnostics|specification|available_tools|available_skills|suggested_agents|relevant_memories|session_context)>/.test(improvedPrompt);
+  const originalHasContextTags = /<(context|git_context|lsp_diagnostics|specification|available_tools|available_skills|suggested_agents|relevant_memories|session_context)>/.test(originalPrompt);
+  if (hasContextTags && !originalHasContextTags) {
+    changes.push('Injected context');
+  }
+
+  // Detect expansion (>20% token increase)
+  const originalTokens = originalPrompt.split(/\s+/).length;
+  const improvedTokens = improvedPrompt.split(/\s+/).length;
+  const growthPercent = ((improvedTokens - originalTokens) / originalTokens) * 100;
+  if (growthPercent > 20) {
+    changes.push('Expanded with detail');
+  }
+
+  // Return max 3 bullets, or fallback if no specific changes detected
+  if (changes.length === 0) {
+    return ['Enhanced clarity'];
+  }
+
+  return changes.slice(0, 3);
 }
 
 /**
@@ -190,6 +231,8 @@ export async function improvePrompt(options: ImprovePromptOptions): Promise<Impr
       };
     }
 
+    const summary = generateImprovementSummary(originalPrompt, _mockClaudeResponse);
+
     return {
       success: true,
       improvedPrompt: _mockClaudeResponse,
@@ -197,6 +240,7 @@ export async function improvePrompt(options: ImprovePromptOptions): Promise<Impr
       modelUsed: model,
       latencyMs,
       contextSources,
+      summary,
     };
   }
 
@@ -226,6 +270,8 @@ export async function improvePrompt(options: ImprovePromptOptions): Promise<Impr
     };
   }
 
+  const summary = generateImprovementSummary(originalPrompt, result.output);
+
   return {
     success: true,
     improvedPrompt: result.output,
@@ -233,5 +279,6 @@ export async function improvePrompt(options: ImprovePromptOptions): Promise<Impr
     modelUsed: model,
     latencyMs,
     contextSources,
+    summary,
   };
 }

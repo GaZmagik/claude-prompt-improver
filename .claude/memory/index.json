@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-19T16:22:56.196Z",
+  "lastUpdated": "2026-01-19T17:29:56.667Z",
   "memories": [
     {
       "id": "learning-retro-agent-first-sdd-workflow-reduces-iteration",
@@ -1498,6 +1498,37 @@
       "updated": "2026-01-19T13:05:28.858Z",
       "scope": "project",
       "relativePath": "temporary/thought-20260119-125700073.md"
+    },
+    {
+      "id": "learning-post-mvp-remediation-completed-6-phases-systematically",
+      "type": "learning",
+      "title": "Post-MVP remediation completed 6 phases systematically",
+      "tags": [
+        "post-mvp",
+        "remediation",
+        "security",
+        "performance",
+        "project"
+      ],
+      "created": "2026-01-19T17:29:52.450Z",
+      "updated": "2026-01-19T17:29:52.450Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-post-mvp-remediation-completed-6-phases-systematically.md"
+    },
+    {
+      "id": "gotcha-improved-prompt-logging-can-expose-sensitive-injected-context",
+      "type": "gotcha",
+      "title": "Improved prompt logging can expose sensitive injected context",
+      "tags": [
+        "security",
+        "logging",
+        "sensitive-data",
+        "project"
+      ],
+      "created": "2026-01-19T17:29:56.657Z",
+      "updated": "2026-01-19T17:29:56.657Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-improved-prompt-logging-can-expose-sensitive-injected-context.md"
     }
   ]
 }

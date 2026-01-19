@@ -14,6 +14,7 @@ export interface BypassCheckInput {
   readonly sessionId: string;
   readonly permissionMode?: string;
   readonly pluginDisabled?: boolean;
+  readonly forceImprove?: boolean;
   readonly contextUsage?: {
     readonly used: number;
     readonly max: number;
@@ -58,16 +59,24 @@ function getAvailableContextPercent(contextUsage: { used: number; max: number })
  * Detects if a prompt should bypass improvement processing
  *
  * Priority order (first match wins):
- * 1. plugin_disabled - Plugin is disabled in configuration
+ * 0. forceImprove - Override all checks except plugin_disabled
+ * 1. plugin_disabled - Plugin is disabled in configuration (cannot be overridden)
  * 2. forked_session - Running in forked session (recursion prevention)
  * 3. low_context - Less than 5% context remaining
  * 4. skip_tag - Prompt contains #skip tag
  * 5. short_prompt - Prompt is ≤10 tokens
  */
 export function detectBypass(input: BypassCheckInput): BypassCheckResult {
-  const { prompt, permissionMode, pluginDisabled, contextUsage } = input;
+  const { prompt, permissionMode, pluginDisabled, forceImprove, contextUsage } = input;
 
-  // Priority 1: Plugin disabled
+  // Priority 0: Force improve bypasses ALL checks except plugin_disabled
+  if (forceImprove === true && pluginDisabled !== true) {
+    return {
+      shouldBypass: false,
+    };
+  }
+
+  // Priority 1: Plugin disabled (absolute priority, cannot be overridden)
   if (pluginDisabled === true) {
     return {
       shouldBypass: true,

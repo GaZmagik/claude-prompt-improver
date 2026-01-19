@@ -12,6 +12,7 @@ import {
   buildImprovementPrompt,
   getModelForClassification,
   getTimeoutForClassification,
+  generateImprovementSummary,
 } from './improver.ts';
 
 describe('Improver', () => {
@@ -222,6 +223,168 @@ describe('Improver', () => {
       expect(result.contextSources).toContain('git');
       expect(result.contextSources).toContain('lsp');
       expect(result.contextSources).toContain('tools');
+    });
+  });
+
+  describe('generateImprovementSummary - change detection', () => {
+    it('should detect XML structuring added', () => {
+      const originalPrompt = 'fix the authentication bug';
+      const improvedPrompt = '<task>Fix the authentication bug in the login service</task>';
+
+      const summary = generateImprovementSummary(originalPrompt, improvedPrompt);
+
+      expect(summary).toBeDefined();
+      expect(summary.length).toBeGreaterThan(0);
+      expect(summary.some(s => s.toLowerCase().includes('xml') || s.toLowerCase().includes('structure'))).toBe(true);
+    });
+
+    it('should detect context injection', () => {
+      const originalPrompt = 'fix the bug';
+      const improvedPrompt = `<task>Fix the bug</task>
+<context>
+Current branch: feature/auth
+Recent commit: Add JWT validation
+</context>`;
+
+      const summary = generateImprovementSummary(originalPrompt, improvedPrompt);
+
+      expect(summary).toBeDefined();
+      expect(summary.some(s => s.toLowerCase().includes('context') || s.toLowerCase().includes('inject'))).toBe(true);
+    });
+
+    it('should detect expansion (>20% token increase)', () => {
+      const originalPrompt = 'fix bug';
+      const improvedPrompt = 'fix the authentication bug in the login service by investigating the JWT validation logic and ensuring proper token expiry handling';
+
+      const summary = generateImprovementSummary(originalPrompt, improvedPrompt);
+
+      expect(summary).toBeDefined();
+      expect(summary.some(s => s.toLowerCase().includes('expand') || s.toLowerCase().includes('detail'))).toBe(true);
+    });
+
+    it('should return maximum 3 bullets', () => {
+      const originalPrompt = 'help';
+      const improvedPrompt = `<task>Help with debugging</task>
+<context>Git branch info, LSP errors, session context</context>
+<constraints>Must preserve user intent and maintain professional tone</constraints>
+This is a very detailed and expanded prompt with lots of additional context and information that should trigger multiple detection rules including XML structure, context injection, and expansion.`;
+
+      const summary = generateImprovementSummary(originalPrompt, improvedPrompt);
+
+      expect(summary).toBeDefined();
+      expect(summary.length).toBeLessThanOrEqual(3);
+    });
+
+    it('should provide fallback for minimal changes', () => {
+      const originalPrompt = 'fix the bug';
+      const improvedPrompt = 'Fix the bug.';
+
+      const summary = generateImprovementSummary(originalPrompt, improvedPrompt);
+
+      expect(summary).toBeDefined();
+      expect(summary.length).toBeGreaterThan(0);
+      // Should have at least some generic message
+      expect(summary[0]).toBeTruthy();
+    });
+
+    it('should handle identical prompts', () => {
+      const originalPrompt = 'test prompt';
+      const improvedPrompt = 'test prompt';
+
+      const summary = generateImprovementSummary(originalPrompt, improvedPrompt);
+
+      expect(summary).toBeDefined();
+      expect(summary.length).toBeGreaterThan(0);
+    });
+
+    it('should detect multiple changes and prioritise', () => {
+      const originalPrompt = 'fix';
+      const improvedPrompt = `<task>Fix the authentication bug in the user login service</task>
+<context>
+Branch: feature/auth
+Recent commits: JWT validation, token refresh
+LSP errors: Type mismatch in auth handler
+</context>`;
+
+      const summary = generateImprovementSummary(originalPrompt, improvedPrompt);
+
+      expect(summary).toBeDefined();
+      expect(summary.length).toBeGreaterThan(0);
+      expect(summary.length).toBeLessThanOrEqual(3);
+      // Should include multiple change types
+      const combinedText = summary.join(' ').toLowerCase();
+      expect(combinedText.includes('xml') || combinedText.includes('structure')).toBe(true);
+    });
+
+    it('should handle very long prompts efficiently', () => {
+      const originalPrompt = 'a'.repeat(1000);
+      const improvedPrompt = '<task>' + 'a'.repeat(1000) + ' with additional context</task>';
+
+      const summary = generateImprovementSummary(originalPrompt, improvedPrompt);
+
+      expect(summary).toBeDefined();
+      expect(summary.length).toBeLessThanOrEqual(3);
+    });
+  });
+
+  describe('ImprovementResult with summary field', () => {
+    it('should include summary in result when changes detected', async () => {
+      const result = await improvePrompt({
+        originalPrompt: 'fix the bug',
+        classification: 'COMPLEX',
+        sessionId: 'session-123',
+        _mockClaudeResponse: '<task>Fix the authentication bug</task>',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.summary).toBeDefined();
+      expect(Array.isArray(result.summary)).toBe(true);
+    });
+
+    it('should include summary array with max 3 items', async () => {
+      const result = await improvePrompt({
+        originalPrompt: 'help',
+        classification: 'COMPLEX',
+        sessionId: 'session-123',
+        _mockClaudeResponse: `<task>Help debug the issue</task>
+<context>Branch: main, Errors: type mismatches</context>
+<constraints>Preserve user intent</constraints>
+This is expanded with lots of detail and context information.`,
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.summary).toBeDefined();
+      if (result.summary) {
+        expect(result.summary.length).toBeLessThanOrEqual(3);
+      }
+    });
+
+    it('should include summary as readonly array', async () => {
+      const result = await improvePrompt({
+        originalPrompt: 'test',
+        classification: 'SIMPLE',
+        sessionId: 'session-123',
+        _mockClaudeResponse: '<task>Test with structure</task>',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.summary).toBeDefined();
+      if (result.summary) {
+        // TypeScript will enforce readonly at compile time
+        expect(Array.isArray(result.summary)).toBe(true);
+      }
+    });
+
+    it('should omit summary when improvement fails', async () => {
+      const result = await improvePrompt({
+        originalPrompt: 'fix the bug',
+        classification: 'COMPLEX',
+        sessionId: 'session-123',
+        _mockClaudeResponse: null, // Simulates timeout/failure
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.summary).toBeUndefined();
     });
   });
 });

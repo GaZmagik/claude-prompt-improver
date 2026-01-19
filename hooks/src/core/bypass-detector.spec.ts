@@ -333,4 +333,141 @@ describe('Bypass Detector', () => {
       expect(elapsed / iterations).toBeLessThan(1);
     });
   });
+
+  describe('forceImprove - bypass override', () => {
+    it('should not bypass short prompt when forceImprove is true', () => {
+      const input: BypassCheckInput = {
+        prompt: 'fix it',
+        sessionId: 'session-123',
+        forceImprove: true,
+      };
+
+      const result = detectBypass(input);
+
+      expect(result.shouldBypass).toBe(false);
+      expect(result.reason).toBeUndefined();
+    });
+
+    it('should not bypass skip tag when forceImprove is true', () => {
+      const input: BypassCheckInput = {
+        prompt: '#skip fix the authentication bug',
+        sessionId: 'session-123',
+        forceImprove: true,
+      };
+
+      const result = detectBypass(input);
+
+      expect(result.shouldBypass).toBe(false);
+      expect(result.reason).toBeUndefined();
+    });
+
+    it('should not bypass low context when forceImprove is true', () => {
+      const input: BypassCheckInput = {
+        prompt: 'fix the bug in the authentication module',
+        sessionId: 'session-123',
+        forceImprove: true,
+        contextUsage: {
+          used: 195000,
+          max: 200000,
+        },
+      };
+
+      const result = detectBypass(input);
+
+      expect(result.shouldBypass).toBe(false);
+      expect(result.reason).toBeUndefined();
+    });
+
+    it('should not bypass forked session when forceImprove is true', () => {
+      const input: BypassCheckInput = {
+        prompt: 'fix the authentication bug',
+        sessionId: 'session-123',
+        forceImprove: true,
+        permissionMode: 'fork',
+      };
+
+      const result = detectBypass(input);
+
+      expect(result.shouldBypass).toBe(false);
+      expect(result.reason).toBeUndefined();
+    });
+
+    it('should still bypass when plugin_disabled even with forceImprove true', () => {
+      const input: BypassCheckInput = {
+        prompt: 'fix the authentication bug',
+        sessionId: 'session-123',
+        forceImprove: true,
+        pluginDisabled: true,
+      };
+
+      const result = detectBypass(input);
+
+      expect(result.shouldBypass).toBe(true);
+      expect(result.reason).toBe('plugin_disabled');
+    });
+
+    it('should follow normal bypass logic when forceImprove is false', () => {
+      const input: BypassCheckInput = {
+        prompt: 'fix',
+        sessionId: 'session-123',
+        forceImprove: false,
+      };
+
+      const result = detectBypass(input);
+
+      expect(result.shouldBypass).toBe(true);
+      expect(result.reason).toBe('short_prompt');
+    });
+
+    it('should follow normal bypass logic when forceImprove is undefined', () => {
+      const input: BypassCheckInput = {
+        prompt: 'help',
+        sessionId: 'session-123',
+      };
+
+      const result = detectBypass(input);
+
+      expect(result.shouldBypass).toBe(true);
+      expect(result.reason).toBe('short_prompt');
+    });
+
+    it('should override all bypass conditions except plugin_disabled', () => {
+      const input: BypassCheckInput = {
+        prompt: '#skip fix',
+        sessionId: 'session-123',
+        forceImprove: true,
+        permissionMode: 'fork',
+        contextUsage: {
+          used: 199000,
+          max: 200000,
+        },
+      };
+
+      const result = detectBypass(input);
+
+      // All conditions present but forceImprove should override them
+      expect(result.shouldBypass).toBe(false);
+      expect(result.reason).toBeUndefined();
+    });
+
+    it('should respect priority: plugin_disabled cannot be overridden', () => {
+      const input: BypassCheckInput = {
+        prompt: '#skip fix',
+        sessionId: 'session-123',
+        forceImprove: true,
+        pluginDisabled: true,
+        permissionMode: 'fork',
+        contextUsage: {
+          used: 199000,
+          max: 200000,
+        },
+      };
+
+      const result = detectBypass(input);
+
+      // plugin_disabled has absolute priority
+      expect(result.shouldBypass).toBe(true);
+      expect(result.reason).toBe('plugin_disabled');
+    });
+  });
 });

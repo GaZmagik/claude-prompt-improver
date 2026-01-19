@@ -465,6 +465,14 @@
       "id": "thought-20260119-125700073",
       "type": "breadcrumb",
       "title": "Think: Potential new features for Claude Prompt Improver Plugin"
+    },
+    {
+      "id": "learning-post-mvp-remediation-completed-6-phases-systematically",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-improved-prompt-logging-can-expose-sensitive-injected-context",
+      "type": "gotcha"
     }
   ],
   "edges": [

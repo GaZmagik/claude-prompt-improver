@@ -99,6 +99,7 @@ Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settin
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `enabled` | boolean | `true` | Enable/disable the plugin globally |
+| `forceImprove` | boolean | `false` | Bypass all heuristic checks (for testing) |
 | `shortPromptThreshold` | number | `10` | Prompts with fewer tokens bypass improvement |
 | `compactionThreshold` | number | `5` | Skip when context availability is below this % |
 | `defaultSimpleModel` | string | `haiku` | Model for simple improvements |
@@ -110,9 +111,11 @@ Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settin
 | `integrations.session` | boolean | `true` | Enable session context |
 | `logging.enabled` | boolean | `true` | Enable logging |
 | `logging.logFilePath` | string | `.claude/logs/...` | Log file location |
+| `logging.logLevel` | string | `INFO` | Log level: ERROR, INFO, or DEBUG |
 | `logging.maxLogSizeMB` | number | `10` | Maximum log file size in MB |
 | `logging.maxLogAgeDays` | number | `7` | Maximum log age in days |
 | `logging.displayImprovedPrompt` | boolean | `true` | Show improved prompt in output |
+| `logging.useTimestampedLogs` | boolean | `false` | Create timestamped log files |
 
 Both camelCase and snake_case key names are supported (e.g., `shortPromptThreshold` or `short_prompt_threshold`).
 
