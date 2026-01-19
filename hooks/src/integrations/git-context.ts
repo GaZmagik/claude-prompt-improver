@@ -37,6 +37,10 @@ export interface GitContextOptions {
   readonly cwd?: string;
   readonly timeoutMs?: number;
   readonly enabled?: boolean;
+  /** Include recent commits (default: false) - opt-in for performance */
+  readonly includeCommits?: boolean;
+  /** Include diff stats (default: false) - opt-in for performance */
+  readonly includeDiff?: boolean;
   /** For testing - mock command execution */
   readonly _mockCommandResults?: Record<string, string | null>;
 }
@@ -264,19 +268,35 @@ export async function gatherGitContext(options: GitContextOptions): Promise<GitC
     }
   }
 
-  // Gather git information
-  const [branchResult, logResult, statusResult, diffResult] = await Promise.all([
-    executeGitCommand('branch --show-current', options),
-    executeGitCommand('log --oneline -5', options),
-    executeGitCommand('status --porcelain', options),
-    executeGitCommand('diff --stat', options),
-  ]);
+  // Gather git information - only fetch what's needed
+  const { includeCommits = false, includeDiff = false } = options;
 
-  // Parse results
-  const branch = branchResult.success ? branchResult.output || '' : '';
-  const recentCommits = logResult.success ? parseGitLog(logResult.output || '') : [];
-  const changedFiles = statusResult.success ? parseGitStatus(statusResult.output || '') : [];
-  const diffStats = diffResult.success ? diffResult.output || '' : '';
+  // Always fetch branch and status (core context)
+  const commands = [
+    executeGitCommand('branch --show-current', options),
+    executeGitCommand('status --porcelain', options),
+  ];
+
+  // Optionally fetch commits and diff (performance optimization)
+  if (includeCommits) {
+    commands.push(executeGitCommand('log --oneline -5', options));
+  }
+  if (includeDiff) {
+    commands.push(executeGitCommand('diff --stat', options));
+  }
+
+  const results = await Promise.all(commands);
+
+  // Parse results (accounting for optional commands)
+  const branchResult = results[0];
+  const statusResult = results[1];
+  const logResult = includeCommits ? results[2] : undefined;
+  const diffResult = includeDiff ? results[includeCommits ? 3 : 2] : undefined;
+
+  const branch = branchResult?.success ? branchResult.output || '' : '';
+  const changedFiles = statusResult?.success ? parseGitStatus(statusResult.output || '') : [];
+  const recentCommits = logResult?.success ? parseGitLog(logResult.output || '') : [];
+  const diffStats = diffResult?.success ? diffResult.output || '' : '';
 
   const context: GitContext = {
     branch,

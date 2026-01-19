@@ -289,8 +289,10 @@ describe('Git Context Integration', () => {
   });
 
   describe('gatherGitContext - full integration', () => {
-    it('should gather complete git context', async () => {
+    it('should gather complete git context with all options enabled', async () => {
       const result = await gatherGitContext({
+        includeCommits: true,
+        includeDiff: true,
         _mockCommandResults: {
           'rev-parse --git-dir': '.git',
           'branch --show-current': 'feature/add-auth',
@@ -305,10 +307,30 @@ describe('Git Context Integration', () => {
       expect(result.context?.branch).toBe('feature/add-auth');
       expect(result.context?.recentCommits.length).toBe(2);
       expect(result.context?.changedFiles.length).toBe(2);
+      expect(result.context?.diffStats).toBe(' src/auth.ts | 10 +++++++---');
+    });
+
+    it('should gather minimal context by default (no commits or diff)', async () => {
+      const result = await gatherGitContext({
+        _mockCommandResults: {
+          'rev-parse --git-dir': '.git',
+          'branch --show-current': 'main',
+          'status --porcelain': ' M src/file.ts',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.context).toBeDefined();
+      expect(result.context?.branch).toBe('main');
+      expect(result.context?.recentCommits.length).toBe(0); // Not fetched by default
+      expect(result.context?.changedFiles.length).toBe(1);
+      expect(result.context?.diffStats).toBe(''); // Not fetched by default
     });
 
     it('should handle partial git data gracefully', async () => {
       const result = await gatherGitContext({
+        includeCommits: true,
+        includeDiff: true,
         _mockCommandResults: {
           'rev-parse --git-dir': '.git',
           'branch --show-current': 'main',
