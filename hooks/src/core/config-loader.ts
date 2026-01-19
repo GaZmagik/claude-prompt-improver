@@ -102,6 +102,11 @@ export function clearConfigCache(): void {
   configCache.clear();
 }
 
+// Pre-compiled regex patterns for YAML parsing (performance optimization)
+const YAML_SECTION_PATTERN = /^(\w+):$/;
+const YAML_NESTED_KV_PATTERN = /^\s+(\w+):\s*(.+)$/;
+const YAML_TOP_LEVEL_KV_PATTERN = /^(\w+):\s*(.+)$/;
+
 /**
  * Parses YAML frontmatter from markdown content
  * Extracts key-value pairs between --- delimiters
@@ -123,42 +128,49 @@ export function parseYamlFrontmatter(content: string): Record<string, unknown> {
   const lines = frontmatter.split('\n');
   let currentSection: string | null = null;
   let currentSectionData: Record<string, unknown> = {};
+  let sectionHasData = false;
 
   for (const line of lines) {
+    // Cache trimmed line to avoid redundant trim() calls
+    const trimmed = line.trim();
+
     // Skip comments and empty lines
-    if (line.trim().startsWith('#') || line.trim() === '') {
+    if (trimmed.startsWith('#') || trimmed === '') {
       continue;
     }
 
     // Check for section header (key followed by colon with no value)
-    const sectionMatch = line.match(/^(\w+):$/);
+    const sectionMatch = line.match(YAML_SECTION_PATTERN);
     if (sectionMatch?.[1]) {
       // Save previous section if exists
-      if (currentSection && Object.keys(currentSectionData).length > 0) {
+      if (currentSection && sectionHasData) {
         result[currentSection] = currentSectionData;
       }
       currentSection = sectionMatch[1];
       currentSectionData = {};
+      sectionHasData = false;
       continue;
     }
 
     // Check for indented key-value (nested in section)
-    const nestedMatch = line.match(/^\s+(\w+):\s*(.+)$/);
+    const nestedMatch = line.match(YAML_NESTED_KV_PATTERN);
     if (nestedMatch?.[1] && nestedMatch[2] && currentSection) {
       const key = nestedMatch[1];
       const value = nestedMatch[2];
       currentSectionData[key] = parseYamlValue(value);
+      sectionHasData = true;
       continue;
     }
 
     // Check for top-level key-value
-    const kvMatch = line.match(/^(\w+):\s*(.+)$/);
+    const kvMatch = line.match(YAML_TOP_LEVEL_KV_PATTERN);
     if (kvMatch?.[1] && kvMatch[2]) {
       // Save any open section first
-      if (currentSection && Object.keys(currentSectionData).length > 0) {
+      if (currentSection && sectionHasData) {
         result[currentSection] = currentSectionData;
         currentSection = null;
         currentSectionData = {};
+        sectionHasData = false;
       }
       const key = kvMatch[1];
       const value = kvMatch[2];
@@ -167,7 +179,7 @@ export function parseYamlFrontmatter(content: string): Record<string, unknown> {
   }
 
   // Save final section if exists
-  if (currentSection && Object.keys(currentSectionData).length > 0) {
+  if (currentSection && sectionHasData) {
     result[currentSection] = currentSectionData;
   }
 
