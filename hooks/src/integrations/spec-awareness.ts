@@ -2,7 +2,8 @@
  * Specification awareness integration for enriching prompts with spec context
  * Parses .specify/ directory for spec.md, plan.md, and tasks.md
  */
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, statSync } from 'node:fs';
+import { readFileSyncSafe } from '../utils/file-reader.ts';
 
 /**
  * Cache entry for spec file content with mtime validation
@@ -306,8 +307,9 @@ export function matchUserStoriesToPrompt(stories: UserStory[], prompt: string): 
  * Helper to read file from mock or real filesystem with mtime-based caching
  */
 function readFile(path: string, mockFs?: Record<string, string | null>): string | null {
+  // Use mock filesystem if provided
   if (mockFs) {
-    return mockFs[path] ?? null;
+    return readFileSyncSafe(path, mockFs);
   }
 
   // Check cache with mtime validation
@@ -323,14 +325,12 @@ function readFile(path: string, mockFs?: Record<string, string | null>): string 
     return cached.content;
   }
 
-  // Read fresh content and update cache
-  try {
-    const content = readFileSync(path, 'utf-8');
+  // Read fresh content using shared utility and update cache
+  const content = readFileSyncSafe(path);
+  if (content) {
     specFileCache.set(path, { content, mtimeMs: currentMtime });
-    return content;
-  } catch {
-    return null;
   }
+  return content;
 }
 
 /**

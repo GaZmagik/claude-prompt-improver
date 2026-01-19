@@ -2,7 +2,8 @@
  * Memory plugin integration for enriching prompts with relevant memories
  * Detects claude-memory-plugin and retrieves matching memories from index.json
  */
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
+import { readFileSyncSafe } from '../utils/file-reader.ts';
 
 /** Maximum number of memories to include */
 const MAX_MEMORIES = 5;
@@ -194,23 +195,6 @@ function scoreMemories(
   });
 }
 
-/**
- * Helper to read file from mock or real filesystem
- */
-function readFile(path: string, mockFs?: Record<string, string | null>): string | null {
-  if (mockFs) {
-    return mockFs[path] ?? null;
-  }
-  // Real implementation - read from filesystem
-  try {
-    if (!existsSync(path)) {
-      return null;
-    }
-    return readFileSync(path, 'utf-8');
-  } catch {
-    return null;
-  }
-}
 
 /**
  * Gathers memory context from the memory plugin
@@ -241,7 +225,7 @@ export async function gatherMemoryContext(
 
   // Read index.json
   const indexPath = `${pluginCheck.path}index.json`;
-  const indexContent = readFile(indexPath, _mockFileSystem);
+  const indexContent = readFileSyncSafe(indexPath, _mockFileSystem);
 
   if (!indexContent) {
     return {

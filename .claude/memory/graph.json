@@ -473,6 +473,38 @@
     {
       "id": "gotcha-improved-prompt-logging-can-expose-sensitive-injected-context",
       "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-memory-driven-work-prevents-duplication-and-maintains-context",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-tdd-integration-tests-achieved-100-pass-rate-first-run-with-clear-structure",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-read-function-signatures-before-writing-test-code-to-avoid-iteration",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-progressive-cleanup-strategy-must-should-nice-to-have-enables-user-agency",
+      "type": "learning"
+    },
+    {
+      "id": "learning-tdd-hook-enforcement-requires-stub-file-creation",
+      "type": "learning"
+    },
+    {
+      "id": "learning-integration-tests-must-validate-interface-signatures-before-writing-assertions",
+      "type": "learning"
+    },
+    {
+      "id": "artifact-promise-race-timeout-cleanup",
+      "type": "artifact"
+    },
+    {
+      "id": "learning-file-reader-utility-extraction-pattern-for-shared-readfile-helpers",
+      "type": "learning"
     }
   ],
   "edges": [

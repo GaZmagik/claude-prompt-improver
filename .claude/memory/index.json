@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-19T17:29:56.667Z",
+  "lastUpdated": "2026-01-19T18:16:28.321Z",
   "memories": [
     {
       "id": "learning-retro-agent-first-sdd-workflow-reduces-iteration",
@@ -1529,6 +1529,139 @@
       "updated": "2026-01-19T17:29:56.657Z",
       "scope": "project",
       "relativePath": "permanent/gotcha-improved-prompt-logging-can-expose-sensitive-injected-context.md"
+    },
+    {
+      "id": "learning-retro-memory-driven-work-prevents-duplication-and-maintains-context",
+      "type": "learning",
+      "title": "Retro - Memory-driven work prevents duplication and maintains context",
+      "tags": [
+        "retrospective",
+        "process",
+        "memory-driven-dev",
+        "project"
+      ],
+      "created": "2026-01-19T18:15:29.750Z",
+      "updated": "2026-01-19T18:15:29.750Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-memory-driven-work-prevents-duplication-and-maintains-context.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-retro-tdd-integration-tests-achieved-100-pass-rate-first-run-with-clear-structure",
+      "type": "learning",
+      "title": "Retro - TDD integration tests achieved 100% pass-rate first run with clear structure",
+      "tags": [
+        "retrospective",
+        "process",
+        "tdd",
+        "testing",
+        "project"
+      ],
+      "created": "2026-01-19T18:15:34.430Z",
+      "updated": "2026-01-19T18:15:34.430Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-tdd-integration-tests-achieved-100-pass-rate-first-run-with-clear-structure.md",
+      "severity": "medium"
+    },
+    {
+      "id": "gotcha-retro-read-function-signatures-before-writing-test-code-to-avoid-iteration",
+      "type": "gotcha",
+      "title": "Retro - Read function signatures before writing test code to avoid iteration",
+      "tags": [
+        "retrospective",
+        "process",
+        "testing",
+        "workflow",
+        "project"
+      ],
+      "created": "2026-01-19T18:15:39.809Z",
+      "updated": "2026-01-19T18:15:39.809Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-read-function-signatures-before-writing-test-code-to-avoid-iteration.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-retro-progressive-cleanup-strategy-must-should-nice-to-have-enables-user-agency",
+      "type": "learning",
+      "title": "Retro - Progressive cleanup strategy (must → should → nice-to-have) enables user agency",
+      "tags": [
+        "retrospective",
+        "process",
+        "planning",
+        "user-agency",
+        "project"
+      ],
+      "created": "2026-01-19T18:15:44.840Z",
+      "updated": "2026-01-19T18:15:44.840Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-progressive-cleanup-strategy-must-should-nice-to-have-enables-user-agency.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-tdd-hook-enforcement-requires-stub-file-creation",
+      "type": "learning",
+      "title": "TDD hook enforcement requires stub file creation",
+      "tags": [
+        "tdd",
+        "hooks",
+        "workflow",
+        "typescript",
+        "project"
+      ],
+      "created": "2026-01-19T18:15:49.108Z",
+      "updated": "2026-01-19T18:15:49.108Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-tdd-hook-enforcement-requires-stub-file-creation.md"
+    },
+    {
+      "id": "learning-integration-tests-must-validate-interface-signatures-before-writing-assertions",
+      "type": "learning",
+      "title": "Integration tests must validate interface signatures before writing assertions",
+      "tags": [
+        "testing",
+        "integration-tests",
+        "typescript",
+        "tdd",
+        "project"
+      ],
+      "created": "2026-01-19T18:16:00.480Z",
+      "updated": "2026-01-19T18:16:00.480Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-integration-tests-must-validate-interface-signatures-before-writing-assertions.md"
+    },
+    {
+      "id": "artifact-promise-race-timeout-cleanup",
+      "type": "artifact",
+      "title": "Promise.race timeout cleanup pattern",
+      "tags": [
+        "async",
+        "patterns",
+        "typescript",
+        "cleanup",
+        "resource-management",
+        "project"
+      ],
+      "created": "2026-01-19T18:16:17.195Z",
+      "updated": "2026-01-19T18:16:17.195Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-promise-race-timeout-cleanup.md"
+    },
+    {
+      "id": "learning-file-reader-utility-extraction-pattern-for-shared-readfile-helpers",
+      "type": "learning",
+      "title": "File-reader utility extraction pattern for shared readFile helpers",
+      "tags": [
+        "refactoring",
+        "utilities",
+        "deduplication",
+        "typescript",
+        "testing",
+        "project"
+      ],
+      "created": "2026-01-19T18:16:28.300Z",
+      "updated": "2026-01-19T18:16:28.300Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-file-reader-utility-extraction-pattern-for-shared-readfile-helpers.md"
     }
   ]
 }
