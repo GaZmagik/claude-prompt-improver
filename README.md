@@ -46,6 +46,7 @@ bun install
 .claude-plugin/
   plugin.json          # Plugin metadata
 hooks/
+  hooks.json           # Hook definitions
   user-prompt-submit/
     improve-prompt.ts  # Main hook entry point
   src/
@@ -93,6 +94,38 @@ logging:
 ```
 
 Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settings private.
+
+### Legacy JSON Configuration (Backwards Compatibility)
+
+For backwards compatibility, the plugin also supports JSON configuration at `.claude/prompt-improver-config.json`:
+
+```json
+{
+  "enabled": true,
+  "shortPromptThreshold": 10,
+  "compactionThreshold": 5,
+  "defaultSimpleModel": "haiku",
+  "defaultComplexModel": "sonnet",
+  "integrations": {
+    "git": true,
+    "lsp": true,
+    "spec": true,
+    "memory": true,
+    "session": true
+  },
+  "logging": {
+    "enabled": true,
+    "logFilePath": ".claude/logs/prompt-improver-latest.log",
+    "logLevel": "INFO",
+    "maxLogSizeMB": 10,
+    "maxLogAgeDays": 7,
+    "displayImprovedPrompt": true,
+    "useTimestampedLogs": false
+  }
+}
+```
+
+**Note**: The markdown format (`.local.md`) is recommended as it allows inline documentation alongside configuration.
 
 ### Configuration Options
 
@@ -195,7 +228,8 @@ bun test
 ### Test Coverage
 
 The plugin has comprehensive test coverage:
-- 454+ tests across 22+ files
+- 619+ tests across 27+ files
+- 1191+ expect() assertions
 - TDD methodology throughout
 - Unit tests for all components
 - Integration tests for context building

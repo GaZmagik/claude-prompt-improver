@@ -154,6 +154,15 @@ export function matchMemoriesByTags(memories: Memory[], prompt: string): Memory[
 
 /**
  * Scores and ranks memories by relevance to prompt
+ *
+ * Note: Uses custom scoring logic rather than shared keyword-matcher utility because:
+ * - Bidirectional matching for tags (tag.includes(word) || word.includes(tag))
+ * - Weighted scoring (title matches: 3pts, tag matches: 2pts, type boost: 1pt)
+ * - Splits prompt into words rather than matching keywords against prompt
+ *
+ * @param memories - Memories to score
+ * @param prompt - User prompt to match against
+ * @returns Scored memories with relevance scores
  */
 function scoreMemories(
   memories: Memory[],
@@ -168,13 +177,13 @@ function scoreMemories(
     const tagsLower = memory.tags.map((t) => t.toLowerCase());
 
     for (const word of words) {
-      // Title matches are worth more
+      // Title matches are worth more (3 points per word)
       if (titleLower.includes(word)) score += 3;
-      // Tag matches
+      // Tag matches (2 points per word, bidirectional)
       if (tagsLower.some((tag) => tag.includes(word) || word.includes(tag))) score += 2;
     }
 
-    // Boost certain types
+    // Boost certain memory types
     if (memory.type === 'decision') score += 1;
     if (memory.type === 'gotcha') score += 1;
 
