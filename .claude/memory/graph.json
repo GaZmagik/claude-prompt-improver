@@ -608,31 +608,90 @@
     },
     {
       "id": "learning-retro-user-questioning-architectural-assumptions-revealed-critical-bug",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - User questioning architectural assumptions revealed critical bug"
     },
     {
       "id": "learning-retro-testing-with-real-session-id-revealed-environmental-dependency",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Testing with real session ID revealed environmental dependency"
     },
     {
       "id": "learning-retro-architectural-fix-eliminated-entire-class-of-complexity",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Architectural fix eliminated entire class of complexity"
     },
     {
       "id": "gotcha-retro-userpromptsubmit-hooks-should-not-use-fork-session",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Retro - UserPromptSubmit hooks should not use fork-session"
     },
     {
       "id": "decision-remove-fork-session-from-userpromptsubmit-hooks",
-      "type": "decision"
+      "type": "decision",
+      "title": "Remove fork-session from UserPromptSubmit hooks"
     },
     {
       "id": "learning-prompt-improver-end-to-end-validation-successful",
-      "type": "learning"
+      "type": "learning",
+      "title": "Prompt improver end-to-end validation successful"
     },
     {
       "id": "artifact-always-improve-without-classification-pattern",
-      "type": "artifact"
+      "type": "artifact",
+      "title": "Always-improve without classification pattern"
+    },
+    {
+      "id": "learning-session-restore-with-parallel-agents-improves-memory-graph-health-efficiently",
+      "type": "learning",
+      "title": "Session-restore with parallel agents improves memory graph health efficiently"
+    },
+    {
+      "id": "learning-typescript-exactoptionalpropertytypes-requires-conditional-spread-for-optional-params",
+      "type": "learning",
+      "title": "TypeScript exactOptionalPropertyTypes requires conditional spread for optional params"
+    },
+    {
+      "id": "decision-always-improve-comprehensive-expert-review-before-pr",
+      "type": "decision",
+      "title": "Comprehensive expert review before Always-Improve PR"
+    },
+    {
+      "id": "artifact-always-improve-production-restructuring-pattern",
+      "type": "artifact",
+      "title": "Production restructuring pattern for classification system removal"
+    },
+    {
+      "id": "learning-retro-systematic-priority-based-task-ordering-prevents-context-thrashing",
+      "type": "learning"
+    },
+    {
+      "id": "learning-session-restoration-with-parallel-agents-improves-memory-curation",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-pre-identify-all-code-locations-before-refactoring-to-avoid-incremental-discovery",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-security-vulnerabilities-v100-merged-with-2-critical-issues-indicate-need-for-mandatory-pre-merge-security-audit-gate",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-parallel-agent-launches-for-complex-reviews-8-agents-dramatically-more-efficient-than-sequential",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-defer-medium-priority-schema-refactoring-when-existing-manual-validation-adequate",
+      "type": "gotcha"
+    },
+    {
+      "id": "decision-git-command-array-based-arguments",
+      "type": "decision"
+    },
+    {
+      "id": "decision-featurepath-traversal-validation",
+      "type": "decision"
     }
   ],
   "edges": [
@@ -1309,6 +1368,86 @@
     {
       "source": "learning-retro-testing-with-real-session-id-revealed-environmental-dependency",
       "target": "learning-retro-user-questioning-architectural-assumptions-revealed-critical-bug",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-session-restore-with-parallel-agents-improves-memory-graph-health-efficiently",
+      "target": "learning-post-compaction-context-restoration-via-memory-system-effective",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-typescript-exactoptionalpropertytypes-requires-conditional-spread-for-optional-params",
+      "target": "learning-typescript-exactoptionalpropertytypes-in-strict-mode",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-always-improve-comprehensive-expert-review-before-pr",
+      "target": "artifact-always-improve-production-restructuring-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-always-improve-comprehensive-expert-review-before-pr",
+      "target": "decision-prompt-improver-always-improve-no-classification",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-session-restoration-with-parallel-agents-improves-memory-curation",
+      "target": "decision-always-improve-comprehensive-expert-review-before-pr",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-git-command-array-based-arguments",
+      "target": "decision-always-improve-comprehensive-expert-review-before-pr",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-featurepath-traversal-validation",
+      "target": "decision-always-improve-comprehensive-expert-review-before-pr",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-security-vulnerabilities-v100-merged-with-2-critical-issues-indicate-need-for-mandatory-pre-merge-security-audit-gate",
+      "target": "decision-always-improve-comprehensive-expert-review-before-pr",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-featurepath-traversal-validation",
+      "target": "decision-git-command-array-based-arguments",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-git-command-array-based-arguments",
+      "target": "learning-command-injection-vulnerability-sessionid-escaping",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-retro-defer-medium-priority-schema-refactoring-when-existing-manual-validation-adequate",
+      "target": "learning-retro-early-code-review-prevents-planning-misdirected-effort",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-parallel-agent-launches-for-complex-reviews-8-agents-dramatically-more-efficient-than-sequential",
+      "target": "learning-session-restoration-coordinates-3-parallel-agents-for-context-recovery",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-systematic-priority-based-task-ordering-prevents-context-thrashing",
+      "target": "learning-retro-progressive-cleanup-strategy-must-should-nice-to-have-enables-user-agency",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-pre-identify-all-code-locations-before-refactoring-to-avoid-incremental-discovery",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-classification-three-tier-cost-optimised",
+      "target": "learning-prompt-improver-classifier-conservative-by-design",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-retro-userpromptsubmit-hooks-should-not-use-fork-session",
+      "target": "decision-remove-fork-session-from-userpromptsubmit-hooks",
       "label": "relates-to"
     }
   ]

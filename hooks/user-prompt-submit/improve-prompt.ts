@@ -5,6 +5,7 @@
 import type {
   BypassReason,
   ClaudeModel,
+  Configuration,
   HookInput,
   HookOutput,
   VisibilityInfo,
@@ -185,6 +186,7 @@ export interface ProcessPromptOptions {
   readonly permissionMode?: string;
   readonly pluginDisabled?: boolean;
   readonly forceImprove?: boolean;
+  readonly shortPromptThreshold?: number;
   readonly contextUsage?: {
     readonly used: number;
     readonly max: number;
@@ -217,29 +219,13 @@ export type ProcessPromptResult =
     };
 
 /**
- * Processes a prompt through classification and improvement
- * Returns passthrough for NONE classification or on any error
+ * Builds bypass check input from process options
  */
-export async function processPrompt(options: ProcessPromptOptions): Promise<ProcessPromptResult> {
-  const {
-    prompt,
-    sessionId,
-    permissionMode,
-    pluginDisabled,
-    forceImprove,
-    contextUsage,
-    availableTools,
-    skillRules,
-    agentDefinitions,
-    _mockClassification,
-    _mockImprovement,
-  } = options;
+function buildBypassCheckInput(options: ProcessPromptOptions): BypassCheckInput {
+  const { prompt, sessionId, permissionMode, pluginDisabled, forceImprove, shortPromptThreshold, contextUsage } = options;
 
-  // Build bypass check input
-  const bypassInput: BypassCheckInput = {
-    prompt,
-    sessionId,
-  };
+  const bypassInput: BypassCheckInput = { prompt, sessionId };
+
   if (permissionMode !== undefined) {
     (bypassInput as { permissionMode?: string }).permissionMode = permissionMode;
   }
@@ -249,58 +235,73 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
   if (forceImprove !== undefined) {
     (bypassInput as { forceImprove?: boolean }).forceImprove = forceImprove;
   }
+  if (shortPromptThreshold !== undefined) {
+    (bypassInput as { shortPromptThreshold?: number }).shortPromptThreshold = shortPromptThreshold;
+  }
   if (contextUsage !== undefined) {
     (bypassInput as { contextUsage?: { used: number; max: number } }).contextUsage = contextUsage;
   }
 
-  // Check for bypass conditions (fast, synchronous check)
-  const bypassResult = detectBypass(bypassInput);
-  if (bypassResult.shouldBypass) {
-    // Only include bypassReason if defined
-    return bypassResult.reason
-      ? { type: 'passthrough', bypassReason: bypassResult.reason }
-      : { type: 'passthrough' };
+  return bypassInput;
+}
+
+/**
+ * Builds improvement context from available sources
+ */
+async function buildImprovementContext(
+  prompt: string,
+  availableTools?: readonly string[],
+  skillRules?: SkillRule[],
+  agentDefinitions?: AgentDefinition[]
+): Promise<ImprovementContext | undefined> {
+  if (!availableTools && !skillRules && !agentDefinitions) {
+    return undefined;
   }
 
-  // Build context from available sources
-  let improvementContext: ImprovementContext | undefined;
-  if (availableTools || skillRules || agentDefinitions) {
-    const contextInput: Parameters<typeof buildContext>[0] = { prompt };
-    if (availableTools) {
-      (contextInput as { availableTools?: readonly string[] }).availableTools = availableTools;
-    }
-    if (skillRules) {
-      (contextInput as { skillRules?: SkillRule[] }).skillRules = skillRules;
-    }
-    if (agentDefinitions) {
-      (contextInput as { agentDefinitions?: AgentDefinition[] }).agentDefinitions = agentDefinitions;
-    }
-
-    const builtContext = await buildContext(contextInput);
-    const formattedContext = formatContextForInjection(builtContext);
-
-    // Only include context if we have something
-    if (formattedContext.tools || formattedContext.skills || formattedContext.agents) {
-      improvementContext = {};
-      if (formattedContext.tools) {
-        (improvementContext as { tools?: string }).tools = formattedContext.tools;
-      }
-      if (formattedContext.skills) {
-        (improvementContext as { skills?: string }).skills = formattedContext.skills;
-      }
-      if (formattedContext.agents) {
-        (improvementContext as { agents?: string }).agents = formattedContext.agents;
-      }
-    }
+  const contextInput: Parameters<typeof buildContext>[0] = { prompt };
+  if (availableTools) {
+    (contextInput as { availableTools?: readonly string[] }).availableTools = availableTools;
+  }
+  if (skillRules) {
+    (contextInput as { skillRules?: SkillRule[] }).skillRules = skillRules;
+  }
+  if (agentDefinitions) {
+    (contextInput as { agentDefinitions?: AgentDefinition[] }).agentDefinitions = agentDefinitions;
   }
 
-  // Load config for model selection
-  const config = await loadConfigFromStandardPaths();
+  const builtContext = await buildContext(contextInput);
+  const formattedContext = formatContextForInjection(builtContext);
 
-  // Count tokens before improvement
-  const tokensBefore = countTokens(prompt);
+  // Only return context if we have something
+  if (!formattedContext.tools && !formattedContext.skills && !formattedContext.agents) {
+    return undefined;
+  }
 
-  // Build improve options, only including mock and context if defined
+  const improvementContext: ImprovementContext = {};
+  if (formattedContext.tools) {
+    (improvementContext as { tools?: string }).tools = formattedContext.tools;
+  }
+  if (formattedContext.skills) {
+    (improvementContext as { skills?: string }).skills = formattedContext.skills;
+  }
+  if (formattedContext.agents) {
+    (improvementContext as { agents?: string }).agents = formattedContext.agents;
+  }
+
+  return improvementContext;
+}
+
+/**
+ * Builds improve options with mocks and context
+ */
+function buildImproveOptions(
+  prompt: string,
+  sessionId: string,
+  config: Configuration,
+  improvementContext: ImprovementContext | undefined,
+  _mockImprovement?: string | null,
+  _mockClassification?: string | null
+): Parameters<typeof improvePrompt>[0] {
   const improveOptions: Parameters<typeof improvePrompt>[0] = {
     originalPrompt: prompt,
     sessionId,
@@ -319,8 +320,45 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
     (improveOptions as { context?: ImprovementContext }).context = improvementContext;
   }
 
-  // Improve the prompt
-  const improvement = await improvePrompt(improveOptions);
+  return improveOptions;
+}
+
+/**
+ * Processes a prompt through bypass detection and improvement
+ * Returns passthrough on bypass conditions or errors
+ */
+export async function processPrompt(options: ProcessPromptOptions): Promise<ProcessPromptResult> {
+  const { prompt, sessionId, availableTools, skillRules, agentDefinitions, _mockClassification, _mockImprovement } = options;
+
+  // Check for bypass conditions (fast, synchronous check)
+  const bypassInput = buildBypassCheckInput(options);
+  const bypassResult = detectBypass(bypassInput);
+  if (bypassResult.shouldBypass) {
+    return bypassResult.reason
+      ? { type: 'passthrough', bypassReason: bypassResult.reason }
+      : { type: 'passthrough' };
+  }
+
+  // Build context from available sources
+  const improvementContext = await buildImprovementContext(prompt, availableTools, skillRules, agentDefinitions);
+
+  // Load config for model selection
+  const config = await loadConfigFromStandardPaths();
+
+  // Count tokens before improvement
+  const tokensBefore = countTokens(prompt);
+
+  // Build improve options with mocks and context
+  const improveOptions = buildImproveOptions(prompt, sessionId, config, improvementContext, _mockImprovement, _mockClassification);
+
+  // Improve the prompt with consistent error handling
+  let improvement;
+  try {
+    improvement = await improvePrompt(improveOptions);
+  } catch (err) {
+    // Unexpected error during improvement - fallback to passthrough
+    return { type: 'passthrough' };
+  }
 
   // On improvement failure, fallback to passthrough
   if (!improvement.success || improvement.fallbackToOriginal) {
@@ -372,6 +410,7 @@ async function main(): Promise<void> {
     sessionId: context.conversation_id,
     pluginDisabled: !config.enabled,
     forceImprove: config.forceImprove,
+    shortPromptThreshold: config.shortPromptThreshold,
   };
 
   if (context.permission_mode) {

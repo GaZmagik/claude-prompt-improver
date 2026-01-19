@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-19T22:08:37.862Z",
+  "lastUpdated": "2026-01-19T23:06:32.121Z",
   "memories": [
     {
       "id": "learning-retro-agent-first-sdd-workflow-reduces-iteration",
@@ -2064,6 +2064,197 @@
       "updated": "2026-01-19T22:08:37.857Z",
       "scope": "project",
       "relativePath": "permanent/artifact-always-improve-without-classification-pattern.md"
+    },
+    {
+      "id": "learning-session-restore-with-parallel-agents-improves-memory-graph-health-efficiently",
+      "type": "learning",
+      "title": "Session-restore with parallel agents improves memory graph health efficiently",
+      "tags": [
+        "memory-system",
+        "session-restore",
+        "curation",
+        "project"
+      ],
+      "created": "2026-01-19T22:35:06.733Z",
+      "updated": "2026-01-19T22:35:06.733Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-session-restore-with-parallel-agents-improves-memory-graph-health-efficiently.md"
+    },
+    {
+      "id": "learning-typescript-exactoptionalpropertytypes-requires-conditional-spread-for-optional-params",
+      "type": "learning",
+      "title": "TypeScript exactOptionalPropertyTypes requires conditional spread for optional params",
+      "tags": [
+        "typescript",
+        "testing",
+        "type-safety",
+        "project"
+      ],
+      "created": "2026-01-19T22:35:09.944Z",
+      "updated": "2026-01-19T22:35:09.944Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-typescript-exactoptionalpropertytypes-requires-conditional-spread-for-optional-params.md"
+    },
+    {
+      "id": "decision-always-improve-comprehensive-expert-review-before-pr",
+      "type": "decision",
+      "title": "Comprehensive expert review before Always-Improve PR",
+      "tags": [
+        "always-improve",
+        "review",
+        "quality-assurance",
+        "project"
+      ],
+      "created": "2026-01-19T22:35:28.864Z",
+      "updated": "2026-01-19T22:35:28.864Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-always-improve-comprehensive-expert-review-before-pr.md"
+    },
+    {
+      "id": "artifact-always-improve-production-restructuring-pattern",
+      "type": "artifact",
+      "title": "Production restructuring pattern for classification system removal",
+      "tags": [
+        "always-improve",
+        "refactoring",
+        "pattern",
+        "project"
+      ],
+      "created": "2026-01-19T22:35:31.091Z",
+      "updated": "2026-01-19T22:35:31.091Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-always-improve-production-restructuring-pattern.md"
+    },
+    {
+      "id": "learning-retro-systematic-priority-based-task-ordering-prevents-context-thrashing",
+      "type": "learning",
+      "title": "Retro - Systematic priority-based task ordering prevents context thrashing",
+      "tags": [
+        "retrospective",
+        "process",
+        "task-planning",
+        "project"
+      ],
+      "created": "2026-01-19T23:06:00.894Z",
+      "updated": "2026-01-19T23:06:00.894Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-systematic-priority-based-task-ordering-prevents-context-thrashing.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-session-restoration-with-parallel-agents-improves-memory-curation",
+      "type": "learning",
+      "title": "Session restoration with parallel agents improves memory curation",
+      "tags": [
+        "session-restore",
+        "parallel-agents",
+        "memory-curation",
+        "efficiency",
+        "project"
+      ],
+      "created": "2026-01-19T23:06:04.295Z",
+      "updated": "2026-01-19T23:06:04.295Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-session-restoration-with-parallel-agents-improves-memory-curation.md"
+    },
+    {
+      "id": "learning-retro-pre-identify-all-code-locations-before-refactoring-to-avoid-incremental-discovery",
+      "type": "learning",
+      "title": "Retro - Pre-identify all code locations before refactoring to avoid incremental discovery",
+      "tags": [
+        "retrospective",
+        "process",
+        "refactoring",
+        "project"
+      ],
+      "created": "2026-01-19T23:06:09.456Z",
+      "updated": "2026-01-19T23:06:09.456Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-pre-identify-all-code-locations-before-refactoring-to-avoid-incremental-discovery.md",
+      "severity": "low"
+    },
+    {
+      "id": "gotcha-security-vulnerabilities-v100-merged-with-2-critical-issues-indicate-need-for-mandatory-pre-merge-security-audit-gate",
+      "type": "gotcha",
+      "title": "Security vulnerabilities (v1.0.0 merged with 2 critical issues) indicate need for mandatory pre-merge security audit gate",
+      "tags": [
+        "security",
+        "gate-requirement",
+        "pre-merge-validation",
+        "always-improve",
+        "project"
+      ],
+      "created": "2026-01-19T23:06:13.806Z",
+      "updated": "2026-01-19T23:06:13.806Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-security-vulnerabilities-v100-merged-with-2-critical-issues-indicate-need-for-mandatory-pre-merge-security-audit-gate.md",
+      "severity": "critical"
+    },
+    {
+      "id": "learning-retro-parallel-agent-launches-for-complex-reviews-8-agents-dramatically-more-efficient-than-sequential",
+      "type": "learning",
+      "title": "Retro - Parallel agent launches for complex reviews (8 agents) dramatically more efficient than sequential",
+      "tags": [
+        "retrospective",
+        "process",
+        "agents",
+        "review",
+        "project"
+      ],
+      "created": "2026-01-19T23:06:14.736Z",
+      "updated": "2026-01-19T23:06:14.736Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-parallel-agent-launches-for-complex-reviews-8-agents-dramatically-more-efficient-than-sequential.md",
+      "severity": "medium"
+    },
+    {
+      "id": "gotcha-retro-defer-medium-priority-schema-refactoring-when-existing-manual-validation-adequate",
+      "type": "gotcha",
+      "title": "Retro - Defer medium-priority schema refactoring when existing manual validation adequate",
+      "tags": [
+        "retrospective",
+        "process",
+        "validation",
+        "scope-creep",
+        "project"
+      ],
+      "created": "2026-01-19T23:06:20.182Z",
+      "updated": "2026-01-19T23:06:20.182Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-defer-medium-priority-schema-refactoring-when-existing-manual-validation-adequate.md",
+      "severity": "low"
+    },
+    {
+      "id": "decision-git-command-array-based-arguments",
+      "type": "decision",
+      "title": "Refactor executeGitCommand to use array-based arguments instead of string splitting",
+      "tags": [
+        "security",
+        "command-injection-prevention",
+        "git-integration",
+        "refactoring",
+        "project"
+      ],
+      "created": "2026-01-19T23:06:25.445Z",
+      "updated": "2026-01-19T23:06:25.445Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-git-command-array-based-arguments.md"
+    },
+    {
+      "id": "decision-featurepath-traversal-validation",
+      "type": "decision",
+      "title": "Add path traversal validation for featurePath in spec-awareness integration",
+      "tags": [
+        "security",
+        "path-traversal-prevention",
+        "spec-awareness",
+        "input-validation",
+        "project"
+      ],
+      "created": "2026-01-19T23:06:32.102Z",
+      "updated": "2026-01-19T23:06:32.102Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-featurepath-traversal-validation.md"
     }
   ]
 }

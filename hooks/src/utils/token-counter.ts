@@ -20,8 +20,11 @@ export function countTokens(text: string): number {
 /**
  * Checks if a prompt is considered "short" based on token count
  * Short prompts are bypassed as they're likely commands or simple queries
+ * @param prompt - The prompt to check
+ * @param threshold - Token threshold (defaults to SHORT_PROMPT_THRESHOLD_TOKENS if not provided)
  */
-export function isShortPrompt(prompt: string): boolean {
+export function isShortPrompt(prompt: string, threshold?: number): boolean {
   const tokenCount = countTokens(prompt);
-  return tokenCount <= SHORT_PROMPT_THRESHOLD_TOKENS;
+  const effectiveThreshold = threshold ?? SHORT_PROMPT_THRESHOLD_TOKENS;
+  return tokenCount <= effectiveThreshold;
 }
