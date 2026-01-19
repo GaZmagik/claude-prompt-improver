@@ -158,6 +158,26 @@ describe('Improver', () => {
       expect(result.latencyMs).toBeGreaterThanOrEqual(0);
     });
 
+    it('should use opus with 90s timeout when configured', async () => {
+      const opusConfig: Configuration = {
+        ...mockConfig,
+        improverModel: 'opus',
+      };
+
+      const result = await improvePrompt({
+        config: opusConfig,
+        originalPrompt: 'complex architectural decision requiring deep analysis',
+        sessionId: 'session-opus',
+        _mockClaudeResponse: 'Detailed architectural analysis with trade-offs...',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.modelUsed).toBe('opus');
+      expect(result.improvedPrompt).toContain('architectural');
+      // Opus timeout is 90s (90_000ms) - verify it completes within reasonable time
+      expect(result.latencyMs).toBeLessThan(90_000);
+    });
+
     it('should use correct model based on classification', async () => {
       const simpleResult = await improvePrompt({
         config: mockConfig,

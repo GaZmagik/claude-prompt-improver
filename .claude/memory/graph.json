@@ -1449,6 +1449,11 @@
       "source": "gotcha-retro-userpromptsubmit-hooks-should-not-use-fork-session",
       "target": "decision-remove-fork-session-from-userpromptsubmit-hooks",
       "label": "relates-to"
+    },
+    {
+      "source": "decision-prompt-improver-always-improve-no-classification",
+      "target": "artifact-always-improve-production-restructuring-pattern",
+      "label": "relates-to"
     }
   ]
 }
