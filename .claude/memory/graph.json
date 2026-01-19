@@ -284,6 +284,38 @@
     {
       "id": "learning-tdd-pre-commit-hook-enforces-stub-first-pattern-for-new-modules",
       "type": "learning"
+    },
+    {
+      "id": "learning-session-restoration-coordinates-3-parallel-agents-for-context-recovery",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-parallel-multi-agent-restoration-after-compaction-accelerates-context-recovery",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-integration-tests-must-validate-interface-signatures-before-writing-assertions",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-integration-test-interface-properties-must-match-real-implementation-exactly",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-review-report-recommendations-need-upfront-scoping-before-implementation",
+      "type": "learning"
+    },
+    {
+      "id": "learning-spec-file-caching-uses-mtime-based-invalidation-pattern",
+      "type": "learning"
+    },
+    {
+      "id": "artifact-conditional-property-inclusion-pattern-for-exactoptionalpropertytypes",
+      "type": "artifact"
+    },
+    {
+      "id": "learning-review-remediation-across-4-phases-security-performance-quality-cleanup",
+      "type": "learning"
     }
   ],
   "edges": [
@@ -575,6 +607,36 @@
     {
       "source": "learning-tdd-pre-commit-hook-enforces-stub-first-pattern-for-new-modules",
       "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-session-restoration-coordinates-3-parallel-agents-for-context-recovery",
+      "target": "learning-retro-parallel-multi-agent-restoration-after-compaction-accelerates-context-recovery",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-retro-integration-tests-must-validate-interface-signatures-before-writing-assertions",
+      "target": "learning-integration-test-interface-properties-must-match-real-implementation-exactly",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-review-report-recommendations-need-upfront-scoping-before-implementation",
+      "target": "learning-retro-analysis-driven-fixes-prevent-rework-before-implementation",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-spec-file-caching-uses-mtime-based-invalidation-pattern",
+      "target": "learning-configuration-caching-with-mtime-invalidation",
+      "label": "relates-to"
+    },
+    {
+      "source": "artifact-conditional-property-inclusion-pattern-for-exactoptionalpropertytypes",
+      "target": "learning-conditional-property-inclusion-pattern-solves-exactoptionalpropertytypes-friction-in-test-construction",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-review-remediation-across-4-phases-security-performance-quality-cleanup",
+      "target": "learning-comprehensive-review-with-parallel-agents-catches-systemic-test-quality-issues",
       "label": "relates-to"
     }
   ]

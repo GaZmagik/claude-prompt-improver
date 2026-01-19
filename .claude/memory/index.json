@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-19T11:07:31.868Z",
+  "lastUpdated": "2026-01-19T11:38:18.856Z",
   "memories": [
     {
       "id": "learning-retro-agent-first-sdd-workflow-reduces-iteration",
@@ -1035,6 +1035,116 @@
       "updated": "2026-01-19T11:02:48.773Z",
       "scope": "project",
       "relativePath": "permanent/learning-tdd-pre-commit-hook-enforces-stub-first-pattern-for-new-modules.md"
+    },
+    {
+      "id": "learning-session-restoration-coordinates-3-parallel-agents-for-context-recovery",
+      "type": "learning",
+      "title": "Session restoration coordinates 3 parallel agents for context recovery",
+      "tags": [
+        "project"
+      ],
+      "created": "2026-01-19T11:37:48.443Z",
+      "updated": "2026-01-19T11:37:48.443Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-session-restoration-coordinates-3-parallel-agents-for-context-recovery.md"
+    },
+    {
+      "id": "learning-retro-parallel-multi-agent-restoration-after-compaction-accelerates-context-recovery",
+      "type": "learning",
+      "title": "Retro - Parallel multi-agent restoration after compaction accelerates context recovery",
+      "tags": [
+        "retrospective",
+        "process",
+        "agents",
+        "session-restore",
+        "project"
+      ],
+      "created": "2026-01-19T11:37:51.379Z",
+      "updated": "2026-01-19T11:37:51.379Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-parallel-multi-agent-restoration-after-compaction-accelerates-context-recovery.md",
+      "severity": "medium"
+    },
+    {
+      "id": "gotcha-retro-integration-tests-must-validate-interface-signatures-before-writing-assertions",
+      "type": "gotcha",
+      "title": "Retro - Integration tests must validate interface signatures before writing assertions",
+      "tags": [
+        "retrospective",
+        "testing",
+        "integration-tests",
+        "gotcha",
+        "project"
+      ],
+      "created": "2026-01-19T11:37:56.423Z",
+      "updated": "2026-01-19T11:37:56.423Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-integration-tests-must-validate-interface-signatures-before-writing-assertions.md",
+      "severity": "high"
+    },
+    {
+      "id": "learning-integration-test-interface-properties-must-match-real-implementation-exactly",
+      "type": "learning",
+      "title": "Integration test interface properties must match real implementation exactly",
+      "tags": [
+        "project"
+      ],
+      "created": "2026-01-19T11:38:00.045Z",
+      "updated": "2026-01-19T11:38:00.045Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-integration-test-interface-properties-must-match-real-implementation-exactly.md"
+    },
+    {
+      "id": "learning-retro-review-report-recommendations-need-upfront-scoping-before-implementation",
+      "type": "learning",
+      "title": "Retro - Review report recommendations need upfront scoping before implementation",
+      "tags": [
+        "retrospective",
+        "process",
+        "code-review",
+        "project"
+      ],
+      "created": "2026-01-19T11:38:03.433Z",
+      "updated": "2026-01-19T11:38:03.433Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-review-report-recommendations-need-upfront-scoping-before-implementation.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-spec-file-caching-uses-mtime-based-invalidation-pattern",
+      "type": "learning",
+      "title": "Spec file caching uses mtime-based invalidation pattern",
+      "tags": [
+        "project"
+      ],
+      "created": "2026-01-19T11:38:08.219Z",
+      "updated": "2026-01-19T11:38:08.219Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-spec-file-caching-uses-mtime-based-invalidation-pattern.md"
+    },
+    {
+      "id": "artifact-conditional-property-inclusion-pattern-for-exactoptionalpropertytypes",
+      "type": "artifact",
+      "title": "Conditional property inclusion pattern for exactOptionalPropertyTypes",
+      "tags": [
+        "project"
+      ],
+      "created": "2026-01-19T11:38:13.124Z",
+      "updated": "2026-01-19T11:38:13.124Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-conditional-property-inclusion-pattern-for-exactoptionalpropertytypes.md"
+    },
+    {
+      "id": "learning-review-remediation-across-4-phases-security-performance-quality-cleanup",
+      "type": "learning",
+      "title": "Review remediation across 4 phases: security, performance, quality, cleanup",
+      "tags": [
+        "project"
+      ],
+      "created": "2026-01-19T11:38:18.853Z",
+      "updated": "2026-01-19T11:38:18.853Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-review-remediation-across-4-phases-security-performance-quality-cleanup.md"
     }
   ]
 }
