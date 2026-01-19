@@ -1,7 +1,7 @@
 /**
  * T011-T014: Config loader tests
  * T011: Test configuration loading with defaults
- * T012: Test configuration loading from .claude/prompt-improver-config.json
+ * T012: Test configuration loading from .claude/prompt-improver.local.md
  * T013: Test configuration validation for threshold bounds
  * T014: Test integration toggles default to true
  */
@@ -10,11 +10,19 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { Configuration } from './types.ts';
-import { DEFAULT_CONFIG, loadConfig, validateConfig } from './config-loader.ts';
+import {
+  CONFIG_PATHS,
+  DEFAULT_CONFIG,
+  loadConfig,
+  loadConfigFromStandardPaths,
+  parseYamlFrontmatter,
+  validateConfig,
+} from './config-loader.ts';
 
 describe('Config Loader', () => {
   const testDir = join(tmpdir(), 'prompt-improver-config-test-' + Date.now());
-  const testConfigPath = join(testDir, '.claude', 'prompt-improver-config.json');
+  const testConfigPathMd = join(testDir, '.claude', 'prompt-improver.local.md');
+  const testConfigPathJson = join(testDir, '.claude', 'prompt-improver-config.json');
 
   beforeEach(() => {
     mkdirSync(join(testDir, '.claude'), { recursive: true });
@@ -26,15 +34,99 @@ describe('Config Loader', () => {
     }
   });
 
+  describe('parseYamlFrontmatter', () => {
+    it('should parse simple key-value pairs', () => {
+      const content = `---
+enabled: true
+shortPromptThreshold: 15
+---
+# Documentation here`;
+
+      const result = parseYamlFrontmatter(content);
+
+      expect(result.enabled).toBe(true);
+      expect(result.shortPromptThreshold).toBe(15);
+    });
+
+    it('should parse nested sections', () => {
+      const content = `---
+enabled: true
+integrations:
+  git: false
+  lsp: true
+---`;
+
+      const result = parseYamlFrontmatter(content);
+
+      expect(result.enabled).toBe(true);
+      expect(result.integrations).toEqual({ git: false, lsp: true });
+    });
+
+    it('should skip comments', () => {
+      const content = `---
+# This is a comment
+enabled: false
+# Another comment
+shortPromptThreshold: 20
+---`;
+
+      const result = parseYamlFrontmatter(content);
+
+      expect(result.enabled).toBe(false);
+      expect(result.shortPromptThreshold).toBe(20);
+    });
+
+    it('should handle quoted strings', () => {
+      const content = `---
+logFilePath: ".claude/logs/test.log"
+---`;
+
+      const result = parseYamlFrontmatter(content);
+
+      expect(result.logFilePath).toBe('.claude/logs/test.log');
+    });
+
+    it('should return empty object for no frontmatter', () => {
+      const content = `# Just documentation
+No frontmatter here`;
+
+      const result = parseYamlFrontmatter(content);
+
+      expect(result).toEqual({});
+    });
+
+    it('should parse floats', () => {
+      const content = `---
+threshold: 0.75
+---`;
+
+      const result = parseYamlFrontmatter(content);
+
+      expect(result.threshold).toBe(0.75);
+    });
+
+    it('should support snake_case keys', () => {
+      const content = `---
+short_prompt_threshold: 25
+compaction_threshold: 10
+---`;
+
+      const result = parseYamlFrontmatter(content);
+
+      expect(result.short_prompt_threshold).toBe(25);
+      expect(result.compaction_threshold).toBe(10);
+    });
+  });
+
   describe('T011: loadConfig - configuration loading with defaults', () => {
     it('should return default configuration when no config file exists', () => {
-      const config = loadConfig(join(testDir, 'nonexistent', 'config.json'));
+      const config = loadConfig(join(testDir, 'nonexistent', 'config.md'));
 
       expect(config).toEqual(DEFAULT_CONFIG);
     });
 
     it('should have sensible default values', () => {
-      const config = loadConfig(join(testDir, 'nonexistent', 'config.json'));
+      const config = loadConfig(join(testDir, 'nonexistent', 'config.md'));
 
       expect(config.enabled).toBe(true);
       expect(config.shortPromptThreshold).toBe(10);
@@ -44,7 +136,7 @@ describe('Config Loader', () => {
     });
 
     it('should have default logging configuration', () => {
-      const config = loadConfig(join(testDir, 'nonexistent', 'config.json'));
+      const config = loadConfig(join(testDir, 'nonexistent', 'config.md'));
 
       expect(config.logging.enabled).toBe(true);
       expect(config.logging.logFilePath).toBe('.claude/logs/prompt-improver-latest.log');
@@ -54,32 +146,34 @@ describe('Config Loader', () => {
     });
   });
 
-  describe('T012: loadConfig - configuration loading from file', () => {
-    it('should load configuration from specified file path', () => {
-      const customConfig = {
-        enabled: false,
-        shortPromptThreshold: 15,
-      };
+  describe('T012: loadConfig - configuration loading from markdown file', () => {
+    it('should load configuration from markdown file with YAML frontmatter', () => {
+      const markdownConfig = `---
+enabled: false
+shortPromptThreshold: 15
+---
+# Configuration Documentation
 
-      writeFileSync(testConfigPath, JSON.stringify(customConfig));
+This file configures the prompt improver plugin.`;
 
-      const config = loadConfig(testConfigPath);
+      writeFileSync(testConfigPathMd, markdownConfig);
+
+      const config = loadConfig(testConfigPathMd);
 
       expect(config.enabled).toBe(false);
       expect(config.shortPromptThreshold).toBe(15);
     });
 
-    it('should merge partial config with defaults', () => {
-      const partialConfig = {
-        enabled: false,
-        integrations: {
-          git: false,
-        },
-      };
+    it('should merge partial markdown config with defaults', () => {
+      const markdownConfig = `---
+enabled: false
+integrations:
+  git: false
+---`;
 
-      writeFileSync(testConfigPath, JSON.stringify(partialConfig));
+      writeFileSync(testConfigPathMd, markdownConfig);
 
-      const config = loadConfig(testConfigPath);
+      const config = loadConfig(testConfigPathMd);
 
       // Overridden values
       expect(config.enabled).toBe(false);
@@ -91,30 +185,126 @@ describe('Config Loader', () => {
       expect(config.integrations.spec).toBe(true);
     });
 
-    it('should handle invalid JSON gracefully and return defaults', () => {
-      writeFileSync(testConfigPath, 'not valid json {{{');
+    it('should handle invalid markdown gracefully and return defaults', () => {
+      writeFileSync(testConfigPathMd, '# No frontmatter here\nJust text');
 
-      const config = loadConfig(testConfigPath);
+      const config = loadConfig(testConfigPathMd);
 
       expect(config).toEqual(DEFAULT_CONFIG);
     });
 
-    it('should load nested logging configuration', () => {
-      const customConfig = {
-        logging: {
-          enabled: false,
-          maxLogSizeMB: 50,
-        },
-      };
+    it('should load nested logging configuration from markdown', () => {
+      const markdownConfig = `---
+logging:
+  enabled: false
+  maxLogSizeMB: 50
+---`;
 
-      writeFileSync(testConfigPath, JSON.stringify(customConfig));
+      writeFileSync(testConfigPathMd, markdownConfig);
 
-      const config = loadConfig(testConfigPath);
+      const config = loadConfig(testConfigPathMd);
 
       expect(config.logging.enabled).toBe(false);
       expect(config.logging.maxLogSizeMB).toBe(50);
       // Defaults preserved for unspecified
       expect(config.logging.logFilePath).toBe('.claude/logs/prompt-improver-latest.log');
+    });
+
+    it('should support snake_case keys in markdown', () => {
+      const markdownConfig = `---
+short_prompt_threshold: 20
+compaction_threshold: 8
+simple_model: sonnet
+---`;
+
+      writeFileSync(testConfigPathMd, markdownConfig);
+
+      const config = loadConfig(testConfigPathMd);
+
+      expect(config.shortPromptThreshold).toBe(20);
+      expect(config.compactionThreshold).toBe(8);
+      expect(config.defaultSimpleModel).toBe('sonnet');
+    });
+  });
+
+  describe('T012: loadConfig - legacy JSON format support', () => {
+    it('should load configuration from JSON file', () => {
+      const customConfig = {
+        enabled: false,
+        shortPromptThreshold: 15,
+      };
+
+      writeFileSync(testConfigPathJson, JSON.stringify(customConfig));
+
+      const config = loadConfig(testConfigPathJson);
+
+      expect(config.enabled).toBe(false);
+      expect(config.shortPromptThreshold).toBe(15);
+    });
+
+    it('should merge partial JSON config with defaults', () => {
+      const partialConfig = {
+        enabled: false,
+        integrations: {
+          git: false,
+        },
+      };
+
+      writeFileSync(testConfigPathJson, JSON.stringify(partialConfig));
+
+      const config = loadConfig(testConfigPathJson);
+
+      // Overridden values
+      expect(config.enabled).toBe(false);
+      expect(config.integrations.git).toBe(false);
+
+      // Default values preserved
+      expect(config.shortPromptThreshold).toBe(10);
+      expect(config.integrations.lsp).toBe(true);
+    });
+
+    it('should handle invalid JSON gracefully and return defaults', () => {
+      writeFileSync(testConfigPathJson, 'not valid json {{{');
+
+      const config = loadConfig(testConfigPathJson);
+
+      expect(config).toEqual(DEFAULT_CONFIG);
+    });
+  });
+
+  describe('loadConfigFromStandardPaths', () => {
+    it('should check paths in order of precedence', () => {
+      expect(CONFIG_PATHS[0]).toBe('.claude/prompt-improver.local.md');
+      expect(CONFIG_PATHS[1]).toBe('.claude/prompt-improver-config.json');
+    });
+
+    it('should prefer markdown over JSON when both exist', () => {
+      const mdConfig = `---
+shortPromptThreshold: 25
+---`;
+      const jsonConfig = { shortPromptThreshold: 30 };
+
+      writeFileSync(testConfigPathMd, mdConfig);
+      writeFileSync(testConfigPathJson, JSON.stringify(jsonConfig));
+
+      const config = loadConfigFromStandardPaths(testDir);
+
+      expect(config.shortPromptThreshold).toBe(25); // From markdown
+    });
+
+    it('should fall back to JSON when markdown does not exist', () => {
+      const jsonConfig = { shortPromptThreshold: 30 };
+      writeFileSync(testConfigPathJson, JSON.stringify(jsonConfig));
+
+      const config = loadConfigFromStandardPaths(testDir);
+
+      expect(config.shortPromptThreshold).toBe(30);
+    });
+
+    it('should return defaults when no config files exist', () => {
+      const config = loadConfigFromStandardPaths(testDir);
+
+      expect(config).toEqual(DEFAULT_CONFIG);
     });
   });
 
@@ -204,7 +394,7 @@ describe('Config Loader', () => {
 
   describe('T014: loadConfig - integration toggles default to true', () => {
     it('should have all integration toggles default to true', () => {
-      const config = loadConfig(join(testDir, 'nonexistent', 'config.json'));
+      const config = loadConfig(join(testDir, 'nonexistent', 'config.md'));
 
       expect(config.integrations.git).toBe(true);
       expect(config.integrations.lsp).toBe(true);
@@ -213,20 +403,19 @@ describe('Config Loader', () => {
       expect(config.integrations.session).toBe(true);
     });
 
-    it('should allow individual integration toggles to be disabled', () => {
-      const customConfig = {
-        integrations: {
-          git: true,
-          lsp: false,
-          spec: true,
-          memory: false,
-          session: true,
-        },
-      };
+    it('should allow individual integration toggles to be disabled via markdown', () => {
+      const markdownConfig = `---
+integrations:
+  git: true
+  lsp: false
+  spec: true
+  memory: false
+  session: true
+---`;
 
-      writeFileSync(testConfigPath, JSON.stringify(customConfig));
+      writeFileSync(testConfigPathMd, markdownConfig);
 
-      const config = loadConfig(testConfigPath);
+      const config = loadConfig(testConfigPathMd);
 
       expect(config.integrations.git).toBe(true);
       expect(config.integrations.lsp).toBe(false);
@@ -236,15 +425,14 @@ describe('Config Loader', () => {
     });
 
     it('should merge partial integration toggles with defaults', () => {
-      const customConfig = {
-        integrations: {
-          session: false,
-        },
-      };
+      const markdownConfig = `---
+integrations:
+  session: false
+---`;
 
-      writeFileSync(testConfigPath, JSON.stringify(customConfig));
+      writeFileSync(testConfigPathMd, markdownConfig);
 
-      const config = loadConfig(testConfigPath);
+      const config = loadConfig(testConfigPathMd);
 
       // Only session should be changed
       expect(config.integrations.git).toBe(true);

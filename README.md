@@ -58,47 +58,63 @@ hooks/
 
 ## Configuration
 
-Create a configuration file at `.claude/prompt-improver-config.json`:
+Configuration is **optional** - the plugin works with sensible defaults. To customise:
 
-```json
-{
-  "enabled": true,
-  "thresholds": {
-    "shortPromptTokens": 10,
-    "compactionPercent": 5
-  },
-  "timeouts": {
-    "classificationMs": 5000,
-    "simpleImprovementMs": 30000,
-    "complexImprovementMs": 60000,
-    "contextGatheringMs": 2000
-  },
-  "integrations": {
-    "git": true,
-    "lsp": true,
-    "spec": true,
-    "memory": true,
-    "session": true
-  }
-}
+```bash
+cp .claude/prompt-improver.example.md .claude/prompt-improver.local.md
 ```
+
+The configuration uses markdown with YAML frontmatter:
+
+```yaml
+---
+enabled: true
+shortPromptThreshold: 10
+compactionThreshold: 5
+defaultSimpleModel: haiku
+defaultComplexModel: sonnet
+
+integrations:
+  git: true
+  lsp: true
+  spec: true
+  memory: true
+  session: true
+
+logging:
+  enabled: true
+  logFilePath: .claude/logs/prompt-improver-latest.log
+  maxLogSizeMB: 10
+  maxLogAgeDays: 7
+  displayImprovedPrompt: true
+---
+
+# Your documentation here...
+```
+
+Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settings private.
 
 ### Configuration Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `enabled` | boolean | `true` | Enable/disable the plugin globally |
-| `thresholds.shortPromptTokens` | number | `10` | Prompts with fewer tokens bypass improvement |
-| `thresholds.compactionPercent` | number | `5` | Skip when context availability is below this % |
-| `timeouts.classificationMs` | number | `5000` | Timeout for prompt classification |
-| `timeouts.simpleImprovementMs` | number | `30000` | Timeout for simple improvements (Haiku) |
-| `timeouts.complexImprovementMs` | number | `60000` | Timeout for complex improvements (Sonnet) |
-| `timeouts.contextGatheringMs` | number | `2000` | Timeout per context source |
+| `shortPromptThreshold` | number | `10` | Prompts with fewer tokens bypass improvement |
+| `compactionThreshold` | number | `5` | Skip when context availability is below this % |
+| `defaultSimpleModel` | string | `haiku` | Model for simple improvements |
+| `defaultComplexModel` | string | `sonnet` | Model for complex improvements |
 | `integrations.git` | boolean | `true` | Enable git context gathering |
 | `integrations.lsp` | boolean | `true` | Enable LSP diagnostics gathering |
 | `integrations.spec` | boolean | `true` | Enable specification awareness |
 | `integrations.memory` | boolean | `true` | Enable memory plugin integration |
 | `integrations.session` | boolean | `true` | Enable session context |
+| `logging.enabled` | boolean | `true` | Enable logging |
+| `logging.logFilePath` | string | `.claude/logs/...` | Log file location |
+| `logging.maxLogSizeMB` | number | `10` | Maximum log file size in MB |
+| `logging.maxLogAgeDays` | number | `7` | Maximum log age in days |
+| `logging.displayImprovedPrompt` | boolean | `true` | Show improved prompt in output |
+
+Both camelCase and snake_case key names are supported (e.g., `shortPromptThreshold` or `short_prompt_threshold`).
 
 ## Usage
 
@@ -138,15 +154,7 @@ Check if any bypass condition is triggered:
 
 ### Timeout Errors
 
-Increase timeout values in configuration:
-
-```json
-{
-  "timeouts": {
-    "complexImprovementMs": 90000
-  }
-}
-```
+Timeouts are currently hardcoded. If you experience timeout errors, please open an issue.
 
 ### Integration Not Working
 
@@ -172,7 +180,7 @@ bun test
 ### Test Coverage
 
 The plugin has comprehensive test coverage:
-- 436+ tests across 22+ files
+- 454+ tests across 22+ files
 - TDD methodology throughout
 - Unit tests for all components
 - Integration tests for context building
@@ -180,3 +188,12 @@ The plugin has comprehensive test coverage:
 ## Licence
 
 MIT - See [LICENSE](LICENSE) for details.
+
+## Contributing
+
+This plugin is developed following:
+- **Specification-Driven Development** (SDD) - see `.specify/spec-driven.md`
+- **Test-Driven Development** (TDD) - see `.specify/test-driven.md`
+- **British English** throughout
+
+All contributions should maintain 100% test coverage where possible and follow the specification first.

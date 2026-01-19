@@ -9,6 +9,7 @@ import { describe, expect, it } from 'bun:test';
 import {
   buildXmlPrompt,
   escapeXmlContent,
+  getAppliedTags,
   shouldApplyXmlTags,
   wrapInTag,
   type XmlPromptParts,
@@ -253,6 +254,67 @@ describe('XML Builder', () => {
       expect(result).toContain('<task>');
       expect(result).toContain('<context>');
       expect(result).not.toContain('<constraints>');
+    });
+  });
+
+  describe('getAppliedTags', () => {
+    it('should return empty array when only task is provided', () => {
+      const parts: XmlPromptParts = {
+        task: 'Just a task',
+      };
+
+      const tags = getAppliedTags(parts);
+
+      expect(tags).toEqual(['task']);
+    });
+
+    it('should return all provided tags in correct order', () => {
+      const parts: XmlPromptParts = {
+        task: 'Task',
+        context: 'Context',
+        constraints: 'Constraints',
+        output_format: 'Format',
+        examples: 'Examples',
+      };
+
+      const tags = getAppliedTags(parts);
+
+      expect(tags).toEqual(['task', 'context', 'constraints', 'output_format', 'examples']);
+    });
+
+    it('should return subset of tags when some are undefined', () => {
+      const parts: XmlPromptParts = {
+        task: 'Task',
+        constraints: 'Constraints',
+        examples: 'Examples',
+      };
+
+      const tags = getAppliedTags(parts);
+
+      expect(tags).toEqual(['task', 'constraints', 'examples']);
+    });
+
+    it('should maintain tag order regardless of object property order', () => {
+      const parts: XmlPromptParts = {
+        examples: 'Examples',
+        task: 'Task',
+        output_format: 'Format',
+      };
+
+      const tags = getAppliedTags(parts);
+
+      expect(tags).toEqual(['task', 'output_format', 'examples']);
+    });
+
+    it('should handle parts with only optional tags', () => {
+      const parts: XmlPromptParts = {
+        task: 'Task',
+        context: 'Context only',
+      };
+
+      const tags = getAppliedTags(parts);
+
+      expect(tags).toEqual(['task', 'context']);
     });
   });
 });

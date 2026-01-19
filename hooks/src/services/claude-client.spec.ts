@@ -79,6 +79,34 @@ describe('Claude Client', () => {
       // Should not have unescaped quotes that break the command
       expect(cmd).toBeDefined();
     });
+
+    it('should escape special characters in sessionId to prevent command injection', () => {
+      const options: ClaudeClientOptions = {
+        prompt: 'Test prompt',
+        model: 'haiku',
+        sessionId: 'session-123; rm -rf /',
+      };
+
+      const cmd = buildClaudeCommand(options);
+
+      // SessionId should be wrapped in quotes to prevent injection
+      expect(cmd).toContain("'session-123; rm -rf /'");
+      // Should not have unquoted semicolon that would execute additional commands
+      expect(cmd).not.toMatch(/--resume session-123;/);
+    });
+
+    it('should escape single quotes in sessionId', () => {
+      const options: ClaudeClientOptions = {
+        prompt: 'Test prompt',
+        model: 'haiku',
+        sessionId: "session'inject",
+      };
+
+      const cmd = buildClaudeCommand(options);
+
+      // Single quotes in sessionId should be escaped
+      expect(cmd).toContain("'session'\\''inject'");
+    });
   });
 
   describe('T029: executeClaudeCommand - timeout enforcement', () => {

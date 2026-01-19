@@ -53,10 +53,11 @@ export function buildClaudeCommand(options: ClaudeClientOptions): string {
   const { prompt, model, sessionId } = options;
   const modelId = getModelIdentifier(model);
   const escapedPrompt = escapeForShell(prompt);
+  const escapedSessionId = escapeForShell(sessionId);
 
   // Build command: cd /tmp to avoid project hooks, then execute claude
   // Using --fork-session to prevent recursion, --print for output only
-  return `cd /tmp && claude --resume ${sessionId} --fork-session --print --model ${modelId} ${escapedPrompt}`;
+  return `cd /tmp && claude --resume ${escapedSessionId} --fork-session --print --model ${modelId} ${escapedPrompt}`;
 }
 
 /**
