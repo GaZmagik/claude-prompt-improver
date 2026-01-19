@@ -25,7 +25,7 @@ import {
 describe('Git Context Integration', () => {
   describe('T079: executeGitCommand - executes git log', () => {
     it('should execute git log command with correct arguments', async () => {
-      const result = await executeGitCommand('log --oneline -5', {
+      const result = await executeGitCommand(['log', '--oneline', '-5'], {
         _mockCommandResults: {
           'log --oneline -5': 'abc1234 Fix bug\ndef5678 Add feature\n',
         },
@@ -37,7 +37,7 @@ describe('Git Context Integration', () => {
 
     it('should return output from git log', async () => {
       const mockOutput = 'a1b2c3d First commit\ne4f5g6h Second commit';
-      const result = await executeGitCommand('log --oneline -5', {
+      const result = await executeGitCommand(['log', '--oneline', '-5'], {
         _mockCommandResults: {
           'log --oneline -5': mockOutput,
         },
@@ -50,7 +50,7 @@ describe('Git Context Integration', () => {
 
   describe('T080: executeGitCommand - executes git status', () => {
     it('should execute git status with porcelain format', async () => {
-      const result = await executeGitCommand('status --porcelain', {
+      const result = await executeGitCommand(['status', '--porcelain'], {
         _mockCommandResults: {
           'status --porcelain': ' M src/file.ts\nA  new-file.ts\n',
         },
@@ -61,7 +61,7 @@ describe('Git Context Integration', () => {
     });
 
     it('should handle empty status (clean repo)', async () => {
-      const result = await executeGitCommand('status --porcelain', {
+      const result = await executeGitCommand(['status', '--porcelain'], {
         _mockCommandResults: {
           'status --porcelain': '',
         },
@@ -76,7 +76,7 @@ describe('Git Context Integration', () => {
     it('should execute git diff with stat format', async () => {
       const mockDiff =
         ' src/file.ts | 10 +++++-----\n 1 file changed, 5 insertions(+), 5 deletions(-)';
-      const result = await executeGitCommand('diff --stat', {
+      const result = await executeGitCommand(['diff', '--stat'], {
         _mockCommandResults: {
           'diff --stat': mockDiff,
         },

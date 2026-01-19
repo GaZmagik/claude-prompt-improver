@@ -155,7 +155,7 @@ This is a test user story.
 
   describe('Git Context - Real FS', () => {
     it('should handle non-git directory gracefully', async () => {
-      const result = await executeGitCommand('status', {
+      const result = await executeGitCommand(['status'], {
         cwd: testDir,
         timeoutMs: 5000,
       });
@@ -180,7 +180,7 @@ This is a test user story.
     });
 
     it('should respect timeout for git commands', async () => {
-      const result = await executeGitCommand('status', {
+      const result = await executeGitCommand(['status'], {
         cwd: process.cwd(),
         timeoutMs: 1, // Very short timeout
       });

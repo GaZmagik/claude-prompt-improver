@@ -60,14 +60,15 @@ export interface GitContextResult {
  * Executes a git command with timeout
  */
 export async function executeGitCommand(
-  command: string,
+  args: string[],
   options: GitContextOptions
 ): Promise<{ success: boolean; output?: string; error?: string }> {
   const { _mockCommandResults, cwd, timeoutMs = GIT_COMMAND_TIMEOUT_MS } = options;
 
   // Handle mock responses for testing
   if (_mockCommandResults !== undefined) {
-    const result = _mockCommandResults[command];
+    const commandKey = args.join(' ');
+    const result = _mockCommandResults[commandKey];
     if (result === null || result === undefined) {
       return { success: false, error: 'Command failed or timed out' };
     }
@@ -78,7 +79,7 @@ export async function executeGitCommand(
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
   try {
-    const proc = Bun.spawn(['git', ...command.split(' ')], {
+    const proc = Bun.spawn(['git', ...args], {
       cwd: cwd || process.cwd(),
       stdout: 'pipe',
       stderr: 'pipe',
@@ -247,7 +248,7 @@ export async function gatherGitContext(options: GitContextOptions): Promise<GitC
   }
 
   // Check if this is a git repository
-  const gitDirResult = await executeGitCommand('rev-parse --git-dir', options);
+  const gitDirResult = await executeGitCommand(['rev-parse', '--git-dir'], options);
   if (!gitDirResult.success) {
     return {
       success: false,
@@ -273,16 +274,16 @@ export async function gatherGitContext(options: GitContextOptions): Promise<GitC
 
   // Always fetch branch and status (core context)
   const commands = [
-    executeGitCommand('branch --show-current', options),
-    executeGitCommand('status --porcelain', options),
+    executeGitCommand(['branch', '--show-current'], options),
+    executeGitCommand(['status', '--porcelain'], options),
   ];
 
   // Optionally fetch commits and diff (performance optimization)
   if (includeCommits) {
-    commands.push(executeGitCommand('log --oneline -5', options));
+    commands.push(executeGitCommand(['log', '--oneline', '-5'], options));
   }
   if (includeDiff) {
-    commands.push(executeGitCommand('diff --stat', options));
+    commands.push(executeGitCommand(['diff', '--stat'], options));
   }
 
   const results = await Promise.all(commands);

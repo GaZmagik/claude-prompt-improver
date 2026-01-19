@@ -28,6 +28,35 @@ function getFileMtime(filePath: string): number {
 }
 
 /**
+ * Validates a feature path to prevent path traversal attacks
+ * @param path - The feature path to validate
+ * @returns true if path is safe, false otherwise
+ */
+function isValidFeaturePath(path: string | undefined): boolean {
+  if (!path) {
+    return true; // undefined/empty is valid (will use defaults)
+  }
+
+  // Reject path traversal sequences (primary security risk)
+  if (path.includes('..')) {
+    return false;
+  }
+
+  // Reject null bytes (path truncation attack)
+  if (path.includes('\0')) {
+    return false;
+  }
+
+  // Only allow safe characters: alphanumeric, hyphens, underscores, forward slashes, dots, colons (for Windows)
+  // Allow both relative and absolute paths, but block path traversal
+  if (!/^[a-zA-Z0-9/:._-]+$/.test(path)) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * Clears the spec file cache (useful for testing)
  */
 export function clearSpecFileCache(): void {
@@ -95,7 +124,7 @@ export interface SpecAwarenessResult {
   readonly context?: SpecContext;
   readonly error?: string;
   readonly skipped?: boolean;
-  readonly skipReason?: 'disabled' | 'no_specify_dir' | 'no_spec_file';
+  readonly skipReason?: 'disabled' | 'invalid_feature_path' | 'no_specify_dir' | 'no_spec_file';
 }
 
 /**
@@ -347,6 +376,15 @@ export async function gatherSpecContext(
       success: false,
       skipped: true,
       skipReason: 'disabled',
+    };
+  }
+
+  // Validate featurePath to prevent path traversal attacks
+  if (!isValidFeaturePath(featurePath)) {
+    return {
+      success: false,
+      skipped: true,
+      skipReason: 'invalid_feature_path',
     };
   }
 
