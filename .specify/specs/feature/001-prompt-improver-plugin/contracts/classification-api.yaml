@@ -1,0 +1,216 @@
+openapi: 3.0.0
+info:
+  title: Prompt Classification API
+  version: 1.0.0
+  description: API contract for Claude-based prompt classification (NONE/SIMPLE/COMPLEX)
+
+paths:
+  /classify:
+    post:
+      summary: Classify a user prompt into improvement categories
+      description: |
+        Uses Claude Haiku to classify a prompt's improvement potential.
+        This is a logical API contract; actual implementation uses `claude --fork-session --print`.
+
+      operationId: classifyPrompt
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - prompt
+              properties:
+                prompt:
+                  type: string
+                  minLength: 1
+                  maxLength: 200000
+                  description: The user's original prompt to classify
+                  example: "fix the bug"
+
+                projectContext:
+                  type: object
+                  description: Optional context about the project
+                  properties:
+                    workingDirectory:
+                      type: string
+                      example: "/home/user/projects/my-app"
+
+                    gitBranch:
+                      type: string
+                      example: "feature/auth-refactor"
+
+                    availableTools:
+                      type: array
+                      items:
+                        type: string
+                      example: ["Read", "Write", "Edit", "Grep", "Glob", "Bash"]
+
+                timeout:
+                  type: integer
+                  minimum: 1000
+                  maximum: 10000
+                  default: 5000
+                  description: Maximum time to wait for classification (milliseconds)
+
+      responses:
+        '200':
+          description: Successfully classified prompt
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - classification
+                  - reasoning
+                properties:
+                  classification:
+                    type: string
+                    enum:
+                      - NONE
+                      - SIMPLE
+                      - COMPLEX
+                    description: |
+                      - NONE: Well-structured, clear, specific. No improvement needed.
+                      - SIMPLE: Moderately unclear, could benefit from minor enhancements.
+                      - COMPLEX: Vague, multi-faceted, requires significant restructuring.
+
+                  reasoning:
+                    type: string
+                    minLength: 10
+                    maxLength: 500
+                    description: Brief explanation of why this classification was chosen
+                    example: "Prompt is vague ('the bug') without specifying which bug, what symptoms, or where to look."
+
+                  confidence:
+                    type: number
+                    minimum: 0.0
+                    maximum: 1.0
+                    description: Model's confidence in the classification (optional)
+                    example: 0.92
+
+                  modelUsed:
+                    type: string
+                    enum:
+                      - haiku
+                    description: Model used for classification (always Haiku)
+                    default: haiku
+
+                  latency:
+                    type: integer
+                    description: Time taken for classification (milliseconds)
+                    example: 1200
+
+              examples:
+                complexClassification:
+                  summary: COMPLEX classification example
+                  value:
+                    classification: "COMPLEX"
+                    reasoning: "Prompt is vague ('the bug') without specifying which bug, what symptoms, or where to look. Requires clarification questions."
+                    confidence: 0.92
+                    modelUsed: "haiku"
+                    latency: 1200
+
+                noneClassification:
+                  summary: NONE classification example
+                  value:
+                    classification: "NONE"
+                    reasoning: "Prompt is well-structured with specific file path, clear action, and sufficient context. No improvement needed."
+                    confidence: 0.88
+                    modelUsed: "haiku"
+                    latency: 980
+
+                simpleClassification:
+                  summary: SIMPLE classification example
+                  value:
+                    classification: "SIMPLE"
+                    reasoning: "Prompt lacks specifics ('testing') but core intent is clear. Could benefit from clarifying what type of testing and what needs testing."
+                    confidence: 0.75
+                    modelUsed: "haiku"
+                    latency: 1050
+
+        '408':
+          description: Classification timed out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Classification timeout after 5000ms"
+
+                  fallbackBehavior:
+                    type: string
+                    enum:
+                      - passthrough
+                    description: Default to passing prompt through unchanged
+
+        '500':
+          description: Classification failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Claude API error: rate limit exceeded"
+
+                  fallbackBehavior:
+                    type: string
+                    enum:
+                      - passthrough
+                    description: Default to passing prompt through unchanged
+
+components:
+  schemas:
+    ClassificationLevel:
+      type: string
+      enum:
+        - NONE
+        - SIMPLE
+        - COMPLEX
+      description: |
+        Classification categories:
+        - NONE: Well-formed prompt needs no improvement (pass through)
+        - SIMPLE: Light enhancements needed (use Haiku)
+        - COMPLEX: Significant restructuring needed (use Sonnet)
+
+  examples:
+    systemPromptTemplate:
+      summary: System prompt used for classification
+      description: |
+        The following system prompt is sent to Claude Haiku for classification:
+
+        ---
+        You are a prompt quality classifier. Analyse the user's prompt and classify it into one of three categories:
+
+        - NONE: Well-structured, clear, and specific. Needs no improvement.
+        - SIMPLE: Moderately unclear or could benefit from minor enhancements.
+        - COMPLEX: Vague, multi-faceted, or requires significant restructuring.
+
+        Consider:
+        1. Specificity: Does the prompt clearly state what's needed?
+        2. Context: Is sufficient background provided?
+        3. Scope: Is the request well-bounded or overly broad?
+        4. Actionability: Can the request be acted upon without clarification?
+
+        Respond ONLY with JSON in this format:
+        {
+          "classification": "NONE" | "SIMPLE" | "COMPLEX",
+          "reasoning": "Brief explanation of classification"
+        }
+
+        Prompt to classify:
+        {{user_prompt}}
+
+        Project context (if available):
+        {{project_context}}
+        ---
+
+tags:
+  - name: Classification
+    description: Prompt classification operations

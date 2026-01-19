@@ -1,0 +1,362 @@
+openapi: 3.0.0
+info:
+  title: Prompt Improvement API
+  version: 1.0.0
+  description: API contract for Claude-based prompt improvement (SIMPLE and COMPLEX)
+
+paths:
+  /improve:
+    post:
+      summary: Improve a user prompt based on classification level
+      description: |
+        Uses Claude (Haiku for SIMPLE, Sonnet for COMPLEX) to enhance prompts.
+        This is a logical API contract; actual implementation uses `claude --fork-session --print`.
+
+      operationId: improvePrompt
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - prompt
+                - classificationLevel
+              properties:
+                prompt:
+                  type: string
+                  minLength: 1
+                  maxLength: 200000
+                  description: The user's original prompt to improve
+                  example: "fix the bug"
+
+                classificationLevel:
+                  type: string
+                  enum:
+                    - SIMPLE
+                    - COMPLEX
+                  description: Classification level (determines model and strategy)
+
+                context:
+                  type: object
+                  description: Gathered context from various sources
+                  properties:
+                    tools:
+                      type: array
+                      items:
+                        type: string
+                      description: Available Claude Code tools
+                      example: ["Read", "Write", "Edit", "Grep", "Glob", "Bash"]
+
+                    skills:
+                      type: array
+                      items:
+                        type: string
+                      description: Available skills
+                      example: ["memory", "typescript-expert"]
+
+                    agents:
+                      type: array
+                      items:
+                        type: string
+                      description: Suggested agents
+                      example: ["typescript-expert", "rust-specialist"]
+
+                    git:
+                      type: object
+                      properties:
+                        branch:
+                          type: string
+                          example: "feature/auth-refactor"
+                        recentCommits:
+                          type: array
+                          items:
+                            type: string
+                          example: ["a1b2c3d: feat(auth): add JWT validation"]
+                        changedFiles:
+                          type: array
+                          items:
+                            type: string
+                          example: ["src/auth.ts", "tests/auth.spec.ts"]
+
+                    lsp:
+                      type: array
+                      description: LSP diagnostics (errors/warnings)
+                      items:
+                        type: object
+                        properties:
+                          file:
+                            type: string
+                            example: "src/auth.ts"
+                          line:
+                            type: integer
+                            example: 45
+                          severity:
+                            type: string
+                            enum: ["error", "warning"]
+                          message:
+                            type: string
+                            example: "Property 'exp' does not exist on type 'JwtPayload'"
+
+                    spec:
+                      type: object
+                      properties:
+                        userStories:
+                          type: array
+                          items:
+                            type: string
+                          example: ["US1: Implement JWT authentication"]
+                        acceptanceCriteria:
+                          type: array
+                          items:
+                            type: string
+
+                    memory:
+                      type: array
+                      description: Relevant memories from memory plugin
+                      items:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                            example: "Authentication gotcha: JWT refresh tokens"
+                          content:
+                            type: string
+
+                    session:
+                      type: string
+                      description: Session conversation history summary (if applicable)
+
+                timeout:
+                  type: integer
+                  minimum: 1000
+                  maximum: 120000
+                  description: Maximum time to wait for improvement (milliseconds)
+                  example: 30000
+
+      responses:
+        '200':
+          description: Successfully improved prompt
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - improvedPrompt
+                  - preservedIntent
+                properties:
+                  improvedPrompt:
+                    type: string
+                    minLength: 1
+                    maxLength: 200000
+                    description: The enhanced prompt text
+                    example: "<task>Investigate and fix the bug in the authentication module...</task>"
+
+                  appliedTags:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - task
+                        - context
+                        - constraints
+                        - output_format
+                        - examples
+                    description: XML tags applied to structure the prompt
+                    example: ["task", "context", "constraints"]
+
+                  injectedContext:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - tools
+                        - skills
+                        - agents
+                        - git
+                        - lsp
+                        - spec
+                        - memory
+                        - session
+                    description: Which context sources contributed to improvement
+                    example: ["git", "lsp"]
+
+                  preservedIntent:
+                    type: boolean
+                    description: Validation that original intent was preserved
+                    example: true
+
+                  modelUsed:
+                    type: string
+                    enum:
+                      - haiku
+                      - sonnet
+                    description: Model used for improvement
+
+                  latency:
+                    type: integer
+                    description: Time taken for improvement (milliseconds)
+                    example: 4200
+
+              examples:
+                complexImprovement:
+                  summary: COMPLEX improvement with XML tags
+                  value:
+                    improvedPrompt: |
+                      <task>
+                      Investigate and fix the bug in the authentication module.
+                      </task>
+
+                      <context>
+                      Recent git commits show work on JWT token refresh logic.
+                      LSP reports error in src/auth.ts line 45: "Property 'exp' does not exist on type 'JwtPayload'".
+                      Current branch: feature/auth-refactor
+                      </context>
+
+                      <constraints>
+                      - Maintain backward compatibility with existing token format
+                      - Ensure fix doesn't break existing tests
+                      </constraints>
+                    appliedTags: ["task", "context", "constraints"]
+                    injectedContext: ["git", "lsp"]
+                    preservedIntent: true
+                    modelUsed: "sonnet"
+                    latency: 4200
+
+                simpleImprovement:
+                  summary: SIMPLE improvement without XML tags
+                  value:
+                    improvedPrompt: "Help with testing the authentication module. Specifically, what type of testing are you looking for (unit tests, integration tests, or end-to-end tests), and which components need testing (JWT validation, token refresh, login flow)?"
+                    appliedTags: []
+                    injectedContext: ["tools", "skills"]
+                    preservedIntent: true
+                    modelUsed: "haiku"
+                    latency: 2800
+
+        '408':
+          description: Improvement timed out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Improvement timeout after 30000ms"
+
+                  fallbackBehavior:
+                    type: string
+                    enum:
+                      - passthrough
+                    description: Fall back to original prompt
+
+        '500':
+          description: Improvement failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Claude API error: context limit exceeded"
+
+                  fallbackBehavior:
+                    type: string
+                    enum:
+                      - passthrough
+                      - simple_fallback
+                    description: Fall back to original or try SIMPLE improvement
+
+components:
+  schemas:
+    ImprovementStrategy:
+      type: object
+      properties:
+        level:
+          type: string
+          enum:
+            - SIMPLE
+            - COMPLEX
+        model:
+          type: string
+          enum:
+            - haiku
+            - sonnet
+        timeout:
+          type: integer
+          description: Milliseconds
+        applyXMLTags:
+          type: boolean
+          description: Whether to apply XML tag structuring
+
+      examples:
+        - level: SIMPLE
+          model: haiku
+          timeout: 30000
+          applyXMLTags: false
+
+        - level: COMPLEX
+          model: sonnet
+          timeout: 60000
+          applyXMLTags: true
+
+  examples:
+    simpleImprovementPromptTemplate:
+      summary: System prompt for SIMPLE improvements
+      description: |
+        The following system prompt is sent to Claude Haiku for SIMPLE improvements:
+
+        ---
+        You are a prompt enhancement assistant. The user's prompt needs minor improvements for clarity.
+
+        Original prompt:
+        {{user_prompt}}
+
+        Available context:
+        {{context_summary}}
+
+        Instructions:
+        1. Clarify any vague terms or references
+        2. Add specifics where the user was unclear
+        3. Suggest using available tools/skills if relevant
+        4. Preserve the user's original intent and tone
+        5. Keep enhancements minimal - this is a SIMPLE improvement
+
+        Respond with ONLY the improved prompt text (no explanations, no JSON).
+        ---
+
+    complexImprovementPromptTemplate:
+      summary: System prompt for COMPLEX improvements
+      description: |
+        The following system prompt is sent to Claude Sonnet for COMPLEX improvements:
+
+        ---
+        You are a prompt restructuring expert. The user's prompt requires significant enhancement.
+
+        Original prompt:
+        {{user_prompt}}
+
+        Available context:
+        {{detailed_context}}
+
+        Instructions:
+        1. Restructure the prompt using XML tags for clarity:
+           - <task>: Main request/goal
+           - <context>: Relevant background (from provided context)
+           - <constraints>: Limitations or requirements
+           - <output_format>: Expected response structure (if applicable)
+           - <examples>: Example inputs/outputs (if applicable)
+
+        2. Ask clarifying questions if the original prompt is too vague
+        3. Inject relevant context from git, LSP, specs, or memory
+        4. Preserve the user's original intent and terminology
+        5. Make the prompt actionable and specific
+
+        Respond with ONLY the improved prompt text using XML tags.
+        ---
+
+tags:
+  - name: Improvement
+    description: Prompt improvement operations
