@@ -11,16 +11,16 @@
  * T087: Test git context gracefully skips if configuration.integrations.git=false
  */
 import { describe, expect, it } from 'bun:test';
+import { GIT_COMMAND_TIMEOUT_MS } from '../core/constants.ts';
 import {
+  type GitContext,
   executeGitCommand,
   formatGitContext,
   gatherGitContext,
   parseBranchName,
   parseGitLog,
   parseGitStatus,
-  type GitContext,
 } from './git-context.ts';
-import { GIT_COMMAND_TIMEOUT_MS } from '../core/constants.ts';
 
 describe('Git Context Integration', () => {
   describe('T079: executeGitCommand - executes git log', () => {
@@ -123,8 +123,8 @@ describe('Git Context Integration', () => {
       const commits = parseGitLog(output);
 
       expect(commits.length).toBe(3);
-      expect(commits[0]!.hash).toBe('abc1234');
-      expect(commits[0]!.message).toBe('Fix authentication bug');
+      expect(commits[0]?.hash).toBe('abc1234');
+      expect(commits[0]?.message).toBe('Fix authentication bug');
     });
 
     it('should handle single commit', () => {
@@ -132,7 +132,7 @@ describe('Git Context Integration', () => {
       const commits = parseGitLog(output);
 
       expect(commits.length).toBe(1);
-      expect(commits[0]!.hash).toBe('abc1234');
+      expect(commits[0]?.hash).toBe('abc1234');
     });
 
     it('should handle empty log', () => {
@@ -145,7 +145,7 @@ describe('Git Context Integration', () => {
       const output = 'abc1234 This is a longer commit message with spaces';
       const commits = parseGitLog(output);
 
-      expect(commits[0]!.message).toBe('This is a longer commit message with spaces');
+      expect(commits[0]?.message).toBe('This is a longer commit message with spaces');
     });
   });
 
@@ -155,8 +155,8 @@ describe('Git Context Integration', () => {
       const files = parseGitStatus(output);
 
       expect(files.length).toBe(2);
-      expect(files[0]!.path).toBe('src/file.ts');
-      expect(files[0]!.status).toBe('modified');
+      expect(files[0]?.path).toBe('src/file.ts');
+      expect(files[0]?.status).toBe('modified');
     });
 
     it('should parse added files', () => {
@@ -164,28 +164,28 @@ describe('Git Context Integration', () => {
       const files = parseGitStatus(output);
 
       expect(files.length).toBe(1);
-      expect(files[0]!.status).toBe('added');
+      expect(files[0]?.status).toBe('added');
     });
 
     it('should parse deleted files', () => {
       const output = ' D src/removed.ts';
       const files = parseGitStatus(output);
 
-      expect(files[0]!.status).toBe('deleted');
+      expect(files[0]?.status).toBe('deleted');
     });
 
     it('should parse untracked files', () => {
       const output = '?? src/untracked.ts';
       const files = parseGitStatus(output);
 
-      expect(files[0]!.status).toBe('untracked');
+      expect(files[0]?.status).toBe('untracked');
     });
 
     it('should parse renamed files', () => {
       const output = 'R  old-name.ts -> new-name.ts';
       const files = parseGitStatus(output);
 
-      expect(files[0]!.status).toBe('renamed');
+      expect(files[0]?.status).toBe('renamed');
     });
 
     it('should handle mixed status types', () => {
@@ -289,8 +289,10 @@ describe('Git Context Integration', () => {
   });
 
   describe('gatherGitContext - full integration', () => {
-    it('should gather complete git context', async () => {
+    it('should gather complete git context with all options enabled', async () => {
       const result = await gatherGitContext({
+        includeCommits: true,
+        includeDiff: true,
         _mockCommandResults: {
           'rev-parse --git-dir': '.git',
           'branch --show-current': 'feature/add-auth',
@@ -305,10 +307,30 @@ describe('Git Context Integration', () => {
       expect(result.context?.branch).toBe('feature/add-auth');
       expect(result.context?.recentCommits.length).toBe(2);
       expect(result.context?.changedFiles.length).toBe(2);
+      expect(result.context?.diffStats).toBe(' src/auth.ts | 10 +++++++---');
+    });
+
+    it('should gather minimal context by default (no commits or diff)', async () => {
+      const result = await gatherGitContext({
+        _mockCommandResults: {
+          'rev-parse --git-dir': '.git',
+          'branch --show-current': 'main',
+          'status --porcelain': ' M src/file.ts',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.context).toBeDefined();
+      expect(result.context?.branch).toBe('main');
+      expect(result.context?.recentCommits.length).toBe(0); // Not fetched by default
+      expect(result.context?.changedFiles.length).toBe(1);
+      expect(result.context?.diffStats).toBe(''); // Not fetched by default
     });
 
     it('should handle partial git data gracefully', async () => {
       const result = await gatherGitContext({
+        includeCommits: true,
+        includeDiff: true,
         _mockCommandResults: {
           'rev-parse --git-dir': '.git',
           'branch --show-current': 'main',

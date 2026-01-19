@@ -8,9 +8,9 @@
  */
 import { describe, expect, it } from 'bun:test';
 import {
+  buildClassificationPrompt,
   classifyPrompt,
   parseClassificationResponse,
-  buildClassificationPrompt,
 } from './classifier.ts';
 
 describe('Classifier', () => {

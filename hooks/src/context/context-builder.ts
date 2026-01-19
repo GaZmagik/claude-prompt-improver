@@ -1,50 +1,50 @@
+import {
+  type GitContext,
+  type GitContextOptions,
+  formatGitContext,
+  gatherGitContext,
+} from '../integrations/git-context.ts';
+import {
+  type LspContext,
+  type LspDiagnosticsOptions,
+  formatLspContext,
+  gatherLspDiagnostics,
+} from '../integrations/lsp-diagnostics.ts';
+import {
+  type MemoryContext,
+  type MemoryPluginOptions,
+  formatMemoryContext,
+  gatherMemoryContext,
+} from '../integrations/memory-plugin.ts';
+import {
+  type SessionContext,
+  type SessionContextOptions,
+  formatSessionContext,
+  gatherSessionContext,
+} from '../integrations/session-context.ts';
+import {
+  type SpecAwarenessOptions,
+  type SpecContext,
+  formatSpecContext,
+  gatherSpecContext,
+} from '../integrations/spec-awareness.ts';
+import {
+  type AgentDefinition,
+  type SuggestedAgent,
+  formatAgentsContext,
+  suggestAgents,
+} from './agent-suggester.ts';
+import {
+  type MatchedSkill,
+  type SkillRule,
+  formatSkillsContext,
+  matchSkills,
+} from './skill-matcher.ts';
 /**
  * Context builder for aggregating context from multiple sources
  * Orchestrates tool detection, skill matching, agent suggestion, and git context
  */
-import { detectTools, formatToolsContext, type DetectedTools } from './tool-detector.ts';
-import {
-  matchSkills,
-  formatSkillsContext,
-  type SkillRule,
-  type MatchedSkill,
-} from './skill-matcher.ts';
-import {
-  suggestAgents,
-  formatAgentsContext,
-  type AgentDefinition,
-  type SuggestedAgent,
-} from './agent-suggester.ts';
-import {
-  gatherGitContext,
-  formatGitContext,
-  type GitContext,
-  type GitContextOptions,
-} from '../integrations/git-context.ts';
-import {
-  gatherLspDiagnostics,
-  formatLspContext,
-  type LspContext,
-  type LspDiagnosticsOptions,
-} from '../integrations/lsp-diagnostics.ts';
-import {
-  gatherSpecContext,
-  formatSpecContext,
-  type SpecContext,
-  type SpecAwarenessOptions,
-} from '../integrations/spec-awareness.ts';
-import {
-  gatherMemoryContext,
-  formatMemoryContext,
-  type MemoryContext,
-  type MemoryPluginOptions,
-} from '../integrations/memory-plugin.ts';
-import {
-  gatherSessionContext,
-  formatSessionContext,
-  type SessionContext,
-  type SessionContextOptions,
-} from '../integrations/session-context.ts';
+import { type DetectedTools, detectTools, formatToolsContext } from './tool-detector.ts';
 
 /**
  * Helper type for async context gatherers

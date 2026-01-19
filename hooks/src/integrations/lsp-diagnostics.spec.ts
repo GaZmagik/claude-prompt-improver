@@ -11,13 +11,13 @@
  */
 import { describe, expect, it } from 'bun:test';
 import {
+  type Diagnostic,
+  type LspContext,
   filterDiagnostics,
   formatLspContext,
   gatherLspDiagnostics,
   isDebuggingPrompt,
   matchDiagnosticsToPrompt,
-  type Diagnostic,
-  type LspContext,
 } from './lsp-diagnostics.ts';
 
 describe('LSP Diagnostics Integration', () => {
@@ -95,8 +95,8 @@ describe('LSP Diagnostics Integration', () => {
 
       const filtered = filterDiagnostics(diagnostics);
 
-      expect(filtered[0]!.severity).toBe('error');
-      expect(filtered[1]!.severity).toBe('error');
+      expect(filtered[0]?.severity).toBe('error');
+      expect(filtered[1]?.severity).toBe('error');
     });
 
     it('should include warnings after errors', () => {
@@ -122,8 +122,8 @@ describe('LSP Diagnostics Integration', () => {
       const filtered = filterDiagnostics(diagnostics);
 
       expect(filtered.length).toBe(2);
-      expect(filtered[0]!.severity).toBe('error');
-      expect(filtered[1]!.severity).toBe('warning');
+      expect(filtered[0]?.severity).toBe('error');
+      expect(filtered[1]?.severity).toBe('warning');
     });
 
     it('should handle info and hint severity levels', () => {
@@ -135,7 +135,7 @@ describe('LSP Diagnostics Integration', () => {
 
       const filtered = filterDiagnostics(diagnostics);
 
-      expect(filtered[0]!.severity).toBe('error');
+      expect(filtered[0]?.severity).toBe('error');
     });
   });
 
@@ -215,7 +215,7 @@ describe('LSP Diagnostics Integration', () => {
 
       const matched = matchDiagnosticsToPrompt(diagnostics, 'fix the authentication login bug');
 
-      expect(matched[0]!.filePath).toContain('auth');
+      expect(matched[0]?.filePath).toContain('auth');
     });
 
     it('should return all diagnostics if no keywords match', () => {

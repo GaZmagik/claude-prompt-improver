@@ -3,7 +3,7 @@
  * Tests for shared keyword matching logic
  */
 import { describe, expect, it } from 'bun:test';
-import { matchKeywords, matchItemsByKeywords } from './keyword-matcher.ts';
+import { matchItemsByKeywords, matchKeywords } from './keyword-matcher.ts';
 
 describe('Keyword Matcher', () => {
   describe('matchKeywords', () => {
@@ -71,8 +71,8 @@ describe('Keyword Matcher', () => {
       const result = matchItemsByKeywords('I want to commit', items, getKeywords);
 
       expect(result.length).toBe(1);
-      expect(result[0]!.item.name).toBe('commit');
-      expect(result[0]!.matchedKeywords).toContain('commit');
+      expect(result[0]?.item.name).toBe('commit');
+      expect(result[0]?.matchedKeywords).toContain('commit');
     });
 
     it('should match multiple items', () => {
@@ -85,8 +85,8 @@ describe('Keyword Matcher', () => {
       const result = matchItemsByKeywords('commit git push', items, getKeywords);
 
       expect(result.length).toBe(1);
-      expect(result[0]!.item.name).toBe('commit');
-      expect(result[0]!.score).toBe(3);
+      expect(result[0]?.item.name).toBe('commit');
+      expect(result[0]?.score).toBe(3);
     });
 
     it('should return empty array when no items match', () => {
@@ -105,7 +105,7 @@ describe('Keyword Matcher', () => {
       const result = matchItemsByKeywords('review my PR', items, getKeywords);
 
       expect(result.length).toBe(1);
-      expect(result[0]!.item).toEqual({
+      expect(result[0]?.item).toEqual({
         name: 'review',
         keywords: ['review', 'pr', 'pull request'],
       });

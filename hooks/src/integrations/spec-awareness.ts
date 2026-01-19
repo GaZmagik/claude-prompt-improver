@@ -2,7 +2,8 @@
  * Specification awareness integration for enriching prompts with spec context
  * Parses .specify/ directory for spec.md, plan.md, and tasks.md
  */
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, statSync } from 'node:fs';
+import { readFileSyncSafe } from '../utils/file-reader.ts';
 
 /**
  * Cache entry for spec file content with mtime validation
@@ -133,14 +134,14 @@ export function parseFrontmatter(content: string): Record<string, unknown> {
   for (const line of lines) {
     // Check for array item
     const arrayMatch = line.match(/^\s+-\s+(.+)$/);
-    if (arrayMatch && arrayMatch[1] && currentKey && currentArray) {
+    if (arrayMatch?.[1] && currentKey && currentArray) {
       currentArray.push(arrayMatch[1].trim());
       continue;
     }
 
     // Check for key: value
     const kvMatch = line.match(/^(\w+):\s*(.*)$/);
-    if (kvMatch && kvMatch[1]) {
+    if (kvMatch?.[1]) {
       // Save previous array if exists
       if (currentKey && currentArray) {
         result[currentKey] = currentArray;
@@ -224,7 +225,7 @@ export function parsePlanPhases(content: string): PlanPhase[] {
     let status: 'pending' | 'in_progress' | 'completed' | undefined;
     for (const line of lines) {
       const statusMatch = line.match(/Status:\s*(\w+)/i);
-      if (statusMatch && statusMatch[1]) {
+      if (statusMatch?.[1]) {
         const rawStatus = statusMatch[1].toLowerCase();
         if (rawStatus === 'completed') status = 'completed';
         else if (rawStatus === 'in_progress') status = 'in_progress';
@@ -262,7 +263,7 @@ export function parseTasks(content: string): SpecTask[] {
 
     // Extract user story reference [US{n}]
     const usMatch = rest.match(/\[US(\d+)\]/);
-    const userStory = usMatch && usMatch[1] ? `US${usMatch[1]}` : undefined;
+    const userStory = usMatch?.[1] ? `US${usMatch[1]}` : undefined;
 
     // Extract title - remove [P], [US{n}], and path references
     const title = rest
@@ -306,8 +307,9 @@ export function matchUserStoriesToPrompt(stories: UserStory[], prompt: string): 
  * Helper to read file from mock or real filesystem with mtime-based caching
  */
 function readFile(path: string, mockFs?: Record<string, string | null>): string | null {
+  // Use mock filesystem if provided
   if (mockFs) {
-    return mockFs[path] ?? null;
+    return readFileSyncSafe(path, mockFs);
   }
 
   // Check cache with mtime validation
@@ -323,14 +325,12 @@ function readFile(path: string, mockFs?: Record<string, string | null>): string 
     return cached.content;
   }
 
-  // Read fresh content and update cache
-  try {
-    const content = readFileSync(path, 'utf-8');
+  // Read fresh content using shared utility and update cache
+  const content = readFileSyncSafe(path);
+  if (content) {
     specFileCache.set(path, { content, mtimeMs: currentMtime });
-    return content;
-  } catch {
-    return null;
   }
+  return content;
 }
 
 /**

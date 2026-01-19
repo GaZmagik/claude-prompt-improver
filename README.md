@@ -46,6 +46,7 @@ bun install
 .claude-plugin/
   plugin.json          # Plugin metadata
 hooks/
+  hooks.json           # Hook definitions
   user-prompt-submit/
     improve-prompt.ts  # Main hook entry point
   src/
@@ -94,11 +95,44 @@ logging:
 
 Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settings private.
 
+### Legacy JSON Configuration (Backwards Compatibility)
+
+For backwards compatibility, the plugin also supports JSON configuration at `.claude/prompt-improver-config.json`:
+
+```json
+{
+  "enabled": true,
+  "shortPromptThreshold": 10,
+  "compactionThreshold": 5,
+  "defaultSimpleModel": "haiku",
+  "defaultComplexModel": "sonnet",
+  "integrations": {
+    "git": true,
+    "lsp": true,
+    "spec": true,
+    "memory": true,
+    "session": true
+  },
+  "logging": {
+    "enabled": true,
+    "logFilePath": ".claude/logs/prompt-improver-latest.log",
+    "logLevel": "INFO",
+    "maxLogSizeMB": 10,
+    "maxLogAgeDays": 7,
+    "displayImprovedPrompt": true,
+    "useTimestampedLogs": false
+  }
+}
+```
+
+**Note**: The markdown format (`.local.md`) is recommended as it allows inline documentation alongside configuration.
+
 ### Configuration Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `enabled` | boolean | `true` | Enable/disable the plugin globally |
+| `forceImprove` | boolean | `false` | Bypass all heuristic checks (for testing) |
 | `shortPromptThreshold` | number | `10` | Prompts with fewer tokens bypass improvement |
 | `compactionThreshold` | number | `5` | Skip when context availability is below this % |
 | `defaultSimpleModel` | string | `haiku` | Model for simple improvements |
@@ -110,9 +144,11 @@ Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settin
 | `integrations.session` | boolean | `true` | Enable session context |
 | `logging.enabled` | boolean | `true` | Enable logging |
 | `logging.logFilePath` | string | `.claude/logs/...` | Log file location |
+| `logging.logLevel` | string | `INFO` | Log level: ERROR, INFO, or DEBUG |
 | `logging.maxLogSizeMB` | number | `10` | Maximum log file size in MB |
 | `logging.maxLogAgeDays` | number | `7` | Maximum log age in days |
 | `logging.displayImprovedPrompt` | boolean | `true` | Show improved prompt in output |
+| `logging.useTimestampedLogs` | boolean | `false` | Create timestamped log files |
 
 Both camelCase and snake_case key names are supported (e.g., `shortPromptThreshold` or `short_prompt_threshold`).
 
@@ -192,7 +228,8 @@ bun test
 ### Test Coverage
 
 The plugin has comprehensive test coverage:
-- 454+ tests across 22+ files
+- 619+ tests across 27+ files
+- 1191+ expect() assertions
 - TDD methodology throughout
 - Unit tests for all components
 - Integration tests for context building

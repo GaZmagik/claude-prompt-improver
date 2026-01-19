@@ -2,7 +2,8 @@
  * Memory plugin integration for enriching prompts with relevant memories
  * Detects claude-memory-plugin and retrieves matching memories from index.json
  */
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
+import { readFileSyncSafe } from '../utils/file-reader.ts';
 
 /** Maximum number of memories to include */
 const MAX_MEMORIES = 5;
@@ -118,6 +119,7 @@ export function parseMemoryIndex(content: string): MemoryIndex {
  */
 export function matchMemoriesByTitle(memories: Memory[], prompt: string): Memory[] {
   const promptLower = prompt.toLowerCase();
+  // Filter words with >2 characters (min 3 chars) to exclude articles/prepositions like "a", "in", "of"
   const words = promptLower.split(/\s+/).filter((w) => w.length > 2);
 
   return memories.filter((memory) => {
@@ -136,6 +138,7 @@ export function matchMemoriesByTitle(memories: Memory[], prompt: string): Memory
  */
 export function matchMemoriesByTags(memories: Memory[], prompt: string): Memory[] {
   const promptLower = prompt.toLowerCase();
+  // Filter words with >2 characters (min 3 chars) to exclude articles/prepositions
   const words = promptLower.split(/\s+/).filter((w) => w.length > 2);
 
   return memories.filter((memory) => {
@@ -154,12 +157,22 @@ export function matchMemoriesByTags(memories: Memory[], prompt: string): Memory[
 
 /**
  * Scores and ranks memories by relevance to prompt
+ *
+ * Note: Uses custom scoring logic rather than shared keyword-matcher utility because:
+ * - Bidirectional matching for tags (tag.includes(word) || word.includes(tag))
+ * - Weighted scoring (title matches: 3pts, tag matches: 2pts, type boost: 1pt)
+ * - Splits prompt into words rather than matching keywords against prompt
+ *
+ * @param memories - Memories to score
+ * @param prompt - User prompt to match against
+ * @returns Scored memories with relevance scores
  */
 function scoreMemories(
-  memories: Memory[],
+  memories: readonly Memory[],
   prompt: string
 ): Array<{ memory: Memory; score: number }> {
   const promptLower = prompt.toLowerCase();
+  // Filter words with >2 characters (min 3 chars) to exclude articles/prepositions
   const words = promptLower.split(/\s+/).filter((w) => w.length > 2);
 
   return memories.map((memory) => {
@@ -168,13 +181,13 @@ function scoreMemories(
     const tagsLower = memory.tags.map((t) => t.toLowerCase());
 
     for (const word of words) {
-      // Title matches are worth more
+      // Title matches are worth more (3 points per word)
       if (titleLower.includes(word)) score += 3;
-      // Tag matches
+      // Tag matches (2 points per word, bidirectional)
       if (tagsLower.some((tag) => tag.includes(word) || word.includes(tag))) score += 2;
     }
 
-    // Boost certain types
+    // Boost certain memory types
     if (memory.type === 'decision') score += 1;
     if (memory.type === 'gotcha') score += 1;
 
@@ -182,23 +195,6 @@ function scoreMemories(
   });
 }
 
-/**
- * Helper to read file from mock or real filesystem
- */
-function readFile(path: string, mockFs?: Record<string, string | null>): string | null {
-  if (mockFs) {
-    return mockFs[path] ?? null;
-  }
-  // Real implementation - read from filesystem
-  try {
-    if (!existsSync(path)) {
-      return null;
-    }
-    return readFileSync(path, 'utf-8');
-  } catch {
-    return null;
-  }
-}
 
 /**
  * Gathers memory context from the memory plugin
@@ -229,7 +225,7 @@ export async function gatherMemoryContext(
 
   // Read index.json
   const indexPath = `${pluginCheck.path}index.json`;
-  const indexContent = readFile(indexPath, _mockFileSystem);
+  const indexContent = readFileSyncSafe(indexPath, _mockFileSystem);
 
   if (!indexContent) {
     return {
@@ -268,12 +264,28 @@ export async function gatherMemoryContext(
   }
 
   // Score and filter memories
-  const scored = scoreMemories([...index.memories], prompt);
-  const filtered = scored
-    .filter((s) => s.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, MAX_MEMORIES)
-    .map((s) => s.memory);
+  // Optimization: Avoid unnecessary array copy and full sort
+  // Only keep top N scored memories (O(n) scoring + O(n log k) partial sort where k=MAX_MEMORIES)
+  const scored = scoreMemories(index.memories, prompt);
+
+  // Filter out zero-score memories first (cheaper than sorting everything)
+  const nonZero = scored.filter((s) => s.score > 0);
+
+  // If we have fewer than MAX_MEMORIES, no need to sort
+  if (nonZero.length <= MAX_MEMORIES) {
+    const filtered = nonZero.map((s) => s.memory);
+    return {
+      success: true,
+      context: {
+        memories: filtered,
+      },
+    };
+  }
+
+  // Use partial sort: only sort enough to get top MAX_MEMORIES
+  // Sort in descending order by score
+  nonZero.sort((a, b) => b.score - a.score);
+  const filtered = nonZero.slice(0, MAX_MEMORIES).map((s) => s.memory);
 
   return {
     success: true,

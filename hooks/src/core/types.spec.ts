@@ -172,6 +172,7 @@ describe('Core Types', () => {
     it('should create a valid Configuration object with all fields', () => {
       const config: Configuration = {
         enabled: true,
+        forceImprove: false,
         shortPromptThreshold: 10,
         compactionThreshold: 5,
         defaultSimpleModel: 'haiku',
@@ -186,9 +187,11 @@ describe('Core Types', () => {
         logging: {
           enabled: true,
           logFilePath: '.claude/logs/prompt-improver-latest.log',
+          logLevel: 'INFO',
           maxLogSizeMB: 10,
           maxLogAgeDays: 7,
           displayImprovedPrompt: true,
+          useTimestampedLogs: false,
         },
       };
 
@@ -217,7 +220,9 @@ describe('Core Types', () => {
     it('should create a valid LogEntry for improved prompt', () => {
       const entry: LogEntry = {
         timestamp: new Date(),
-        originalPrompt: 'fix the bug',
+        level: 'INFO',
+        phase: 'complete',
+        promptPreview: 'fix the bug...',
         improvedPrompt: '<task>Fix the bug...</task>',
         classification: 'COMPLEX',
         bypassReason: null,
@@ -235,7 +240,9 @@ describe('Core Types', () => {
     it('should create a valid LogEntry for bypassed prompt', () => {
       const entry: LogEntry = {
         timestamp: new Date(),
-        originalPrompt: 'yes',
+        level: 'INFO',
+        phase: 'bypass',
+        promptPreview: 'yes...',
         improvedPrompt: null,
         classification: 'NONE',
         bypassReason: 'short_prompt',

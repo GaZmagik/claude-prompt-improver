@@ -9,15 +9,18 @@ import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
+  type LogEntryInput,
   createLogEntry,
+  createPromptPreview,
   formatLogEntry,
+  generateLogFilePath,
+  shouldLog,
   writeLogEntry,
   writeLogEntryAsync,
-  type LogEntryInput,
 } from './logger.ts';
 
 describe('Logger', () => {
-  const testDir = join(tmpdir(), 'prompt-improver-test-' + Date.now());
+  const testDir = join(tmpdir(), `prompt-improver-test-${Date.now()}`);
   const testLogPath = join(testDir, '.claude', 'logs', 'prompt-improver-latest.log');
 
   beforeEach(() => {
@@ -43,13 +46,17 @@ describe('Logger', () => {
         totalLatency: 4532,
         contextSources: ['git', 'lsp'],
         conversationId: 'conv-123',
+        level: 'INFO',
+        phase: 'complete',
       };
 
       const entry = createLogEntry(input);
 
       expect(entry.timestamp).toBeInstanceOf(Date);
-      expect(entry.originalPrompt).toBe('fix the bug');
-      expect(entry.improvedPrompt).toBe('<task>Fix the authentication bug</task>');
+      expect(entry.level).toBe('INFO');
+      expect(entry.phase).toBe('complete');
+      expect(entry.promptPreview).toContain('fix the bug');
+      expect(entry.improvedPrompt).toBe('<task>Fix the authentication bug</task>...');
       expect(entry.classification).toBe('COMPLEX');
       expect(entry.bypassReason).toBeNull();
       expect(entry.modelUsed).toBe('sonnet');
@@ -68,12 +75,16 @@ describe('Logger', () => {
         totalLatency: 2,
         contextSources: [],
         conversationId: 'conv-456',
+        level: 'INFO',
+        phase: 'bypass',
       };
 
       const entry = createLogEntry(input);
 
       expect(entry.timestamp).toBeInstanceOf(Date);
-      expect(entry.originalPrompt).toBe('yes');
+      expect(entry.level).toBe('INFO');
+      expect(entry.phase).toBe('bypass');
+      expect(entry.promptPreview).toContain('yes');
       expect(entry.improvedPrompt).toBeNull();
       expect(entry.classification).toBe('NONE');
       expect(entry.bypassReason).toBe('short_prompt');
@@ -94,6 +105,8 @@ describe('Logger', () => {
         totalLatency: 1,
         contextSources: [],
         conversationId: 'conv-789',
+        level: 'INFO',
+        phase: 'bypass',
       });
 
       const after = new Date();
@@ -114,6 +127,8 @@ describe('Logger', () => {
         totalLatency: 1000,
         contextSources: ['git'],
         conversationId: 'conv-123',
+        level: 'INFO',
+        phase: 'complete',
       };
 
       const entry = createLogEntry(input);
@@ -133,6 +148,8 @@ describe('Logger', () => {
         totalLatency: 500,
         contextSources: ['tools', 'skills'],
         conversationId: 'conv-abc',
+        level: 'INFO',
+        phase: 'complete',
       };
 
       const entry = createLogEntry(input);
@@ -140,7 +157,7 @@ describe('Logger', () => {
       const parsed = JSON.parse(json);
 
       expect(parsed).toHaveProperty('timestamp');
-      expect(parsed).toHaveProperty('originalPrompt');
+      expect(parsed).toHaveProperty('promptPreview');
       expect(parsed).toHaveProperty('improvedPrompt');
       expect(parsed).toHaveProperty('classification');
       expect(parsed).toHaveProperty('bypassReason');
@@ -160,6 +177,8 @@ describe('Logger', () => {
         totalLatency: 1,
         contextSources: [],
         conversationId: 'conv-xyz',
+        level: 'INFO',
+        phase: 'bypass',
       };
 
       const entry = createLogEntry(input);
@@ -180,6 +199,8 @@ describe('Logger', () => {
         totalLatency: 2,
         contextSources: [],
         conversationId: 'conv-null',
+        level: 'INFO',
+        phase: 'bypass',
       };
 
       const entry = createLogEntry(input);
@@ -200,6 +221,8 @@ describe('Logger', () => {
         totalLatency: 100,
         contextSources: [],
         conversationId: 'conv-special',
+        level: 'INFO',
+        phase: 'complete',
       };
 
       const entry = createLogEntry(input);
@@ -209,7 +232,7 @@ describe('Logger', () => {
       expect(() => JSON.parse(json)).not.toThrow();
 
       const parsed = JSON.parse(json);
-      expect(parsed.originalPrompt).toBe('test "quotes" and\nnewlines');
+      expect(parsed.promptPreview).toContain('test "quotes"');
     });
   });
 
@@ -224,6 +247,8 @@ describe('Logger', () => {
         totalLatency: 300,
         contextSources: [],
         conversationId: 'conv-write',
+        level: 'INFO',
+        phase: 'complete',
       };
 
       const entry = createLogEntry(input);
@@ -243,6 +268,8 @@ describe('Logger', () => {
         totalLatency: 1,
         contextSources: [],
         conversationId: 'conv-1',
+        level: 'INFO',
+        phase: 'bypass',
       });
       await writeLogEntryAsync(entry1, testLogPath);
 
@@ -256,6 +283,8 @@ describe('Logger', () => {
         totalLatency: 1,
         contextSources: [],
         conversationId: 'conv-2',
+        level: 'INFO',
+        phase: 'bypass',
       });
       await writeLogEntryAsync(entry2, testLogPath);
 
@@ -267,8 +296,8 @@ describe('Logger', () => {
       const parsed1 = JSON.parse(lines[0]!);
       const parsed2 = JSON.parse(lines[1]!);
 
-      expect(parsed1.originalPrompt).toBe('first');
-      expect(parsed2.originalPrompt).toBe('second');
+      expect(parsed1.promptPreview).toContain('first');
+      expect(parsed2.promptPreview).toContain('second');
     });
 
     it('should create parent directories if they do not exist (async)', async () => {
@@ -283,6 +312,8 @@ describe('Logger', () => {
         totalLatency: 1,
         contextSources: [],
         conversationId: 'conv-nested',
+        level: 'INFO',
+        phase: 'bypass',
       });
 
       await writeLogEntryAsync(entry, nestedPath);
@@ -300,6 +331,8 @@ describe('Logger', () => {
         totalLatency: 100,
         contextSources: ['git'],
         conversationId: 'conv-jsonl',
+        level: 'INFO',
+        phase: 'complete',
       });
 
       await writeLogEntryAsync(entry, testLogPath);
@@ -323,6 +356,8 @@ describe('Logger', () => {
         totalLatency: 1,
         contextSources: [],
         conversationId: 'conv-sync',
+        level: 'INFO',
+        phase: 'bypass',
       });
 
       // This should return immediately without blocking
@@ -332,6 +367,482 @@ describe('Logger', () => {
 
       // Should complete nearly instantly (fire-and-forget)
       expect(elapsed).toBeLessThan(50);
+    });
+  });
+
+  describe('createPromptPreview - security and privacy', () => {
+    it('should truncate prompt to 50 characters', () => {
+      const longPrompt = 'a'.repeat(100);
+      const preview = createPromptPreview(longPrompt);
+
+      expect(preview.length).toBeLessThanOrEqual(53); // 50 chars + '...'
+      expect(preview).toContain('...');
+    });
+
+    it('should strip newlines from preview', () => {
+      const promptWithNewlines = 'first line\nsecond line\nthird line';
+      const preview = createPromptPreview(promptWithNewlines);
+
+      expect(preview).not.toContain('\n');
+      expect(preview).toContain('first line');
+    });
+
+    it('should handle short prompts without truncation marker', () => {
+      const shortPrompt = 'short prompt';
+      const preview = createPromptPreview(shortPrompt);
+
+      expect(preview).toBe('short prompt...');
+    });
+
+    it('should handle empty prompts', () => {
+      const preview = createPromptPreview('');
+
+      expect(preview).toBe('...');
+    });
+
+    it('should replace multiple consecutive spaces from newlines', () => {
+      const promptWithTabs = 'line1\n\nline2\n\n\nline3';
+      const preview = createPromptPreview(promptWithTabs);
+
+      expect(preview).not.toContain('\n');
+      expect(preview).toContain('line1');
+    });
+
+    it('should truncate improvedPrompt to prevent sensitive context exposure', () => {
+      const sensitiveContext =
+        'git commit abc123\nLSP diagnostic: auth.ts:42\nFile: /home/user/.env\nAPI_KEY=secret123';
+      const input: LogEntryInput = {
+        originalPrompt: 'fix the bug',
+        improvedPrompt: sensitiveContext,
+        classification: 'COMPLEX',
+        bypassReason: null,
+        modelUsed: 'sonnet',
+        totalLatency: 1000,
+        contextSources: ['git', 'lsp'],
+        conversationId: 'conv-sec',
+        level: 'INFO',
+        phase: 'complete',
+      };
+
+      const entry = createLogEntry(input);
+
+      expect(entry.improvedPrompt).toBeDefined();
+      expect(entry.improvedPrompt?.length).toBeLessThanOrEqual(53);
+      expect(entry.improvedPrompt).not.toContain('secret123');
+      expect(entry.improvedPrompt).not.toContain('/home/user/.env');
+      expect(entry.improvedPrompt).toContain('...');
+    });
+
+    it('should handle null improvedPrompt without truncation', () => {
+      const input: LogEntryInput = {
+        originalPrompt: 'test',
+        improvedPrompt: null,
+        classification: 'NONE',
+        bypassReason: 'short_prompt',
+        modelUsed: null,
+        totalLatency: 1,
+        contextSources: [],
+        conversationId: 'conv-null',
+        level: 'INFO',
+        phase: 'bypass',
+      };
+
+      const entry = createLogEntry(input);
+
+      expect(entry.improvedPrompt).toBeNull();
+    });
+  });
+
+  describe('generateLogFilePath - timestamped log files', () => {
+    it('should return base path when timestamps disabled', () => {
+      const basePath = '/test/path/log.log';
+      const result = generateLogFilePath(basePath, false);
+
+      expect(result).toBe(basePath);
+    });
+
+    it('should create timestamped filename when enabled', () => {
+      const basePath = '/test/path/prompt-improver.log';
+      const result = generateLogFilePath(basePath, true);
+
+      expect(result).toContain('/test/path/');
+      expect(result).toContain('prompt-improver-');
+      expect(result).toMatch(/prompt-improver-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.log$/);
+    });
+
+    it('should preserve directory structure with timestamps', () => {
+      const basePath = '/deep/nested/path/log.log';
+      const result = generateLogFilePath(basePath, true);
+
+      expect(result).toContain('/deep/nested/path/');
+    });
+
+    it('should handle paths without extensions', () => {
+      const basePath = '/test/logfile';
+      const result = generateLogFilePath(basePath, true);
+
+      expect(result).toContain('/test/');
+      expect(result).toMatch(/logfile-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}$/);
+    });
+
+    it('should create unique timestamps for consecutive calls', async () => {
+      const basePath = '/test/log.log';
+      const first = generateLogFilePath(basePath, true);
+
+      // Wait 1ms to ensure different timestamp
+      await new Promise((resolve) => setTimeout(resolve, 1));
+
+      const second = generateLogFilePath(basePath, true);
+
+      // Both should have timestamp format, and likely be different
+      expect(first).toMatch(/log-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.log$/);
+      expect(second).toMatch(/log-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.log$/);
+    });
+  });
+
+  describe('shouldLog - log level filtering', () => {
+    it('should allow ERROR when level is ERROR', () => {
+      expect(shouldLog('ERROR', 'ERROR')).toBe(true);
+    });
+
+    it('should block INFO when level is ERROR', () => {
+      expect(shouldLog('INFO', 'ERROR')).toBe(false);
+    });
+
+    it('should block DEBUG when level is ERROR', () => {
+      expect(shouldLog('DEBUG', 'ERROR')).toBe(false);
+    });
+
+    it('should allow ERROR when level is INFO', () => {
+      expect(shouldLog('ERROR', 'INFO')).toBe(true);
+    });
+
+    it('should allow INFO when level is INFO', () => {
+      expect(shouldLog('INFO', 'INFO')).toBe(true);
+    });
+
+    it('should block DEBUG when level is INFO', () => {
+      expect(shouldLog('DEBUG', 'INFO')).toBe(false);
+    });
+
+    it('should allow all levels when level is DEBUG', () => {
+      expect(shouldLog('ERROR', 'DEBUG')).toBe(true);
+      expect(shouldLog('INFO', 'DEBUG')).toBe(true);
+      expect(shouldLog('DEBUG', 'DEBUG')).toBe(true);
+    });
+  });
+
+  describe('createLogEntry - enhanced with new fields', () => {
+    it('should include level field', () => {
+      const input: LogEntryInput = {
+        originalPrompt: 'test',
+        improvedPrompt: null,
+        classification: 'NONE',
+        bypassReason: 'short_prompt',
+        modelUsed: null,
+        totalLatency: 1,
+        contextSources: [],
+        conversationId: 'conv-123',
+        level: 'INFO',
+        phase: 'bypass',
+      };
+
+      const entry = createLogEntry(input);
+
+      expect(entry.level).toBe('INFO');
+    });
+
+    it('should include phase field', () => {
+      const input: LogEntryInput = {
+        originalPrompt: 'test',
+        improvedPrompt: 'improved',
+        classification: 'COMPLEX',
+        bypassReason: null,
+        modelUsed: 'sonnet',
+        totalLatency: 1000,
+        contextSources: [],
+        conversationId: 'conv-123',
+        level: 'INFO',
+        phase: 'improve',
+      };
+
+      const entry = createLogEntry(input);
+
+      expect(entry.phase).toBe('improve');
+    });
+
+    it('should include promptPreview instead of originalPrompt', () => {
+      const longPrompt = 'a'.repeat(100);
+      const input: LogEntryInput = {
+        originalPrompt: longPrompt,
+        improvedPrompt: null,
+        classification: 'NONE',
+        bypassReason: 'short_prompt',
+        modelUsed: null,
+        totalLatency: 1,
+        contextSources: [],
+        conversationId: 'conv-123',
+        level: 'INFO',
+        phase: 'bypass',
+      };
+
+      const entry = createLogEntry(input);
+
+      expect(entry.promptPreview).toBeDefined();
+      expect(entry.promptPreview?.length).toBeLessThanOrEqual(53);
+      expect(entry).not.toHaveProperty('originalPrompt');
+    });
+
+    it('should include classificationLatency when provided', () => {
+      const input: LogEntryInput = {
+        originalPrompt: 'test',
+        improvedPrompt: 'improved',
+        classification: 'COMPLEX',
+        bypassReason: null,
+        modelUsed: 'sonnet',
+        totalLatency: 2000,
+        classificationLatency: 500,
+        contextSources: [],
+        conversationId: 'conv-123',
+        level: 'INFO',
+        phase: 'complete',
+      };
+
+      const entry = createLogEntry(input);
+
+      expect(entry.classificationLatency).toBe(500);
+    });
+
+    it('should include improvementLatency when provided', () => {
+      const input: LogEntryInput = {
+        originalPrompt: 'test',
+        improvedPrompt: 'improved',
+        classification: 'COMPLEX',
+        bypassReason: null,
+        modelUsed: 'sonnet',
+        totalLatency: 2000,
+        improvementLatency: 1500,
+        contextSources: [],
+        conversationId: 'conv-123',
+        level: 'INFO',
+        phase: 'complete',
+      };
+
+      const entry = createLogEntry(input);
+
+      expect(entry.improvementLatency).toBe(1500);
+    });
+
+    it('should include error field when provided', () => {
+      const input: LogEntryInput = {
+        originalPrompt: 'test',
+        improvedPrompt: null,
+        classification: 'NONE',
+        bypassReason: 'classification_failed',
+        modelUsed: null,
+        totalLatency: 5000,
+        contextSources: [],
+        conversationId: 'conv-123',
+        level: 'ERROR',
+        phase: 'classify',
+        error: 'Classification timeout after 5s',
+      };
+
+      const entry = createLogEntry(input);
+
+      expect(entry.error).toBe('Classification timeout after 5s');
+    });
+  });
+
+  describe('formatLogEntry - conditional property inclusion', () => {
+    it('should exclude classificationLatency when undefined', () => {
+      const entry = createLogEntry({
+        originalPrompt: 'test',
+        improvedPrompt: null,
+        classification: 'NONE',
+        bypassReason: 'short_prompt',
+        modelUsed: null,
+        totalLatency: 1,
+        contextSources: [],
+        conversationId: 'conv-123',
+        level: 'INFO',
+        phase: 'bypass',
+      });
+
+      const json = formatLogEntry(entry);
+      const parsed = JSON.parse(json);
+
+      expect(parsed).not.toHaveProperty('classificationLatency');
+    });
+
+    it('should include classificationLatency when defined', () => {
+      const entry = createLogEntry({
+        originalPrompt: 'test',
+        improvedPrompt: 'improved',
+        classification: 'COMPLEX',
+        bypassReason: null,
+        modelUsed: 'sonnet',
+        totalLatency: 2000,
+        classificationLatency: 500,
+        contextSources: [],
+        conversationId: 'conv-123',
+        level: 'INFO',
+        phase: 'complete',
+      });
+
+      const json = formatLogEntry(entry);
+      const parsed = JSON.parse(json);
+
+      expect(parsed.classificationLatency).toBe(500);
+    });
+
+    it('should exclude improvementLatency when undefined', () => {
+      const entry = createLogEntry({
+        originalPrompt: 'test',
+        improvedPrompt: null,
+        classification: 'NONE',
+        bypassReason: 'short_prompt',
+        modelUsed: null,
+        totalLatency: 1,
+        contextSources: [],
+        conversationId: 'conv-123',
+        level: 'INFO',
+        phase: 'bypass',
+      });
+
+      const json = formatLogEntry(entry);
+      const parsed = JSON.parse(json);
+
+      expect(parsed).not.toHaveProperty('improvementLatency');
+    });
+
+    it('should exclude error when undefined', () => {
+      const entry = createLogEntry({
+        originalPrompt: 'test',
+        improvedPrompt: 'improved',
+        classification: 'SIMPLE',
+        bypassReason: null,
+        modelUsed: 'haiku',
+        totalLatency: 1000,
+        contextSources: [],
+        conversationId: 'conv-123',
+        level: 'INFO',
+        phase: 'complete',
+      });
+
+      const json = formatLogEntry(entry);
+      const parsed = JSON.parse(json);
+
+      expect(parsed).not.toHaveProperty('error');
+    });
+
+    it('should include all new fields when provided', () => {
+      const entry = createLogEntry({
+        originalPrompt: 'test prompt here',
+        improvedPrompt: 'improved',
+        classification: 'COMPLEX',
+        bypassReason: null,
+        modelUsed: 'sonnet',
+        totalLatency: 2500,
+        classificationLatency: 500,
+        improvementLatency: 2000,
+        contextSources: ['git', 'lsp'],
+        conversationId: 'conv-123',
+        level: 'INFO',
+        phase: 'complete',
+      });
+
+      const json = formatLogEntry(entry);
+      const parsed = JSON.parse(json);
+
+      expect(parsed.level).toBe('INFO');
+      expect(parsed.phase).toBe('complete');
+      expect(parsed.promptPreview).toBeDefined();
+      expect(parsed.classificationLatency).toBe(500);
+      expect(parsed.improvementLatency).toBe(2000);
+    });
+  });
+
+  describe('writeLogEntry - log level filtering', () => {
+    it('should write ERROR level entry when config is ERROR', async () => {
+      const entry = createLogEntry({
+        originalPrompt: 'test',
+        improvedPrompt: null,
+        classification: 'NONE',
+        bypassReason: 'classification_failed',
+        modelUsed: null,
+        totalLatency: 5000,
+        contextSources: [],
+        conversationId: 'conv-error',
+        level: 'ERROR',
+        phase: 'classify',
+        error: 'Timeout',
+      });
+
+      writeLogEntry(entry, testLogPath, 'ERROR');
+
+      // Give fire-and-forget time to complete
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      expect(existsSync(testLogPath)).toBe(true);
+    });
+
+    it('should not write INFO level entry when config is ERROR', async () => {
+      const entry = createLogEntry({
+        originalPrompt: 'test',
+        improvedPrompt: 'improved',
+        classification: 'SIMPLE',
+        bypassReason: null,
+        modelUsed: 'haiku',
+        totalLatency: 1000,
+        contextSources: [],
+        conversationId: 'conv-info',
+        level: 'INFO',
+        phase: 'complete',
+      });
+
+      const beforeSize = existsSync(testLogPath) ? readFileSync(testLogPath, 'utf-8').length : 0;
+      writeLogEntry(entry, testLogPath, 'ERROR');
+
+      // Give fire-and-forget time to complete
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      const afterSize = existsSync(testLogPath) ? readFileSync(testLogPath, 'utf-8').length : 0;
+      expect(afterSize).toBe(beforeSize);
+    });
+
+    it('should write both ERROR and INFO when config is INFO', async () => {
+      const errorEntry = createLogEntry({
+        originalPrompt: 'test',
+        improvedPrompt: null,
+        classification: 'NONE',
+        bypassReason: 'classification_failed',
+        modelUsed: null,
+        totalLatency: 5000,
+        contextSources: [],
+        conversationId: 'conv-error',
+        level: 'ERROR',
+        phase: 'classify',
+        error: 'Timeout',
+      });
+
+      const infoEntry = createLogEntry({
+        originalPrompt: 'test',
+        improvedPrompt: 'improved',
+        classification: 'SIMPLE',
+        bypassReason: null,
+        modelUsed: 'haiku',
+        totalLatency: 1000,
+        contextSources: [],
+        conversationId: 'conv-info',
+        level: 'INFO',
+        phase: 'complete',
+      });
+
+      writeLogEntry(errorEntry, testLogPath, 'INFO');
+      writeLogEntry(infoEntry, testLogPath, 'INFO');
+
+      // Give fire-and-forget time to complete
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      expect(existsSync(testLogPath)).toBe(true);
     });
   });
 });

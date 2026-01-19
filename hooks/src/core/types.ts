@@ -33,6 +33,9 @@ export type BypassReason =
 // Valid XML tags for structured prompts
 export type XmlTag = 'task' | 'context' | 'constraints' | 'output_format' | 'examples';
 
+// Log levels for filtering
+export type LogLevel = 'ERROR' | 'INFO' | 'DEBUG';
+
 /**
  * Original user prompt before processing
  */
@@ -100,9 +103,11 @@ export interface IntegrationToggles {
 export interface LoggingConfig {
   readonly enabled: boolean;
   readonly logFilePath: string;
+  readonly logLevel: LogLevel;
   readonly maxLogSizeMB: number;
   readonly maxLogAgeDays: number;
   readonly displayImprovedPrompt: boolean;
+  readonly useTimestampedLogs: boolean;
 }
 
 /**
@@ -110,6 +115,7 @@ export interface LoggingConfig {
  */
 export interface Configuration {
   readonly enabled: boolean;
+  readonly forceImprove: boolean;
   readonly shortPromptThreshold: number;
   readonly compactionThreshold: number;
   readonly defaultSimpleModel: ClaudeModel;
@@ -133,14 +139,19 @@ export interface BypassDecision {
  */
 export interface LogEntry {
   readonly timestamp: Date;
-  readonly originalPrompt: string;
+  readonly level: LogLevel;
+  readonly phase: 'bypass' | 'classify' | 'improve' | 'complete';
+  readonly promptPreview: string;
   readonly improvedPrompt: string | null;
   readonly classification: ClassificationLevel;
   readonly bypassReason: BypassReason | null;
   readonly modelUsed: ClaudeModel | null;
   readonly totalLatency: number;
+  readonly classificationLatency?: number;
+  readonly improvementLatency?: number;
   readonly contextSources: readonly ContextSource[];
   readonly conversationId: string;
+  readonly error?: string;
 }
 
 /**
@@ -189,4 +200,18 @@ export interface HookOutput {
   readonly systemMessage?: string;
   readonly userMessage?: string;
   readonly additionalContext?: string;
+}
+
+/**
+ * Visibility information for user-facing messages
+ */
+export interface VisibilityInfo {
+  readonly status: 'bypassed' | 'applied' | 'failed';
+  readonly bypassReason?: BypassReason;
+  readonly classification?: ClassificationLevel;
+  readonly tokensBefore?: number;
+  readonly tokensAfter?: number;
+  readonly summary?: readonly string[];
+  readonly errorHint?: string;
+  readonly latencyMs?: number;
 }

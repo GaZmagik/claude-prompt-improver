@@ -6,11 +6,11 @@
  */
 import { describe, expect, it } from 'bun:test';
 import {
-  matchSkills,
-  loadSkillRules,
-  formatSkillsContext,
-  type SkillRule,
   type MatchedSkill,
+  type SkillRule,
+  formatSkillsContext,
+  loadSkillRules,
+  matchSkills,
 } from './skill-matcher.ts';
 
 describe('Skill Matcher', () => {
@@ -34,8 +34,8 @@ describe('Skill Matcher', () => {
       const result = loadSkillRules(rulesJson);
 
       expect(result.length).toBe(2);
-      expect(result[0]!.name).toBe('commit');
-      expect(result[1]!.name).toBe('memory');
+      expect(result[0]?.name).toBe('commit');
+      expect(result[1]?.name).toBe('memory');
     });
 
     it('should extract keywords from skill rules', () => {
@@ -45,9 +45,9 @@ describe('Skill Matcher', () => {
 
       const result = loadSkillRules(rulesJson);
 
-      expect(result[0]!.keywords).toContain('test');
-      expect(result[0]!.keywords).toContain('testing');
-      expect(result[0]!.keywords).toContain('spec');
+      expect(result[0]?.keywords).toContain('test');
+      expect(result[0]?.keywords).toContain('testing');
+      expect(result[0]?.keywords).toContain('spec');
     });
 
     it('should handle empty skills array', () => {
@@ -88,15 +88,15 @@ describe('Skill Matcher', () => {
       const result = matchSkills('help me commit the changes', sampleRules);
 
       expect(result.length).toBe(1);
-      expect(result[0]!.skill.name).toBe('commit');
+      expect(result[0]?.skill.name).toBe('commit');
     });
 
     it('should match multiple keywords to same skill', () => {
       const result = matchSkills('git commit and push', sampleRules);
 
       expect(result.length).toBe(1);
-      expect(result[0]!.skill.name).toBe('commit');
-      expect(result[0]!.matchedKeywords.length).toBeGreaterThanOrEqual(2);
+      expect(result[0]?.skill.name).toBe('commit');
+      expect(result[0]?.matchedKeywords.length).toBeGreaterThanOrEqual(2);
     });
 
     it('should match keywords to multiple skills', () => {
@@ -113,7 +113,7 @@ describe('Skill Matcher', () => {
       const result = matchSkills('COMMIT THE CHANGES', sampleRules);
 
       expect(result.length).toBe(1);
-      expect(result[0]!.skill.name).toBe('commit');
+      expect(result[0]?.skill.name).toBe('commit');
     });
 
     it('should return empty array when no matches', () => {
@@ -126,14 +126,14 @@ describe('Skill Matcher', () => {
       const result = matchSkills('create a pull request', sampleRules);
 
       expect(result.length).toBe(1);
-      expect(result[0]!.skill.name).toBe('review');
+      expect(result[0]?.skill.name).toBe('review');
     });
 
     it('should sort results by match count (most relevant first)', () => {
       const result = matchSkills('git commit and push to remote', sampleRules);
 
       // Should have commit skill first as it matches git, commit, push
-      expect(result[0]!.skill.name).toBe('commit');
+      expect(result[0]?.skill.name).toBe('commit');
     });
   });
 

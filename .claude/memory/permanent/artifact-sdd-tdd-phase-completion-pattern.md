@@ -1,17 +1,17 @@
 ---
 id: artifact-sdd-tdd-phase-completion-pattern
-title: SDD + TDD phase completion pattern
+title: SDD/TDD phase completion pattern with 6 systematic remediation phases
 type: artifact
 scope: project
-created: "2026-01-19T01:11:02.426Z"
-updated: "2026-01-19T01:11:02.426Z"
+created: "2026-01-19T18:53:50.298Z"
+updated: "2026-01-19T18:53:50.298Z"
 tags:
   - sdd
   - tdd
-  - workflow
-  - phase-management
-  - quality
+  - remediation
+  - post-mvp
+  - refactoring
   - project
 ---
 
-Workflow: (1) Research phase documents decisions in spec; (2) Create test stubs with Bash touch; (3) Write all tests (red phase); (4) Implement code (green phase); (5) Run typecheck + tests; (6) Mark task list complete; (7) Update tasks.md checkboxes. This ensures spec-code alignment and comprehensive coverage before moving to next phase.
+Systematic approach to post-MVP remediation: Phase 1 (File structure fix), Phase 2 (Spec/README updates), Phase 3 (Code cleanup with linting), Phase 4 (Test coverage expansion), Phase 5 (Refactoring duplications), Phase 6 (Performance optimizations). Each phase builds on previous; test suite must pass after each phase. Patterns: must-do items (structural), should-do items (quality), nice-to-have items (performance). Verified working on 13 items across hooks project (650 tests passing).

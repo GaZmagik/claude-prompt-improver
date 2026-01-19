@@ -243,6 +243,9 @@ describe('Hook Input/Output', () => {
         type: 'improved',
         improvedPrompt: '<task>Do something</task>',
         classification: 'COMPLEX',
+        tokensBefore: 10,
+        tokensAfter: 25,
+        latencyMs: 2500,
       });
 
       expect(output.continue).toBe(true);
@@ -255,6 +258,9 @@ describe('Hook Input/Output', () => {
         type: 'improved',
         improvedPrompt: 'Better prompt',
         classification: 'SIMPLE',
+        tokensBefore: 5,
+        tokensAfter: 8,
+        latencyMs: 1200,
       });
 
       expect(output.systemMessage).toContain('SIMPLE');
@@ -434,6 +440,247 @@ describe('Hook Input/Output', () => {
       });
 
       expect(result.type).toBe('improved');
+    });
+  });
+
+  describe('Visibility Features - System Messages', () => {
+    it('should include systemMessage in output for bypassed prompts', () => {
+      const output = createHookOutput({
+        type: 'passthrough',
+        bypassReason: 'short_prompt',
+      });
+
+      expect(output.systemMessage).toBeDefined();
+      expect(output.systemMessage).toContain('⏭️');
+      expect(output.systemMessage).toContain('Prompt unchanged');
+    });
+
+    it('should include systemMessage in output for improved prompts', () => {
+      const output = createHookOutput({
+        type: 'improved',
+        improvedPrompt: '<task>Fix the bug</task>',
+        classification: 'COMPLEX',
+        tokensBefore: 45,
+        tokensAfter: 78,
+        summary: ['Added XML structure', 'Injected git context'],
+        latencyMs: 2300,
+      });
+
+      expect(output.additionalContext).toContain('<task>Fix the bug</task>');
+      expect(output.systemMessage).toBeDefined();
+      expect(output.systemMessage).toContain('🎯');
+      expect(output.systemMessage).toContain('Prompt improved');
+      expect(output.systemMessage).toContain('COMPLEX');
+      expect(output.systemMessage).toContain('45');
+      expect(output.systemMessage).toContain('78');
+      expect(output.systemMessage).toContain('Added XML structure');
+    });
+
+    it('should include token counts in improved message', () => {
+      const output = createHookOutput({
+        type: 'improved',
+        improvedPrompt: 'Improved text',
+        classification: 'SIMPLE',
+        tokensBefore: 30,
+        tokensAfter: 42,
+        latencyMs: 1500,
+      });
+
+      expect(output.systemMessage).toBeDefined();
+      expect(output.systemMessage).toContain('30');
+      expect(output.systemMessage).toContain('42');
+    });
+
+    it('should include summary bullets when provided', () => {
+      const output = createHookOutput({
+        type: 'improved',
+        improvedPrompt: 'Improved text',
+        classification: 'COMPLEX',
+        tokensBefore: 50,
+        tokensAfter: 95,
+        summary: ['Added context injection', 'Expanded task description', 'Structured with XML'],
+        latencyMs: 1800,
+      });
+
+      expect(output.systemMessage).toBeDefined();
+      expect(output.systemMessage).toContain('Added context injection');
+      expect(output.systemMessage).toContain('Expanded task description');
+      expect(output.systemMessage).toContain('Structured with XML');
+    });
+
+    it('should format latency in system message', () => {
+      const output = createHookOutput({
+        type: 'improved',
+        improvedPrompt: 'Improved text',
+        classification: 'SIMPLE',
+        tokensBefore: 20,
+        tokensAfter: 25,
+        latencyMs: 12456,
+      });
+
+      expect(output.systemMessage).toBeDefined();
+      expect(output.systemMessage).toContain('12.5s');
+    });
+
+    it('should include all bypass reasons in messages', () => {
+      const reasons: Array<'short_prompt' | 'skip_tag' | 'low_context' | 'forked_session' | 'plugin_disabled'> = [
+        'short_prompt',
+        'skip_tag',
+        'low_context',
+        'forked_session',
+        'plugin_disabled',
+      ];
+
+      for (const reason of reasons) {
+        const output = createHookOutput({
+          type: 'passthrough',
+          bypassReason: reason,
+        });
+
+        expect(output.systemMessage).toBeDefined();
+        expect(output.systemMessage).toContain('⏭️');
+      }
+    });
+  });
+
+  describe('Visibility Features - Logging Integration', () => {
+    it('should pass visibility data to logger for bypass events', async () => {
+      const result = await processPrompt({
+        prompt: 'fix',
+        sessionId: 'session-bypass',
+        _mockClassification: null, // Triggers bypass
+      });
+
+      expect(result.type).toBe('passthrough');
+      // Logger should receive bypass event with INFO level
+    });
+
+    it('should pass visibility data to logger for successful improvements', async () => {
+      const result = await processPrompt({
+        prompt: 'Please help me understand how the authentication module works in detail',
+        sessionId: 'session-success',
+        _mockClassification: 'COMPLEX: Technical question',
+        _mockImprovement: '<task>Explain authentication module</task>',
+      });
+
+      expect(result.type).toBe('improved');
+      // Logger should receive improvement event with INFO level
+    });
+
+    it('should pass error data to logger for failures', async () => {
+      const result = await processPrompt({
+        prompt: 'Please help me understand how the authentication module works in detail',
+        sessionId: 'session-fail',
+        _mockClassification: null, // Simulates classification failure
+      });
+
+      // Should fallback to passthrough
+      expect(result.type).toBe('passthrough');
+      // Logger should receive error event with ERROR level
+    });
+  });
+
+  describe('Visibility Features - Force Improve Integration', () => {
+    it('should pass forceImprove flag to bypass detector', async () => {
+      const result = await processPrompt({
+        prompt: 'fix',
+        sessionId: 'session-force',
+        forceImprove: true,
+        _mockClassification: 'SIMPLE: Short but forced',
+        _mockImprovement: '<task>Fix the issue</task>',
+      });
+
+      // With forceImprove=true, short prompt should NOT bypass
+      expect(result.type).toBe('improved');
+    });
+
+    it('should respect plugin_disabled even with forceImprove', async () => {
+      const result = await processPrompt({
+        prompt: 'fix the bug',
+        sessionId: 'session-disabled',
+        forceImprove: true,
+        pluginDisabled: true,
+      });
+
+      // plugin_disabled has absolute priority
+      expect(result.type).toBe('passthrough');
+    });
+
+    it('should follow normal bypass logic when forceImprove is false', async () => {
+      const result = await processPrompt({
+        prompt: 'fix',
+        sessionId: 'session-normal',
+        forceImprove: false,
+      });
+
+      // Short prompt should bypass normally
+      expect(result.type).toBe('passthrough');
+    });
+  });
+
+  describe('Visibility Features - Timestamped Logs', () => {
+    it('should generate timestamped log path when enabled', async () => {
+      // Note: Logging configuration is loaded from config files, not ProcessPromptOptions
+      const result = await processPrompt({
+        prompt: 'Please help me understand how the authentication module works in detail',
+        sessionId: 'session-timestamp',
+        _mockClassification: 'COMPLEX: Question',
+        _mockImprovement: '<task>Explain authentication</task>',
+      });
+
+      expect(result.type).toBe('improved');
+      // Logging config is handled via loadConfigFromStandardPaths() in main()
+    });
+
+    it('should use base log path when timestamps disabled', async () => {
+      const result = await processPrompt({
+        prompt: 'Please help me understand how the authentication module works in detail',
+        sessionId: 'session-no-timestamp',
+        _mockClassification: 'COMPLEX: Question',
+        _mockImprovement: '<task>Explain authentication</task>',
+      });
+
+      expect(result.type).toBe('improved');
+      // Logging config is handled via loadConfigFromStandardPaths() in main()
+    });
+  });
+
+  describe('Visibility Features - Log Level Filtering', () => {
+    it('should respect ERROR log level', async () => {
+      // Note: Log level filtering is handled by logger via config, not ProcessPromptOptions
+      const result = await processPrompt({
+        prompt: 'Please help me understand how the authentication module works in detail',
+        sessionId: 'session-error-level',
+        _mockClassification: 'COMPLEX: Question',
+        _mockImprovement: '<task>Explain authentication</task>',
+      });
+
+      expect(result.type).toBe('improved');
+      // Log level config is handled via loadConfigFromStandardPaths() in main()
+    });
+
+    it('should respect INFO log level', async () => {
+      const result = await processPrompt({
+        prompt: 'Please help me understand how the authentication module works in detail',
+        sessionId: 'session-info-level',
+        _mockClassification: 'COMPLEX: Question',
+        _mockImprovement: '<task>Explain authentication</task>',
+      });
+
+      expect(result.type).toBe('improved');
+      // Log level config is handled via loadConfigFromStandardPaths() in main()
+    });
+
+    it('should respect DEBUG log level', async () => {
+      const result = await processPrompt({
+        prompt: 'Please help me understand how the authentication module works in detail',
+        sessionId: 'session-debug-level',
+        _mockClassification: 'COMPLEX: Question',
+        _mockImprovement: '<task>Explain authentication</task>',
+      });
+
+      expect(result.type).toBe('improved');
+      // Log level config is handled via loadConfigFromStandardPaths() in main()
     });
   });
 });

@@ -6,17 +6,17 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { checkSpecifyDirectory, clearSpecFileCache, gatherSpecContext } from './spec-awareness.ts';
-import { checkMemoryPluginInstalled, gatherMemoryContext } from './memory-plugin.ts';
-import { gatherGitContext, executeGitCommand } from './git-context.ts';
 import {
+  clearConfigCache,
   loadConfig,
   loadConfigFromStandardPaths,
-  clearConfigCache,
 } from '../core/config-loader.ts';
+import { executeGitCommand, gatherGitContext } from './git-context.ts';
+import { checkMemoryPluginInstalled, gatherMemoryContext } from './memory-plugin.ts';
+import { checkSpecifyDirectory, clearSpecFileCache, gatherSpecContext } from './spec-awareness.ts';
 
 describe('Integration Tests - Real Filesystem', () => {
-  const testDir = join(tmpdir(), 'prompt-improver-integration-' + Date.now());
+  const testDir = join(tmpdir(), `prompt-improver-integration-${Date.now()}`);
 
   beforeEach(() => {
     clearConfigCache();
@@ -191,7 +191,7 @@ This is a test user story.
   });
 
   describe('Config Loader - Real FS', () => {
-    it('should load markdown config from real filesystem', () => {
+    it('should load markdown config from real filesystem', async () => {
       const configDir = join(testDir, '.claude');
       mkdirSync(configDir, { recursive: true });
 
@@ -207,13 +207,13 @@ Custom configuration for testing.
       const configPath = join(configDir, 'prompt-improver.local.md');
       writeFileSync(configPath, configContent);
 
-      const config = loadConfig(configPath);
+      const config = await loadConfig(configPath);
 
       expect(config.enabled).toBe(true);
       expect(config.shortPromptThreshold).toBe(25);
     });
 
-    it('should load JSON config from real filesystem', () => {
+    it('should load JSON config from real filesystem', async () => {
       const configDir = join(testDir, '.claude');
       mkdirSync(configDir, { recursive: true });
 
@@ -224,22 +224,22 @@ Custom configuration for testing.
       const configPath = join(configDir, 'prompt-improver-config.json');
       writeFileSync(configPath, configContent);
 
-      const config = loadConfig(configPath);
+      const config = await loadConfig(configPath);
 
       expect(config.enabled).toBe(false);
       expect(config.shortPromptThreshold).toBe(15);
     });
 
-    it('should return defaults for non-existent config', () => {
+    it('should return defaults for non-existent config', async () => {
       const nonExistentPath = join(testDir, 'nonexistent', 'config.md');
 
-      const config = loadConfig(nonExistentPath);
+      const config = await loadConfig(nonExistentPath);
 
       expect(config.enabled).toBe(true);
       expect(config.shortPromptThreshold).toBe(10);
     });
 
-    it('should load config from standard paths', () => {
+    it('should load config from standard paths', async () => {
       const configDir = join(testDir, '.claude');
       mkdirSync(configDir, { recursive: true });
 
@@ -248,12 +248,12 @@ shortPromptThreshold: 30
 ---`;
       writeFileSync(join(configDir, 'prompt-improver.local.md'), configContent);
 
-      const config = loadConfigFromStandardPaths(testDir);
+      const config = await loadConfigFromStandardPaths(testDir);
 
       expect(config.shortPromptThreshold).toBe(30);
     });
 
-    it('should use mtime caching for repeated reads', () => {
+    it('should use mtime caching for repeated reads', async () => {
       const configDir = join(testDir, '.claude');
       mkdirSync(configDir, { recursive: true });
 
@@ -266,11 +266,11 @@ shortPromptThreshold: 42
       );
 
       // First read
-      const config1 = loadConfig(configPath);
+      const config1 = await loadConfig(configPath);
       expect(config1.shortPromptThreshold).toBe(42);
 
       // Second read should use cache
-      const config2 = loadConfig(configPath);
+      const config2 = await loadConfig(configPath);
       expect(config2.shortPromptThreshold).toBe(42);
       expect(config2).toEqual(config1);
     });

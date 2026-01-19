@@ -3,9 +3,9 @@
  * Loads and validates user configuration from markdown files with YAML frontmatter
  * Similar to claude-memory-plugin's local.md pattern
  */
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { access, readFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { Configuration, IntegrationToggles, LoggingConfig } from './types.ts';
+import type { Configuration, IntegrationToggles, LogLevel, LoggingConfig } from './types.ts';
 
 /**
  * Validation error for configuration fields
@@ -14,6 +14,13 @@ export interface ConfigValidationError {
   readonly field: string;
   readonly message: string;
   readonly value: unknown;
+}
+
+/**
+ * Validates if a string is a valid LogLevel
+ */
+function isValidLogLevel(value: string): value is LogLevel {
+  return value === 'ERROR' || value === 'INFO' || value === 'DEBUG';
 }
 
 /**
@@ -33,9 +40,11 @@ const DEFAULT_INTEGRATIONS: IntegrationToggles = {
 const DEFAULT_LOGGING: LoggingConfig = {
   enabled: true,
   logFilePath: '.claude/logs/prompt-improver-latest.log',
+  logLevel: 'INFO',
   maxLogSizeMB: 10,
   maxLogAgeDays: 7,
   displayImprovedPrompt: true,
+  useTimestampedLogs: false,
 };
 
 /**
@@ -43,6 +52,7 @@ const DEFAULT_LOGGING: LoggingConfig = {
  */
 export const DEFAULT_CONFIG: Configuration = {
   enabled: true,
+  forceImprove: false,
   shortPromptThreshold: 10,
   compactionThreshold: 5,
   defaultSimpleModel: 'haiku',
@@ -75,9 +85,10 @@ const configCache = new Map<string, ConfigCacheEntry>();
  * Gets the modification time of a file in milliseconds
  * Returns -1 if file doesn't exist or can't be accessed
  */
-function getFileMtime(filePath: string): number {
+async function getFileMtime(filePath: string): Promise<number> {
   try {
-    return statSync(filePath).mtimeMs;
+    const stats = await stat(filePath);
+    return stats.mtimeMs;
   } catch {
     return -1;
   }
@@ -91,9 +102,18 @@ export function clearConfigCache(): void {
   configCache.clear();
 }
 
+// Pre-compiled regex patterns for YAML parsing (performance optimization)
+const YAML_SECTION_PATTERN = /^(\w+):$/;
+const YAML_NESTED_KV_PATTERN = /^\s+(\w+):\s*(.+)$/;
+const YAML_TOP_LEVEL_KV_PATTERN = /^(\w+):\s*(.+)$/;
+
 /**
  * Parses YAML frontmatter from markdown content
  * Extracts key-value pairs between --- delimiters
+ *
+ * @param content - Markdown content with YAML frontmatter
+ * @returns Parsed YAML object, or empty object if no frontmatter found
+ * @throws Error with specific message if YAML syntax is invalid
  */
 export function parseYamlFrontmatter(content: string): Record<string, unknown> {
   const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
@@ -108,42 +128,49 @@ export function parseYamlFrontmatter(content: string): Record<string, unknown> {
   const lines = frontmatter.split('\n');
   let currentSection: string | null = null;
   let currentSectionData: Record<string, unknown> = {};
+  let sectionHasData = false;
 
   for (const line of lines) {
+    // Cache trimmed line to avoid redundant trim() calls
+    const trimmed = line.trim();
+
     // Skip comments and empty lines
-    if (line.trim().startsWith('#') || line.trim() === '') {
+    if (trimmed.startsWith('#') || trimmed === '') {
       continue;
     }
 
     // Check for section header (key followed by colon with no value)
-    const sectionMatch = line.match(/^(\w+):$/);
-    if (sectionMatch && sectionMatch[1]) {
+    const sectionMatch = line.match(YAML_SECTION_PATTERN);
+    if (sectionMatch?.[1]) {
       // Save previous section if exists
-      if (currentSection && Object.keys(currentSectionData).length > 0) {
+      if (currentSection && sectionHasData) {
         result[currentSection] = currentSectionData;
       }
       currentSection = sectionMatch[1];
       currentSectionData = {};
+      sectionHasData = false;
       continue;
     }
 
     // Check for indented key-value (nested in section)
-    const nestedMatch = line.match(/^\s+(\w+):\s*(.+)$/);
-    if (nestedMatch && nestedMatch[1] && nestedMatch[2] && currentSection) {
+    const nestedMatch = line.match(YAML_NESTED_KV_PATTERN);
+    if (nestedMatch?.[1] && nestedMatch[2] && currentSection) {
       const key = nestedMatch[1];
       const value = nestedMatch[2];
       currentSectionData[key] = parseYamlValue(value);
+      sectionHasData = true;
       continue;
     }
 
     // Check for top-level key-value
-    const kvMatch = line.match(/^(\w+):\s*(.+)$/);
-    if (kvMatch && kvMatch[1] && kvMatch[2]) {
+    const kvMatch = line.match(YAML_TOP_LEVEL_KV_PATTERN);
+    if (kvMatch?.[1] && kvMatch[2]) {
       // Save any open section first
-      if (currentSection && Object.keys(currentSectionData).length > 0) {
+      if (currentSection && sectionHasData) {
         result[currentSection] = currentSectionData;
         currentSection = null;
         currentSectionData = {};
+        sectionHasData = false;
       }
       const key = kvMatch[1];
       const value = kvMatch[2];
@@ -152,7 +179,7 @@ export function parseYamlFrontmatter(content: string): Record<string, unknown> {
   }
 
   // Save final section if exists
-  if (currentSection && Object.keys(currentSectionData).length > 0) {
+  if (currentSection && sectionHasData) {
     result[currentSection] = currentSectionData;
   }
 
@@ -170,8 +197,8 @@ function parseYamlValue(value: string): unknown {
   if (trimmed === 'false') return false;
 
   // Number
-  if (/^-?\d+$/.test(trimmed)) return parseInt(trimmed, 10);
-  if (/^-?\d+\.\d+$/.test(trimmed)) return parseFloat(trimmed);
+  if (/^-?\d+$/.test(trimmed)) return Number.parseInt(trimmed, 10);
+  if (/^-?\d+\.\d+$/.test(trimmed)) return Number.parseFloat(trimmed);
 
   // Quoted string - remove quotes
   if (
@@ -216,6 +243,11 @@ function yamlToConfig(yaml: Record<string, unknown>): Partial<Configuration> {
     config.defaultComplexModel = complexModel;
   }
 
+  const forceImprove = yaml.forceImprove ?? yaml.force_improve;
+  if (typeof forceImprove === 'boolean') {
+    config.forceImprove = forceImprove;
+  }
+
   // Parse integrations section
   if (yaml.integrations && typeof yaml.integrations === 'object') {
     const src = yaml.integrations as Record<string, unknown>;
@@ -239,6 +271,12 @@ function yamlToConfig(yaml: Record<string, unknown>): Partial<Configuration> {
           : typeof src.log_file_path === 'string'
             ? src.log_file_path
             : undefined,
+      logLevel:
+        typeof src.logLevel === 'string' && isValidLogLevel(src.logLevel)
+          ? (src.logLevel as LogLevel)
+          : typeof src.log_level === 'string' && isValidLogLevel(src.log_level)
+            ? (src.log_level as LogLevel)
+            : undefined,
       maxLogSizeMB:
         typeof src.maxLogSizeMB === 'number'
           ? src.maxLogSizeMB
@@ -257,6 +295,12 @@ function yamlToConfig(yaml: Record<string, unknown>): Partial<Configuration> {
           : typeof src.display_improved_prompt === 'boolean'
             ? src.display_improved_prompt
             : undefined,
+      useTimestampedLogs:
+        typeof src.useTimestampedLogs === 'boolean'
+          ? src.useTimestampedLogs
+          : typeof src.use_timestamped_logs === 'boolean'
+            ? src.use_timestamped_logs
+            : undefined,
     };
   }
 
@@ -269,6 +313,7 @@ function yamlToConfig(yaml: Record<string, unknown>): Partial<Configuration> {
 function mergeConfig(defaults: Configuration, partial: Partial<Configuration>): Configuration {
   return {
     enabled: partial.enabled ?? defaults.enabled,
+    forceImprove: partial.forceImprove ?? defaults.forceImprove,
     shortPromptThreshold: partial.shortPromptThreshold ?? defaults.shortPromptThreshold,
     compactionThreshold: partial.compactionThreshold ?? defaults.compactionThreshold,
     defaultSimpleModel: partial.defaultSimpleModel ?? defaults.defaultSimpleModel,
@@ -283,10 +328,13 @@ function mergeConfig(defaults: Configuration, partial: Partial<Configuration>): 
     logging: {
       enabled: partial.logging?.enabled ?? defaults.logging.enabled,
       logFilePath: partial.logging?.logFilePath ?? defaults.logging.logFilePath,
+      logLevel: partial.logging?.logLevel ?? defaults.logging.logLevel,
       maxLogSizeMB: partial.logging?.maxLogSizeMB ?? defaults.logging.maxLogSizeMB,
       maxLogAgeDays: partial.logging?.maxLogAgeDays ?? defaults.logging.maxLogAgeDays,
       displayImprovedPrompt:
         partial.logging?.displayImprovedPrompt ?? defaults.logging.displayImprovedPrompt,
+      useTimestampedLogs:
+        partial.logging?.useTimestampedLogs ?? defaults.logging.useTimestampedLogs,
     },
   };
 }
@@ -297,13 +345,16 @@ function mergeConfig(defaults: Configuration, partial: Partial<Configuration>): 
  * Supports both markdown (with YAML frontmatter) and JSON formats
  * Returns defaults if file doesn't exist or is invalid
  */
-export function loadConfig(filePath: string): Configuration {
-  if (!existsSync(filePath)) {
+export async function loadConfig(filePath: string): Promise<Configuration> {
+  // Check if file exists (async)
+  try {
+    await access(filePath);
+  } catch {
     return DEFAULT_CONFIG;
   }
 
   // Check mtime for cache validity
-  const currentMtime = getFileMtime(filePath);
+  const currentMtime = await getFileMtime(filePath);
   const cached = configCache.get(filePath);
 
   if (cached && cached.mtimeMs === currentMtime && currentMtime !== -1) {
@@ -311,18 +362,34 @@ export function loadConfig(filePath: string): Configuration {
   }
 
   try {
-    const content = readFileSync(filePath, 'utf-8');
+    const content = await readFile(filePath, 'utf-8');
     let config: Configuration;
 
     // Detect format by file extension or content
     if (filePath.endsWith('.md')) {
-      const yaml = parseYamlFrontmatter(content);
-      const partial = yamlToConfig(yaml);
-      config = mergeConfig(DEFAULT_CONFIG, partial);
+      try {
+        const yaml = parseYamlFrontmatter(content);
+        const partial = yamlToConfig(yaml);
+        config = mergeConfig(DEFAULT_CONFIG, partial);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.warn(
+          `Warning: Failed to parse YAML frontmatter in ${filePath}: ${message}\nUsing default configuration.`
+        );
+        return DEFAULT_CONFIG;
+      }
     } else {
       // Legacy JSON format
-      const parsed = JSON.parse(content) as Partial<Configuration>;
-      config = mergeConfig(DEFAULT_CONFIG, parsed);
+      try {
+        const parsed = JSON.parse(content) as Partial<Configuration>;
+        config = mergeConfig(DEFAULT_CONFIG, parsed);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.warn(
+          `Warning: Failed to parse JSON in ${filePath}: ${message}\nUsing default configuration.`
+        );
+        return DEFAULT_CONFIG;
+      }
     }
 
     // Cache the result with current mtime
@@ -331,8 +398,8 @@ export function loadConfig(filePath: string): Configuration {
     }
 
     return config;
-  } catch {
-    // Invalid content or read error - return defaults
+  } catch (error) {
+    // File read error - return defaults silently (file may not exist, which is OK)
     return DEFAULT_CONFIG;
   }
 }
@@ -341,12 +408,13 @@ export function loadConfig(filePath: string): Configuration {
  * Finds and loads configuration from standard locations
  * Checks paths in order of precedence
  */
-export function loadConfigFromStandardPaths(baseDir: string = '.'): Configuration {
+export async function loadConfigFromStandardPaths(baseDir = '.'): Promise<Configuration> {
   for (const configPath of CONFIG_PATHS) {
     const fullPath = join(baseDir, configPath);
-    if (existsSync(fullPath)) {
-      return loadConfig(fullPath);
-    }
+    try {
+      await access(fullPath);
+      return await loadConfig(fullPath);
+    } catch {}
   }
   return DEFAULT_CONFIG;
 }
@@ -357,7 +425,8 @@ export function loadConfigFromStandardPaths(baseDir: string = '.'): Configuratio
 export function validateConfig(config: Partial<Configuration>): ConfigValidationError[] {
   const errors: ConfigValidationError[] = [];
 
-  // Validate shortPromptThreshold (1-100)
+  // Validate shortPromptThreshold (1-100 tokens)
+  // Range: 1-100 covers reasonable prompt lengths; <1 would disable feature, >100 is impractical
   if (config.shortPromptThreshold !== undefined) {
     if (config.shortPromptThreshold < 1 || config.shortPromptThreshold > 100) {
       errors.push({
@@ -368,7 +437,8 @@ export function validateConfig(config: Partial<Configuration>): ConfigValidation
     }
   }
 
-  // Validate compactionThreshold (0-100)
+  // Validate compactionThreshold (0-100 percent)
+  // Range: 0-100 represents percentage; <0 invalid, >100 impossible for percentage
   if (config.compactionThreshold !== undefined) {
     if (config.compactionThreshold < 0 || config.compactionThreshold > 100) {
       errors.push({
@@ -381,7 +451,8 @@ export function validateConfig(config: Partial<Configuration>): ConfigValidation
 
   // Validate logging config if present
   if (config.logging) {
-    // Validate maxLogSizeMB (1-1000)
+    // Validate maxLogSizeMB (1-1000 MB)
+    // Range: 1 MB minimum for useful logs, 1000 MB (1 GB) maximum to prevent disk exhaustion
     if (config.logging.maxLogSizeMB !== undefined) {
       if (config.logging.maxLogSizeMB < 1 || config.logging.maxLogSizeMB > 1000) {
         errors.push({
@@ -392,7 +463,8 @@ export function validateConfig(config: Partial<Configuration>): ConfigValidation
       }
     }
 
-    // Validate maxLogAgeDays (1-365)
+    // Validate maxLogAgeDays (1-365 days)
+    // Range: 1 day minimum for log retention, 365 days (1 year) maximum for practical rotation
     if (config.logging.maxLogAgeDays !== undefined) {
       if (config.logging.maxLogAgeDays < 1 || config.logging.maxLogAgeDays > 365) {
         errors.push({

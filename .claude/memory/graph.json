@@ -152,170 +152,370 @@
       "title": "Agent-first specification analysis prevents rework before implementation"
     },
     {
-      "id": "learning-conditional-property-inclusion-pattern-solves-exactoptionalpropertytypes-friction-in-test-construction",
-      "type": "learning",
-      "title": "Conditional property inclusion pattern solves exactOptionalPropertyTypes friction in test construction"
-    },
-    {
       "id": "gotcha-forked-session-retrospective-output-may-not-surface-completely-to-main-session",
       "type": "gotcha",
       "title": "Forked session retrospective output may not surface completely to main session"
     },
     {
       "id": "learning-retro-tdd-stub-first-with-phase-based-organization-scales-to-454-tests-with-zero-rework",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - TDD stub-first with phase-based organization scales to 454 tests with zero rework"
     },
     {
       "id": "gotcha-retro-configuration-format-decisions-should-be-made-in-phase-0-research",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Retro - Configuration format decisions should be made in Phase 0 research"
     },
     {
       "id": "learning-config-redesign-markdown-localmd-format",
-      "type": "learning"
+      "type": "learning",
+      "title": "Config redesign: markdown .local.md format"
     },
     {
       "id": "learning-retro-integration-point-test-coverage-66-73-should-be-prioritised-before-expanding-features",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Integration point test coverage (66-73%) should be prioritised before expanding features"
     },
     {
       "id": "learning-test-coverage-strategy-systematic-gap-analysis-to-reach-100",
-      "type": "learning"
+      "type": "learning",
+      "title": "Test coverage strategy: systematic gap analysis to reach ~100%"
     },
     {
       "id": "learning-retro-config-format-redesign-required-parallel-file-management",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Config format redesign required parallel file management"
     },
     {
       "id": "learning-config-redesign-markdown-yaml-frontmatter",
-      "type": "learning"
+      "type": "learning",
+      "title": "Config redesign markdown YAML frontmatter"
     },
     {
       "id": "learning-retro-security-fix-blocked-pr-merge-until-resolved",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Security fix blocked PR merge until resolved"
     },
     {
       "id": "learning-command-injection-vulnerability-sessionid-escaping",
-      "type": "learning"
+      "type": "learning",
+      "title": "Command injection vulnerability sessionId escaping"
     },
     {
       "id": "gotcha-retro-default-branch-constraint-required-workflow-adjustment",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Retro - Default branch constraint required workflow adjustment"
     },
     {
       "id": "learning-test-coverage-strategy-systematic-gap-analysis",
-      "type": "learning"
+      "type": "learning",
+      "title": "Test coverage strategy systematic gap analysis"
     },
     {
       "id": "learning-retro-test-coverage-reached-9035-with-focused-improvements",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Test coverage reached 90.35% with focused improvements"
     },
     {
       "id": "gotcha-vimock-global-pollution-across-test-files",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "vi.mock() global pollution across test files"
     },
     {
       "id": "learning-retro-memory-curator-graph-linking-resolves-orphaned-nodes-at-scale",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Memory curator graph linking resolves orphaned nodes at scale"
     },
     {
       "id": "learning-comprehensive-review-with-parallel-agents-catches-systemic-test-quality-issues",
-      "type": "learning"
+      "type": "learning",
+      "title": "Comprehensive review with parallel agents catches systemic test quality issues"
     },
     {
       "id": "gotcha-retro-typescript-compilation-errors-should-block-review-phase",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Retro - TypeScript compilation errors should block review phase"
     },
     {
       "id": "gotcha-retro-security-vulnerabilities-in-v100-release-indicate-pre-merge-audit-gap",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Retro - Security vulnerabilities in v1.0.0 release indicate pre-merge audit gap"
     },
     {
       "id": "learning-exactoptionalpropertytypes-requires-null-guards-on-regex-matches",
-      "type": "learning"
+      "type": "learning",
+      "title": "exactOptionalPropertyTypes requires null-guards on regex matches"
     },
     {
       "id": "learning-nouncheckedindexedaccess-requires-non-null-assertion-after-length-verification-in-tests",
-      "type": "learning"
+      "type": "learning",
+      "title": "noUncheckedIndexedAccess requires non-null assertion after length verification in tests"
     },
     {
       "id": "learning-parallel-expert-agents-for-review-save-context-and-catch-complementary-issues",
-      "type": "learning"
+      "type": "learning",
+      "title": "Parallel expert agents for review save context and catch complementary issues"
     },
     {
       "id": "learning-retro-non-null-assertions-in-tests-after-length-checks-work-well-for-strictoptionalpropertytypes",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Non-null assertions in tests after length checks work well for strictOptionalPropertyTypes"
     },
     {
       "id": "gotcha-test-coverage-metrics-90-mask-systemic-test-quality-issues",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Test coverage metrics (90%+) mask systemic test quality issues"
     },
     {
       "id": "artifact-exactoptionalpropertytypes-solution-patterns",
-      "type": "artifact"
+      "type": "artifact",
+      "title": "exactOptionalPropertyTypes Solutions Comparison"
     },
     {
       "id": "learning-retro-systematic-error-pattern-fixing-across-files-reduces-regression-risk",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Systematic error pattern fixing across files reduces regression risk"
     },
     {
       "id": "learning-retro-promiseallsettled-prevents-cascading-failure-in-parallel-async-operations",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Promise.allSettled prevents cascading failure in parallel async operations"
     },
     {
       "id": "learning-retro-fire-and-forget-async-logging-prevents-blocking-hook-execution",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Fire-and-forget async logging prevents blocking hook execution"
     },
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
-      "type": "learning"
+      "type": "learning",
+      "title": "Configuration caching with mtime invalidation"
     },
     {
       "id": "learning-timer-cleanup-prevents-resource-leaks-in-timeout-patterns",
-      "type": "learning"
+      "type": "learning",
+      "title": "Timer cleanup prevents resource leaks in timeout patterns"
     },
     {
       "id": "artifact-keyword-matcher-shared-utility",
-      "type": "artifact"
+      "type": "artifact",
+      "title": "Shared keyword matching utility"
     },
     {
       "id": "gotcha-real-integration-tests-require-accurate-interface-property-names",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Real integration tests require accurate interface property names"
     },
     {
       "id": "learning-tdd-pre-commit-hook-enforces-stub-first-pattern-for-new-modules",
-      "type": "learning"
+      "type": "learning",
+      "title": "TDD pre-commit hook enforces stub-first pattern for new modules"
     },
     {
       "id": "learning-session-restoration-coordinates-3-parallel-agents-for-context-recovery",
-      "type": "learning"
+      "type": "learning",
+      "title": "Session restoration coordinates 3 parallel agents for context recovery"
     },
     {
       "id": "learning-retro-parallel-multi-agent-restoration-after-compaction-accelerates-context-recovery",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Parallel multi-agent restoration after compaction accelerates context recovery"
     },
     {
       "id": "gotcha-retro-integration-tests-must-validate-interface-signatures-before-writing-assertions",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Retro - Integration tests must validate interface signatures before writing assertions"
     },
     {
       "id": "learning-integration-test-interface-properties-must-match-real-implementation-exactly",
-      "type": "learning"
+      "type": "learning",
+      "title": "Integration test interface properties must match real implementation exactly"
     },
     {
       "id": "learning-retro-review-report-recommendations-need-upfront-scoping-before-implementation",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Review report recommendations need upfront scoping before implementation"
     },
     {
       "id": "learning-spec-file-caching-uses-mtime-based-invalidation-pattern",
-      "type": "learning"
-    },
-    {
-      "id": "artifact-conditional-property-inclusion-pattern-for-exactoptionalpropertytypes",
-      "type": "artifact"
+      "type": "learning",
+      "title": "Spec file caching uses mtime-based invalidation pattern"
     },
     {
       "id": "learning-review-remediation-across-4-phases-security-performance-quality-cleanup",
+      "type": "learning",
+      "title": "Review remediation across 4 phases: security, performance, quality, cleanup"
+    },
+    {
+      "id": "decision-potential-new-features-for-claude-prompt-improver-plugin",
+      "type": "decision",
+      "title": "Potential new features for Claude Prompt Improver Plugin"
+    },
+    {
+      "id": "learning-plugin-invisibility-is-core-problem-not-missing-features",
+      "type": "learning",
+      "title": "Plugin invisibility is core problem, not missing features"
+    },
+    {
+      "id": "gotcha-claude-code-plugin-manifest-schema-author-must-be-object-hooks-must-be-path",
+      "type": "gotcha",
+      "title": "Claude Code plugin manifest schema: author must be object, hooks must be path"
+    },
+    {
+      "id": "decision-visibility-mvp-for-prompt-improver-structured-logging-improvement-reports-over-feature-expansion",
+      "type": "decision",
+      "title": "Visibility MVP for Prompt Improver: Structured logging + improvement reports over feature expansion"
+    },
+    {
+      "id": "learning-retro-tdd-test-first-discipline-clarifies-feature-boundaries",
+      "type": "learning",
+      "title": "Retro - TDD test-first discipline clarifies feature boundaries"
+    },
+    {
+      "id": "learning-retro-defer-mechanical-fixture-updates-to-unblock-feature-momentum",
+      "type": "learning",
+      "title": "Retro - Defer mechanical fixture updates to unblock feature momentum"
+    },
+    {
+      "id": "gotcha-retro-conditional-property-spread-operator-creates-boilerplate",
+      "type": "gotcha",
+      "title": "Retro - Conditional property spread operator creates boilerplate"
+    },
+    {
+      "id": "learning-tdd-stub-creation-enforced-by-pre-tool-use-hook",
+      "type": "learning",
+      "title": "TDD stub creation enforced by pre-tool-use hook"
+    },
+    {
+      "id": "learning-log-level-filtering-with-hierarchical-ordering",
+      "type": "learning",
+      "title": "Log level filtering with hierarchical ordering"
+    },
+    {
+      "id": "learning-security-pattern-50-char-prompt-preview-for-logging",
+      "type": "learning",
+      "title": "Security pattern: 50-char prompt preview for logging"
+    },
+    {
+      "id": "learning-defer-mechanical-test-fixture-updates-in-tdd-phases",
+      "type": "learning",
+      "title": "Defer mechanical test fixture updates in TDD phases"
+    },
+    {
+      "id": "learning-retro-tdd-fixture-discovery-gaps-show-need-for-earlier-type-validation",
+      "type": "learning",
+      "title": "Retro - TDD fixture discovery gaps show need for earlier type validation"
+    },
+    {
+      "id": "learning-retro-regex-based-pattern-detection-benefits-from-test-first-specification",
+      "type": "learning",
+      "title": "Retro - Regex-based pattern detection benefits from test-first specification"
+    },
+    {
+      "id": "learning-retro-post-compaction-context-restoration-via-memory-system-saved-30-minutes",
+      "type": "learning",
+      "title": "Retro - Post-compaction context restoration via memory system saved 30+ minutes"
+    },
+    {
+      "id": "learning-visibility-mvp-system-messages-clarify-plugin-invisibility",
+      "type": "learning",
+      "title": "Visibility MVP: System messages clarify plugin invisibility"
+    },
+    {
+      "id": "learning-security-pattern-50-char-prompt-preview-prevents-accidental-log-exposure",
+      "type": "learning",
+      "title": "Security pattern: 50-char prompt preview prevents accidental log exposure"
+    },
+    {
+      "id": "decision-visibility-mvp-three-core-features",
+      "type": "decision",
+      "title": "Visibility MVP: Three core features (system messages, structured logging, force toggle)"
+    },
+    {
+      "id": "learning-tdd-fixture-discovery-test-first-approach-revealed-schema-gaps-early",
+      "type": "learning",
+      "title": "TDD fixture discovery: Test-first approach revealed schema gaps early"
+    },
+    {
+      "id": "learning-retro-parallel-expert-agent-review-uncovered-4-critical-issues-post-implementation",
+      "type": "learning",
+      "title": "Retro - Parallel expert agent review uncovered 4 critical issues post-implementation"
+    },
+    {
+      "id": "learning-retro-memory-curator-agent-identified-4-duplicate-memories-and-6-orphaned-nodes",
+      "type": "learning",
+      "title": "Retro - Memory curator agent identified 4 duplicate memories and 6 orphaned nodes"
+    },
+    {
+      "id": "learning-learning-post-compaction-session-restore-workflow-effective-for-context-recovery",
+      "type": "learning",
+      "title": "Learning - Post-compaction session-restore workflow effective for context recovery"
+    },
+    {
+      "id": "learning-post-compaction-context-restoration-via-memory-system-effective",
+      "type": "learning",
+      "title": "Post-compaction context restoration via memory system effective"
+    },
+    {
+      "id": "thought-20260119-125700073",
+      "type": "breadcrumb",
+      "title": "Think: Potential new features for Claude Prompt Improver Plugin"
+    },
+    {
+      "id": "learning-post-mvp-remediation-completed-6-phases-systematically",
       "type": "learning"
+    },
+    {
+      "id": "gotcha-improved-prompt-logging-can-expose-sensitive-injected-context",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-memory-driven-work-prevents-duplication-and-maintains-context",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-tdd-integration-tests-achieved-100-pass-rate-first-run-with-clear-structure",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-read-function-signatures-before-writing-test-code-to-avoid-iteration",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-progressive-cleanup-strategy-must-should-nice-to-have-enables-user-agency",
+      "type": "learning"
+    },
+    {
+      "id": "learning-tdd-hook-enforcement-requires-stub-file-creation",
+      "type": "learning"
+    },
+    {
+      "id": "learning-integration-tests-must-validate-interface-signatures-before-writing-assertions",
+      "type": "learning"
+    },
+    {
+      "id": "artifact-promise-race-timeout-cleanup",
+      "type": "artifact"
+    },
+    {
+      "id": "learning-file-reader-extraction-discovered-during-m6-refactor",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-memory-driven-gotcha-prevention-in-repeated-task-patterns",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-early-code-review-prevents-planning-misdirected-effort",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-gotcha-tdd-touch-stub-files-must-be-non-empty-or-tests-wont-run",
+      "type": "gotcha"
+    },
+    {
+      "id": "artifact-file-reader-utility-extraction-pattern",
+      "type": "artifact"
     }
   ],
   "edges": [
@@ -565,11 +765,6 @@
       "label": "relates-to"
     },
     {
-      "source": "artifact-exactoptionalpropertytypes-solution-patterns",
-      "target": "learning-conditional-property-inclusion-pattern-solves-exactoptionalpropertytypes-friction-in-test-construction",
-      "label": "relates-to"
-    },
-    {
       "source": "learning-retro-fire-and-forget-async-logging-prevents-blocking-hook-execution",
       "target": "artifact-sdd-tdd-phase-completion-pattern",
       "label": "relates-to"
@@ -630,13 +825,268 @@
       "label": "relates-to"
     },
     {
-      "source": "artifact-conditional-property-inclusion-pattern-for-exactoptionalpropertytypes",
-      "target": "learning-conditional-property-inclusion-pattern-solves-exactoptionalpropertytypes-friction-in-test-construction",
+      "source": "learning-review-remediation-across-4-phases-security-performance-quality-cleanup",
+      "target": "learning-comprehensive-review-with-parallel-agents-catches-systemic-test-quality-issues",
       "label": "relates-to"
     },
     {
-      "source": "learning-review-remediation-across-4-phases-security-performance-quality-cleanup",
+      "source": "decision-potential-new-features-for-claude-prompt-improver-plugin",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-potential-new-features-for-claude-prompt-improver-plugin",
+      "target": "learning-plugin-invisibility-is-core-problem-not-missing-features",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-visibility-mvp-for-prompt-improver-structured-logging-improvement-reports-over-feature-expansion",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-visibility-mvp-for-prompt-improver-structured-logging-improvement-reports-over-feature-expansion",
+      "target": "learning-log-level-filtering-with-hierarchical-ordering",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-visibility-mvp-for-prompt-improver-structured-logging-improvement-reports-over-feature-expansion",
+      "target": "learning-security-pattern-50-char-prompt-preview-for-logging",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-tdd-test-first-discipline-clarifies-feature-boundaries",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-defer-mechanical-fixture-updates-to-unblock-feature-momentum",
+      "target": "learning-defer-mechanical-test-fixture-updates-in-tdd-phases",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-tdd-stub-creation-enforced-by-pre-tool-use-hook",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-defer-mechanical-test-fixture-updates-in-tdd-phases",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-log-level-filtering-with-hierarchical-ordering",
+      "target": "decision-visibility-mvp-for-prompt-improver-structured-logging-improvement-reports-over-feature-expansion",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-security-pattern-50-char-prompt-preview-for-logging",
+      "target": "decision-visibility-mvp-for-prompt-improver-structured-logging-improvement-reports-over-feature-expansion",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-claude-code-plugin-manifest-schema-author-must-be-object-hooks-must-be-path",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-plugin-invisibility-is-core-problem-not-missing-features",
+      "target": "gotcha-claude-code-plugin-manifest-schema-author-must-be-object-hooks-must-be-path",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-potential-new-features-for-claude-prompt-improver-plugin",
+      "target": "decision-visibility-mvp-for-prompt-improver-structured-logging-improvement-reports-over-feature-expansion",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-tdd-fixture-discovery-gaps-show-need-for-earlier-type-validation",
+      "target": "learning-defer-mechanical-test-fixture-updates-in-tdd-phases",
+      "label": "reinforces"
+    },
+    {
+      "source": "learning-retro-post-compaction-context-restoration-via-memory-system-saved-30-minutes",
+      "target": "decision-visibility-mvp-for-prompt-improver-structured-logging-improvement-reports-over-feature-expansion",
+      "label": "enabled-by"
+    },
+    {
+      "source": "learning-retro-regex-based-pattern-detection-benefits-from-test-first-specification",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-regex-based-pattern-detection-benefits-from-test-first-specification",
+      "target": "learning-retro-tdd-test-first-discipline-clarifies-feature-boundaries",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-tdd-fixture-discovery-test-first-approach-revealed-schema-gaps-early",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-tdd-fixture-discovery-test-first-approach-revealed-schema-gaps-early",
+      "target": "decision-visibility-mvp-three-core-features",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-visibility-mvp-three-core-features",
+      "target": "decision-visibility-mvp-for-prompt-improver-structured-logging-improvement-reports-over-feature-expansion",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-visibility-mvp-system-messages-clarify-plugin-invisibility",
+      "target": "decision-visibility-mvp-three-core-features",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-visibility-mvp-system-messages-clarify-plugin-invisibility",
+      "target": "decision-visibility-mvp-for-prompt-improver-structured-logging-improvement-reports-over-feature-expansion",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-security-pattern-50-char-prompt-preview-prevents-accidental-log-exposure",
+      "target": "decision-visibility-mvp-three-core-features",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-security-pattern-50-char-prompt-preview-prevents-accidental-log-exposure",
+      "target": "learning-command-injection-vulnerability-sessionid-escaping",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-security-fix-blocked-pr-merge-until-resolved",
+      "target": "gotcha-retro-security-vulnerabilities-in-v100-release-indicate-pre-merge-audit-gap",
+      "label": "relates-to"
+    },
+    {
+      "source": "artifact-exactoptionalpropertytypes-solution-patterns",
+      "target": "gotcha-retro-exactoptionalpropertytypes-friction-in-object-building-patterns",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-retro-conditional-property-spread-operator-creates-boilerplate",
+      "target": "artifact-exactoptionalpropertytypes-solution-patterns",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-parallel-expert-agent-review-uncovered-4-critical-issues-post-implementation",
+      "target": "gotcha-retro-security-vulnerabilities-in-v100-release-indicate-pre-merge-audit-gap",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-parallel-expert-agent-review-uncovered-4-critical-issues-post-implementation",
       "target": "learning-comprehensive-review-with-parallel-agents-catches-systemic-test-quality-issues",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-memory-curator-agent-identified-4-duplicate-memories-and-6-orphaned-nodes",
+      "target": "learning-retro-memory-curator-graph-linking-resolves-orphaned-nodes-at-scale",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-learning-post-compaction-session-restore-workflow-effective-for-context-recovery",
+      "target": "learning-session-restoration-coordinates-3-parallel-agents-for-context-recovery",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-post-compaction-context-restoration-via-memory-system-effective",
+      "target": "learning-retro-post-compaction-context-restoration-via-memory-system-saved-30-minutes",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-post-compaction-context-restoration-via-memory-system-saved-30-minutes",
+      "target": "learning-retro-parallel-multi-agent-restoration-after-compaction-accelerates-context-recovery",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-learning-post-compaction-session-restore-workflow-effective-for-context-recovery",
+      "target": "learning-retro-parallel-multi-agent-restoration-after-compaction-accelerates-context-recovery",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-post-compaction-context-restoration-via-memory-system-effective",
+      "target": "learning-retro-parallel-multi-agent-restoration-after-compaction-accelerates-context-recovery",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-file-reader-extraction-discovered-during-m6-refactor",
+      "target": "artifact-file-reader-utility-extraction-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-post-mvp-remediation-completed-6-phases-systematically",
+      "target": "learning-retro-parallel-expert-agent-review-uncovered-4-critical-issues-post-implementation",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-post-mvp-remediation-completed-6-phases-systematically",
+      "target": "gotcha-improved-prompt-logging-can-expose-sensitive-injected-context",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-post-mvp-remediation-completed-6-phases-systematically",
+      "target": "learning-retro-memory-curator-agent-identified-4-duplicate-memories-and-6-orphaned-nodes",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-post-mvp-remediation-completed-6-phases-systematically",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "artifact-file-reader-utility-extraction-pattern",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "artifact-promise-race-timeout-cleanup",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-tdd-hook-enforcement-requires-stub-file-creation",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-integration-tests-must-validate-interface-signatures-before-writing-assertions",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-retro-read-function-signatures-before-writing-test-code-to-avoid-iteration",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-memory-driven-work-prevents-duplication-and-maintains-context",
+      "target": "learning-post-compaction-context-restoration-via-memory-system-effective",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-early-code-review-prevents-planning-misdirected-effort",
+      "target": "learning-retro-review-report-recommendations-need-upfront-scoping-before-implementation",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-gotcha-tdd-touch-stub-files-must-be-non-empty-or-tests-wont-run",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-progressive-cleanup-strategy-must-should-nice-to-have-enables-user-agency",
+      "target": "learning-retro-tdd-integration-tests-achieved-100-pass-rate-first-run-with-clear-structure",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-tdd-integration-tests-achieved-100-pass-rate-first-run-with-clear-structure",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-memory-driven-gotcha-prevention-in-repeated-task-patterns",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
       "label": "relates-to"
     }
   ]

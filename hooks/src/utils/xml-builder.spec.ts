@@ -7,12 +7,12 @@
  */
 import { describe, expect, it } from 'bun:test';
 import {
+  type XmlPromptParts,
   buildXmlPrompt,
   escapeXmlContent,
   getAppliedTags,
   shouldApplyXmlTags,
   wrapInTag,
-  type XmlPromptParts,
 } from './xml-builder.ts';
 
 describe('XML Builder', () => {
