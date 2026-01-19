@@ -1,21 +1,14 @@
 {
   "name": "claude-prompt-improver",
-  "displayName": "Claude Prompt Improver",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Automatically classifies and improves prompts for better Claude responses",
-  "author": "GaZmagik",
+  "author": {
+    "name": "Gareth Williams",
+    "url": "https://github.com/GaZmagik"
+  },
   "homepage": "https://github.com/GaZmagik/claude-prompt-improver",
+  "repository": "https://github.com/GaZmagik/claude-prompt-improver",
   "license": "MIT",
-  "hooks": [
-    {
-      "event": "UserPromptSubmit",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "bun run ${CLAUDE_PLUGIN_ROOT}/hooks/user-prompt-submit/improve-prompt.ts",
-          "timeout": 90
-        }
-      ]
-    }
-  ]
+  "keywords": ["prompt-engineering", "automation", "productivity"],
+  "hooks": "./hooks/hooks.json"
 }
