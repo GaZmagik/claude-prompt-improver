@@ -1,12 +1,9 @@
-import {
-  COMPLEX_IMPROVEMENT_TIMEOUT_MS,
-  SIMPLE_IMPROVEMENT_TIMEOUT_MS,
-} from '../core/constants.ts';
+// Timeout constants no longer needed - using model-based timeouts
 /**
  * Prompt improver for enhancing user prompts
- * Uses Haiku for SIMPLE, Sonnet for COMPLEX improvements
+ * Uses config-driven model selection for all improvements
  */
-import type { ClassificationLevel, ClaudeModel, ContextSource } from '../core/types.ts';
+import type { ClaudeModel, Configuration, ContextSource } from '../core/types.ts';
 import { escapeXmlContent } from '../utils/xml-builder.ts';
 import { executeClaudeCommand } from './claude-client.ts';
 
@@ -29,8 +26,8 @@ export interface ImprovementContext {
  */
 export interface ImprovePromptOptions {
   readonly originalPrompt: string;
-  readonly classification: ClassificationLevel;
   readonly sessionId: string;
+  readonly config: Configuration;
   readonly context?: ImprovementContext;
   /** For testing - mock the Claude response */
   readonly _mockClaudeResponse?: string | null;
@@ -50,19 +47,14 @@ export interface ImprovementResult {
 }
 
 /**
- * Returns the appropriate model for the classification level
+ * Returns the appropriate timeout for the model
  */
-export function getModelForClassification(classification: ClassificationLevel): ClaudeModel {
-  return classification === 'COMPLEX' ? 'sonnet' : 'haiku';
-}
-
-/**
- * Returns the appropriate timeout for the classification level
- */
-export function getTimeoutForClassification(classification: ClassificationLevel): number {
-  return classification === 'COMPLEX'
-    ? COMPLEX_IMPROVEMENT_TIMEOUT_MS
-    : SIMPLE_IMPROVEMENT_TIMEOUT_MS;
+function getTimeoutForModel(model: ClaudeModel): number {
+  switch (model) {
+    case 'opus': return 90_000;  // 90s
+    case 'sonnet': return 60_000; // 60s
+    case 'haiku': return 30_000;  // 30s
+  }
 }
 
 /**
@@ -178,8 +170,6 @@ function buildContextSection(context?: ImprovementContext): string {
  */
 const IMPROVEMENT_PROMPT_TEMPLATE = `You are improving a user prompt for Claude Code.
 
-Classification: {CLASSIFICATION}
-
 Original prompt:
 <original_prompt>
 {ORIGINAL_PROMPT}
@@ -203,28 +193,28 @@ Output ONLY the improved prompt, nothing else.`;
  */
 export function buildImprovementPrompt(options: {
   originalPrompt: string;
-  classification: ClassificationLevel;
   context?: ImprovementContext;
 }): string {
-  const { originalPrompt, classification, context } = options;
+  const { originalPrompt, context } = options;
   const contextSection = buildContextSection(context);
 
   // Escape user prompt to prevent XML/prompt injection
   const escapedPrompt = escapeXmlContent(originalPrompt);
 
-  return IMPROVEMENT_PROMPT_TEMPLATE.replace('{CLASSIFICATION}', classification)
-    .replace('{ORIGINAL_PROMPT}', escapedPrompt)
+  return IMPROVEMENT_PROMPT_TEMPLATE.replace('{ORIGINAL_PROMPT}', escapedPrompt)
     .replace('{CONTEXT_SECTION}', contextSection ? `Available context:\n${contextSection}` : '');
 }
 
 /**
- * Improves a prompt using the appropriate Claude model
+ * Improves a prompt using the config-specified Claude model
  * Falls back to original prompt on any error
  */
 export async function improvePrompt(options: ImprovePromptOptions): Promise<ImprovementResult> {
-  const { originalPrompt, classification, sessionId, context, _mockClaudeResponse } = options;
+  const { originalPrompt, sessionId, config, context, _mockClaudeResponse } = options;
   const startTime = Date.now();
-  const model = getModelForClassification(classification);
+
+  // Get model from config
+  const model = config.improverModel;
   const contextSources = getContextSources(context);
 
   // Handle mock response for testing
@@ -257,15 +247,15 @@ export async function improvePrompt(options: ImprovePromptOptions): Promise<Impr
 
   // Real improvement via Claude
   const promptOptions = context
-    ? { originalPrompt, classification, context }
-    : { originalPrompt, classification };
+    ? { originalPrompt, context }
+    : { originalPrompt };
   const improvementPrompt = buildImprovementPrompt(promptOptions);
 
   const result = await executeClaudeCommand({
     prompt: improvementPrompt,
     model,
     sessionId,
-    timeoutMs: getTimeoutForClassification(classification),
+    timeoutMs: getTimeoutForModel(model),
   });
 
   const latencyMs = Date.now() - startTime;

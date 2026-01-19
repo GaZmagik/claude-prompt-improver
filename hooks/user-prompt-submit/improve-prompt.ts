@@ -4,13 +4,12 @@
  */
 import type {
   BypassReason,
-  ClassificationLevel,
+  ClaudeModel,
   HookInput,
   HookOutput,
   VisibilityInfo,
 } from '../src/core/types.ts';
 import { detectBypass, type BypassCheckInput } from '../src/core/bypass-detector.ts';
-import { classifyPrompt } from '../src/services/classifier.ts';
 import { improvePrompt, type ImprovementContext } from '../src/services/improver.ts';
 import { buildContext, formatContextForInjection } from '../src/context/context-builder.ts';
 import type { SkillRule } from '../src/context/skill-matcher.ts';
@@ -18,6 +17,8 @@ import type { AgentDefinition } from '../src/context/agent-suggester.ts';
 import { loadConfigFromStandardPaths } from '../src/core/config-loader.ts';
 import { formatSystemMessage } from '../src/utils/message-formatter.ts';
 import { countTokens } from '../src/utils/token-counter.ts';
+import { createLogEntry, writeLogEntry } from '../src/utils/logger.ts';
+import { generateLogFilePath } from '../src/utils/logger.ts';
 
 /**
  * Result of parsing hook input
@@ -36,7 +37,6 @@ export type HookOutputOptions =
   | {
       type: 'improved';
       improvedPrompt: string;
-      classification: ClassificationLevel;
       tokensBefore: number;
       tokensAfter: number;
       summary?: readonly string[];
@@ -163,7 +163,6 @@ export function createHookOutput(options: HookOutputOptions): HookOutput {
   // Create applied visibility info
   const visibilityInfo: VisibilityInfo = {
     status: 'applied',
-    classification: options.classification,
     tokensBefore: options.tokensBefore,
     tokensAfter: options.tokensAfter,
     latencyMs: options.latencyMs,
@@ -210,11 +209,11 @@ export type ProcessPromptResult =
   | {
       type: 'improved';
       improvedPrompt: string;
-      classification: ClassificationLevel;
       tokensBefore: number;
       tokensAfter: number;
       summary?: readonly string[];
       latencyMs: number;
+      modelUsed: ClaudeModel | null;
     };
 
 /**
@@ -263,20 +262,6 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
       : { type: 'passthrough' };
   }
 
-  // Build classify options, only including mock if defined
-  const classifyOptions: Parameters<typeof classifyPrompt>[0] =
-    _mockClassification !== undefined
-      ? { prompt, sessionId, _mockClaudeResponse: _mockClassification }
-      : { prompt, sessionId };
-
-  // Classify the prompt
-  const classification = await classifyPrompt(classifyOptions);
-
-  // Passthrough for NONE classification
-  if (classification.level === 'NONE') {
-    return { type: 'passthrough' };
-  }
-
   // Build context from available sources
   let improvementContext: ImprovementContext | undefined;
   if (availableTools || skillRules || agentDefinitions) {
@@ -309,21 +294,30 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
     }
   }
 
-  // Build improve options, only including mock and context if defined
-  const improveOptions: Parameters<typeof improvePrompt>[0] = {
-    originalPrompt: prompt,
-    classification: classification.level,
-    sessionId,
-  };
-  if (_mockImprovement !== undefined) {
-    (improveOptions as { _mockClaudeResponse?: string | null })._mockClaudeResponse = _mockImprovement;
-  }
-  if (improvementContext) {
-    (improveOptions as { context?: ImprovementContext }).context = improvementContext;
-  }
+  // Load config for model selection
+  const config = await loadConfigFromStandardPaths();
 
   // Count tokens before improvement
   const tokensBefore = countTokens(prompt);
+
+  // Build improve options, only including mock and context if defined
+  const improveOptions: Parameters<typeof improvePrompt>[0] = {
+    originalPrompt: prompt,
+    sessionId,
+    config,
+  };
+
+  // Handle mocks (combine both params for backward compat)
+  if (_mockImprovement !== undefined) {
+    (improveOptions as { _mockClaudeResponse?: string | null })._mockClaudeResponse = _mockImprovement;
+  } else if (_mockClassification !== undefined) {
+    // Backward compat - treat classification mock as improvement mock
+    (improveOptions as { _mockClaudeResponse?: string | null })._mockClaudeResponse = _mockClassification;
+  }
+
+  if (improvementContext) {
+    (improveOptions as { context?: ImprovementContext }).context = improvementContext;
+  }
 
   // Improve the prompt
   const improvement = await improvePrompt(improveOptions);
@@ -339,10 +333,10 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
   return {
     type: 'improved',
     improvedPrompt: improvement.improvedPrompt,
-    classification: classification.level,
     tokensBefore,
     tokensAfter,
     latencyMs: improvement.latencyMs,
+    modelUsed: improvement.modelUsed,
     ...(improvement.summary !== undefined && { summary: improvement.summary }),
   };
 }
@@ -352,6 +346,8 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
  * Reads stdin, processes prompt, writes stdout
  */
 async function main(): Promise<void> {
+  const startTime = performance.now();
+
   // Load configuration
   const config = await loadConfigFromStandardPaths();
 
@@ -392,13 +388,49 @@ async function main(): Promise<void> {
   // Process the prompt through classification and improvement
   const result = await processPrompt(processOptions);
 
+  // Calculate total latency
+  const totalLatency = performance.now() - startTime;
+
+  // Log the result if logging is enabled
+  if (config.logging.enabled) {
+    const logFilePath = generateLogFilePath(config.logging.logFilePath, config.logging.useTimestampedLogs);
+
+    if (result.type === 'improved') {
+      const logEntry = createLogEntry({
+        originalPrompt: prompt,
+        improvedPrompt: result.improvedPrompt,
+        bypassReason: null,
+        modelUsed: result.modelUsed,
+        totalLatency,
+        improvementLatency: result.latencyMs,
+        contextSources: [],
+        conversationId: context.conversation_id,
+        level: 'INFO',
+        phase: 'complete',
+      });
+      writeLogEntry(logEntry, logFilePath, config.logging.logLevel);
+    } else {
+      const logEntry = createLogEntry({
+        originalPrompt: prompt,
+        improvedPrompt: null,
+        bypassReason: result.bypassReason ?? null,
+        modelUsed: null,
+        totalLatency,
+        contextSources: [],
+        conversationId: context.conversation_id,
+        level: 'INFO',
+        phase: result.bypassReason ? 'bypass' : 'complete',
+      });
+      writeLogEntry(logEntry, logFilePath, config.logging.logLevel);
+    }
+  }
+
   // Create output based on processing result
   let output: HookOutput;
   if (result.type === 'improved') {
     output = createHookOutput({
       type: 'improved',
       improvedPrompt: result.improvedPrompt,
-      classification: result.classification,
       tokensBefore: result.tokensBefore,
       tokensAfter: result.tokensAfter,
       latencyMs: result.latencyMs,

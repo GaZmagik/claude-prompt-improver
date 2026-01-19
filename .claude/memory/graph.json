@@ -463,91 +463,176 @@
     },
     {
       "id": "learning-post-mvp-remediation-completed-6-phases-systematically",
-      "type": "learning"
+      "type": "learning",
+      "title": "Post-MVP remediation completed 6 phases systematically"
     },
     {
       "id": "gotcha-improved-prompt-logging-can-expose-sensitive-injected-context",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Improved prompt logging can expose sensitive injected context"
     },
     {
       "id": "learning-retro-memory-driven-work-prevents-duplication-and-maintains-context",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Memory-driven work prevents duplication and maintains context"
     },
     {
       "id": "learning-retro-tdd-integration-tests-achieved-100-pass-rate-first-run-with-clear-structure",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - TDD integration tests achieved 100% pass-rate first run with clear structure"
     },
     {
       "id": "gotcha-retro-read-function-signatures-before-writing-test-code-to-avoid-iteration",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Retro - Read function signatures before writing test code to avoid iteration"
     },
     {
       "id": "learning-retro-progressive-cleanup-strategy-must-should-nice-to-have-enables-user-agency",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Progressive cleanup strategy (must → should → nice-to-have) enables user agency"
     },
     {
       "id": "learning-tdd-hook-enforcement-requires-stub-file-creation",
-      "type": "learning"
+      "type": "learning",
+      "title": "TDD hook enforcement requires stub file creation"
     },
     {
       "id": "learning-integration-tests-must-validate-interface-signatures-before-writing-assertions",
-      "type": "learning"
+      "type": "learning",
+      "title": "Integration tests must validate interface signatures before writing assertions"
     },
     {
       "id": "artifact-promise-race-timeout-cleanup",
-      "type": "artifact"
+      "type": "artifact",
+      "title": "Promise.race timeout cleanup pattern"
     },
     {
       "id": "learning-file-reader-extraction-discovered-during-m6-refactor",
-      "type": "learning"
+      "type": "learning",
+      "title": "File-reader utility extraction pattern for shared readFile helpers"
     },
     {
       "id": "learning-retro-memory-driven-gotcha-prevention-in-repeated-task-patterns",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Memory-driven gotcha prevention in repeated task patterns"
     },
     {
       "id": "learning-retro-early-code-review-prevents-planning-misdirected-effort",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Early code review prevents planning misdirected effort"
     },
     {
       "id": "gotcha-gotcha-tdd-touch-stub-files-must-be-non-empty-or-tests-wont-run",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Gotcha - TDD touch stub files must be non-empty or tests won't run"
     },
     {
       "id": "artifact-file-reader-utility-extraction-pattern",
-      "type": "artifact"
+      "type": "artifact",
+      "title": "File-reader utility extraction pattern for shared readFile helpers"
     },
     {
       "id": "learning-retro-session-restore-parallel-agents-recovered-30min-of-context-efficiently",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Session-restore + parallel agents recovered 30min of context efficiently"
     },
     {
       "id": "learning-keyword-matcher-extraction-already-complete",
-      "type": "learning"
+      "type": "learning",
+      "title": "Keyword matcher extraction already complete"
     },
     {
       "id": "learning-retro-plan-vs-actual-comparison-revealed-m1-was-already-complete",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Plan vs actual comparison revealed M1 was already complete"
     },
     {
       "id": "learning-retro-memory-cleanup-during-session-restore-prevented-stale-memories-in-pr",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Memory cleanup during session-restore prevented stale memories in PR"
     },
     {
       "id": "learning-retro-pr-already-existed-edit-approach-was-more-efficient-than-recreate",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - PR already existed, edit approach was more efficient than recreate"
     },
     {
       "id": "artifact-memory-system-cleanup-post-restore-pattern",
-      "type": "artifact"
+      "type": "artifact",
+      "title": "Memory System Cleanup Post-Restore Pattern"
     },
     {
       "id": "artifact-sdd-systematic-phase-completion-with-tdd-discipline",
-      "type": "artifact"
+      "type": "artifact",
+      "title": "SDD Systematic Phase Completion with TDD Discipline"
     },
     {
       "id": "learning-post-mvp-remediation-pr-successfully-merged-to-main",
+      "type": "learning",
+      "title": "Post-MVP remediation PR successfully merged to main"
+    },
+    {
+      "id": "gotcha-plugin-logger-utility-exists-but-not-integrated",
+      "type": "gotcha",
+      "title": "plugin-logger-utility-now-integrated-with-active-logging"
+    },
+    {
+      "id": "learning-prompt-improver-classifier-conservative-by-design",
+      "type": "learning",
+      "title": "prompt-improver-classifier-conservative-by-design"
+    },
+    {
+      "id": "decision-prompt-improver-always-improve-no-classification",
+      "type": "decision",
+      "title": "prompt-improver-always-improve-no-classification"
+    },
+    {
+      "id": "artifact-prompt-improver-single-api-call-pattern",
+      "type": "artifact",
+      "title": "prompt-improver-single-api-call-pattern"
+    },
+    {
+      "id": "learning-retro-typescript-errors-as-a-feature-removal-guide",
+      "type": "learning",
+      "title": "Retro - TypeScript errors as a feature removal guide"
+    },
+    {
+      "id": "gotcha-retro-avoid-regex-sed-on-test-files-during-refactoring",
+      "type": "gotcha",
+      "title": "Retro - Avoid regex sed on test files during refactoring"
+    },
+    {
+      "id": "learning-retro-run-tests-after-each-file-type-change-to-measure-progress",
+      "type": "learning",
+      "title": "Retro - Run tests after each file type change to measure progress"
+    },
+    {
+      "id": "learning-retro-user-questioning-architectural-assumptions-revealed-critical-bug",
       "type": "learning"
+    },
+    {
+      "id": "learning-retro-testing-with-real-session-id-revealed-environmental-dependency",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-architectural-fix-eliminated-entire-class-of-complexity",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-userpromptsubmit-hooks-should-not-use-fork-session",
+      "type": "gotcha"
+    },
+    {
+      "id": "decision-remove-fork-session-from-userpromptsubmit-hooks",
+      "type": "decision"
+    },
+    {
+      "id": "learning-prompt-improver-end-to-end-validation-successful",
+      "type": "learning"
+    },
+    {
+      "id": "artifact-always-improve-without-classification-pattern",
+      "type": "artifact"
     }
   ],
   "edges": [
@@ -1144,6 +1229,86 @@
     {
       "source": "learning-retro-pr-already-existed-edit-approach-was-more-efficient-than-recreate",
       "target": "learning-post-mvp-remediation-pr-successfully-merged-to-main",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-plugin-logger-utility-exists-but-not-integrated",
+      "target": "decision-visibility-mvp-for-prompt-improver-structured-logging-improvement-reports-over-feature-expansion",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-prompt-improver-always-improve-no-classification",
+      "target": "decision-visibility-mvp-for-prompt-improver-structured-logging-improvement-reports-over-feature-expansion",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-prompt-improver-classifier-conservative-by-design",
+      "target": "decision-prompt-improver-always-improve-no-classification",
+      "label": "relates-to"
+    },
+    {
+      "source": "artifact-prompt-improver-single-api-call-pattern",
+      "target": "decision-prompt-improver-always-improve-no-classification",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-typescript-errors-as-a-feature-removal-guide",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-retro-avoid-regex-sed-on-test-files-during-refactoring",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-run-tests-after-each-file-type-change-to-measure-progress",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-prompt-improver-always-improve-no-classification",
+      "target": "artifact-always-improve-without-classification-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-prompt-improver-end-to-end-validation-successful",
+      "target": "decision-prompt-improver-always-improve-no-classification",
+      "label": "relates-to"
+    },
+    {
+      "source": "artifact-always-improve-without-classification-pattern",
+      "target": "decision-classification-three-tier-cost-optimised",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-remove-fork-session-from-userpromptsubmit-hooks",
+      "target": "gotcha-retro-userpromptsubmit-hooks-should-not-use-fork-session",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-user-questioning-architectural-assumptions-revealed-critical-bug",
+      "target": "decision-remove-fork-session-from-userpromptsubmit-hooks",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-architectural-fix-eliminated-entire-class-of-complexity",
+      "target": "decision-remove-fork-session-from-userpromptsubmit-hooks",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-testing-with-real-session-id-revealed-environmental-dependency",
+      "target": "decision-remove-fork-session-from-userpromptsubmit-hooks",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-architectural-fix-eliminated-entire-class-of-complexity",
+      "target": "learning-retro-user-questioning-architectural-assumptions-revealed-critical-bug",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-testing-with-real-session-id-revealed-environmental-dependency",
+      "target": "learning-retro-user-questioning-architectural-assumptions-revealed-critical-bug",
       "label": "relates-to"
     }
   ]

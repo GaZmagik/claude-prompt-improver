@@ -30,7 +30,7 @@ describe('Claude Client', () => {
       expect(args).toContain('--print');
     });
 
-    it('should build command with --fork-session flag', () => {
+    it('should build command without --fork-session (not needed for prompt improvement)', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
         model: 'haiku',
@@ -39,20 +39,9 @@ describe('Claude Client', () => {
 
       const { args } = buildClaudeCommand(options);
 
-      expect(args).toContain('--fork-session');
-    });
-
-    it('should build command with --resume flag and session ID', () => {
-      const options: ClaudeClientOptions = {
-        prompt: 'Test prompt',
-        model: 'haiku',
-        sessionId: 'session-abc-123',
-      };
-
-      const { args } = buildClaudeCommand(options);
-
-      expect(args).toContain('--resume');
-      expect(args).toContain('session-abc-123');
+      // No fork-session or resume needed - prompt improvement doesn't require conversation history
+      expect(args).not.toContain('--fork-session');
+      expect(args).not.toContain('--resume');
     });
 
     it('should include the prompt in the command args', () => {
@@ -80,18 +69,17 @@ describe('Claude Client', () => {
       expect(args).toContain('Test "quotes" and $variables');
     });
 
-    it('should preserve special characters in sessionId (array-based prevents injection)', () => {
+    it('should not include sessionId in command (not used without --resume)', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
         model: 'haiku',
-        sessionId: 'session-123; rm -rf /',
+        sessionId: 'session-123',
       };
 
       const { args } = buildClaudeCommand(options);
 
-      // Array-based approach passes sessionId directly - no shell interpretation
-      // The malicious payload is passed as a literal string argument, not executed
-      expect(args).toContain('session-123; rm -rf /');
+      // sessionId not included in command since we don't use --resume
+      expect(args).not.toContain('session-123');
     });
 
     it('should set cwd to /tmp to avoid project hooks', () => {

@@ -3,7 +3,7 @@
  * Formats system messages showing prompt improvement status
  */
 
-import type { BypassReason, ClassificationLevel, VisibilityInfo } from '../core/types.ts';
+import type { BypassReason, VisibilityInfo } from '../core/types.ts';
 
 /**
  * Format visibility information into user-facing system message
@@ -14,7 +14,6 @@ export function formatSystemMessage(info: VisibilityInfo): string {
       return formatBypassMessage(info.bypassReason);
     case 'applied':
       return formatAppliedMessage(
-        info.classification!,
         info.tokensBefore!,
         info.tokensAfter!,
         info.summary,
@@ -61,13 +60,12 @@ function getBypassReasonText(reason?: BypassReason): string {
  * Format applied improvement message
  */
 function formatAppliedMessage(
-  classification: ClassificationLevel,
   tokensBefore: number,
   tokensAfter: number,
   summary?: readonly string[],
   latencyMs?: number
 ): string {
-  let message = `🎯 Prompt improved (${classification})`;
+  let message = `🎯 Prompt improved`;
 
   // Add token change
   message += `\n   Tokens: ${tokensBefore} → ${tokensAfter}`;

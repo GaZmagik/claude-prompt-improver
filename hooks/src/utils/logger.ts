@@ -7,7 +7,6 @@ import { access, appendFile, mkdir } from 'node:fs/promises';
 import { basename, dirname, join } from 'node:path';
 import type {
   BypassReason,
-  ClassificationLevel,
   ClaudeModel,
   ContextSource,
   LogEntry,
@@ -20,16 +19,14 @@ import type {
 export interface LogEntryInput {
   readonly originalPrompt: string;
   readonly improvedPrompt: string | null;
-  readonly classification: ClassificationLevel;
   readonly bypassReason: BypassReason | null;
   readonly modelUsed: ClaudeModel | null;
   readonly totalLatency: number;
-  readonly classificationLatency?: number;
   readonly improvementLatency?: number;
   readonly contextSources: readonly ContextSource[];
   readonly conversationId: string;
   readonly level: LogLevel;
-  readonly phase: 'bypass' | 'classify' | 'improve' | 'complete';
+  readonly phase: 'bypass' | 'improve' | 'complete';
   readonly error?: string;
 }
 
@@ -73,15 +70,11 @@ export function createLogEntry(input: LogEntryInput): LogEntry {
     phase: input.phase,
     promptPreview: createPromptPreview(input.originalPrompt),
     improvedPrompt: input.improvedPrompt ? createPromptPreview(input.improvedPrompt) : null,
-    classification: input.classification,
     bypassReason: input.bypassReason,
     modelUsed: input.modelUsed,
     totalLatency: input.totalLatency,
     contextSources: input.contextSources,
     conversationId: input.conversationId,
-    ...(input.classificationLatency !== undefined && {
-      classificationLatency: input.classificationLatency,
-    }),
     ...(input.improvementLatency !== undefined && { improvementLatency: input.improvementLatency }),
     ...(input.error !== undefined && { error: input.error }),
   };
@@ -97,13 +90,9 @@ export function formatLogEntry(entry: LogEntry): string {
     phase: entry.phase,
     promptPreview: entry.promptPreview,
     improvedPrompt: entry.improvedPrompt,
-    classification: entry.classification,
     bypassReason: entry.bypassReason,
     modelUsed: entry.modelUsed,
     totalLatency: entry.totalLatency,
-    ...(entry.classificationLatency !== undefined && {
-      classificationLatency: entry.classificationLatency,
-    }),
     ...(entry.improvementLatency !== undefined && { improvementLatency: entry.improvementLatency }),
     contextSources: entry.contextSources,
     conversationId: entry.conversationId,
