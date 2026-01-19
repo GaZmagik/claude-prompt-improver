@@ -516,6 +516,38 @@
     {
       "id": "artifact-file-reader-utility-extraction-pattern",
       "type": "artifact"
+    },
+    {
+      "id": "learning-retro-session-restore-parallel-agents-recovered-30min-of-context-efficiently",
+      "type": "learning"
+    },
+    {
+      "id": "learning-keyword-matcher-extraction-already-complete",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-plan-vs-actual-comparison-revealed-m1-was-already-complete",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-memory-cleanup-during-session-restore-prevented-stale-memories-in-pr",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-pr-already-existed-edit-approach-was-more-efficient-than-recreate",
+      "type": "learning"
+    },
+    {
+      "id": "artifact-memory-system-cleanup-post-restore-pattern",
+      "type": "artifact"
+    },
+    {
+      "id": "artifact-sdd-systematic-phase-completion-with-tdd-discipline",
+      "type": "artifact"
+    },
+    {
+      "id": "learning-post-mvp-remediation-pr-successfully-merged-to-main",
+      "type": "learning"
     }
   ],
   "edges": [
@@ -1087,6 +1119,31 @@
     {
       "source": "learning-retro-memory-driven-gotcha-prevention-in-repeated-task-patterns",
       "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "artifact-sdd-systematic-phase-completion-with-tdd-discipline",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-keyword-matcher-extraction-already-complete",
+      "target": "learning-retro-plan-vs-actual-comparison-revealed-m1-was-already-complete",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-memory-cleanup-during-session-restore-prevented-stale-memories-in-pr",
+      "target": "learning-post-mvp-remediation-completed-6-phases-systematically",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-session-restore-parallel-agents-recovered-30min-of-context-efficiently",
+      "target": "artifact-memory-system-cleanup-post-restore-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-pr-already-existed-edit-approach-was-more-efficient-than-recreate",
+      "target": "learning-post-mvp-remediation-pr-successfully-merged-to-main",
       "label": "relates-to"
     }
   ]

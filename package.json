@@ -1,6 +1,6 @@
 {
   "name": "claude-prompt-improver",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "description": "Claude Code plugin that automatically improves prompts based on classification and context",
   "type": "module",
   "scripts": {
