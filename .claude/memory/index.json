@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-19T19:05:27.311Z",
+  "lastUpdated": "2026-01-19T19:28:26.586Z",
   "memories": [
     {
       "id": "learning-retro-agent-first-sdd-workflow-reduces-iteration",
@@ -1709,6 +1709,137 @@
       "updated": "2026-01-19T18:53:50.298Z",
       "scope": "project",
       "relativePath": "permanent/artifact-sdd-tdd-phase-completion-pattern.md"
+    },
+    {
+      "id": "learning-retro-session-restore-parallel-agents-recovered-30min-of-context-efficiently",
+      "type": "learning",
+      "title": "Retro - Session-restore + parallel agents recovered 30min of context efficiently",
+      "tags": [
+        "retrospective",
+        "process",
+        "session-restore",
+        "memory-system",
+        "project"
+      ],
+      "created": "2026-01-19T19:27:47.526Z",
+      "updated": "2026-01-19T19:27:47.526Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-session-restore-parallel-agents-recovered-30min-of-context-efficiently.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-keyword-matcher-extraction-already-complete",
+      "type": "learning",
+      "title": "Keyword matcher extraction already complete",
+      "tags": [
+        "keyword-matching",
+        "refactoring",
+        "M1-item",
+        "project"
+      ],
+      "created": "2026-01-19T19:27:47.707Z",
+      "updated": "2026-01-19T19:27:47.707Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-keyword-matcher-extraction-already-complete.md"
+    },
+    {
+      "id": "learning-retro-plan-vs-actual-comparison-revealed-m1-was-already-complete",
+      "type": "learning",
+      "title": "Retro - Plan vs actual comparison revealed M1 was already complete",
+      "tags": [
+        "retrospective",
+        "process",
+        "planning",
+        "code-review",
+        "project"
+      ],
+      "created": "2026-01-19T19:27:47.991Z",
+      "updated": "2026-01-19T19:27:47.991Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-plan-vs-actual-comparison-revealed-m1-was-already-complete.md",
+      "severity": "low"
+    },
+    {
+      "id": "learning-retro-memory-cleanup-during-session-restore-prevented-stale-memories-in-pr",
+      "type": "learning",
+      "title": "Retro - Memory cleanup during session-restore prevented stale memories in PR",
+      "tags": [
+        "retrospective",
+        "process",
+        "memory-system",
+        "quality",
+        "project"
+      ],
+      "created": "2026-01-19T19:27:48.297Z",
+      "updated": "2026-01-19T19:27:48.297Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-memory-cleanup-during-session-restore-prevented-stale-memories-in-pr.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-retro-pr-already-existed-edit-approach-was-more-efficient-than-recreate",
+      "type": "learning",
+      "title": "Retro - PR already existed, edit approach was more efficient than recreate",
+      "tags": [
+        "retrospective",
+        "process",
+        "github-workflow",
+        "project"
+      ],
+      "created": "2026-01-19T19:27:48.615Z",
+      "updated": "2026-01-19T19:27:48.615Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-pr-already-existed-edit-approach-was-more-efficient-than-recreate.md",
+      "severity": "low"
+    },
+    {
+      "id": "artifact-memory-system-cleanup-post-restore-pattern",
+      "type": "artifact",
+      "title": "Memory System Cleanup Post-Restore Pattern",
+      "tags": [
+        "memory-system",
+        "post-restore",
+        "cleanup-pattern",
+        "process",
+        "project"
+      ],
+      "created": "2026-01-19T19:28:09.897Z",
+      "updated": "2026-01-19T19:28:09.897Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-memory-system-cleanup-post-restore-pattern.md"
+    },
+    {
+      "id": "artifact-sdd-systematic-phase-completion-with-tdd-discipline",
+      "type": "artifact",
+      "title": "SDD Systematic Phase Completion with TDD Discipline",
+      "tags": [
+        "SDD",
+        "TDD",
+        "post-MVP",
+        "systematic-phases",
+        "process",
+        "project"
+      ],
+      "created": "2026-01-19T19:28:19.021Z",
+      "updated": "2026-01-19T19:28:19.021Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-sdd-systematic-phase-completion-with-tdd-discipline.md"
+    },
+    {
+      "id": "learning-post-mvp-remediation-pr-successfully-merged-to-main",
+      "type": "learning",
+      "title": "Post-MVP remediation PR successfully merged to main",
+      "tags": [
+        "PR-merge",
+        "post-MVP",
+        "completion",
+        "CI-success",
+        "project"
+      ],
+      "created": "2026-01-19T19:28:26.581Z",
+      "updated": "2026-01-19T19:28:26.581Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-post-mvp-remediation-pr-successfully-merged-to-main.md"
     }
   ]
 }
