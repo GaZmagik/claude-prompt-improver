@@ -15,6 +15,7 @@ export interface BypassCheckInput {
   readonly permissionMode?: string;
   readonly pluginDisabled?: boolean;
   readonly forceImprove?: boolean;
+  readonly shortPromptThreshold?: number;
   readonly contextUsage?: {
     readonly used: number;
     readonly max: number;
@@ -67,7 +68,7 @@ function getAvailableContextPercent(contextUsage: { used: number; max: number })
  * 5. short_prompt - Prompt is ≤10 tokens
  */
 export function detectBypass(input: BypassCheckInput): BypassCheckResult {
-  const { prompt, permissionMode, pluginDisabled, forceImprove, contextUsage } = input;
+  const { prompt, permissionMode, pluginDisabled, forceImprove, shortPromptThreshold, contextUsage } = input;
 
   // Priority 0: Force improve bypasses ALL checks except plugin_disabled
   if (forceImprove === true && pluginDisabled !== true) {
@@ -113,7 +114,7 @@ export function detectBypass(input: BypassCheckInput): BypassCheckResult {
   }
 
   // Priority 5: Short prompt
-  if (isShortPrompt(prompt)) {
+  if (isShortPrompt(prompt, shortPromptThreshold)) {
     return {
       shouldBypass: true,
       reason: 'short_prompt',

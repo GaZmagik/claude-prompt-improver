@@ -89,7 +89,6 @@ describe('Message Formatter', () => {
     it('should format applied message with all fields', () => {
       const info: VisibilityInfo = {
         status: 'applied',
-        classification: 'COMPLEX',
         tokensBefore: 45,
         tokensAfter: 78,
         summary: ['Added XML structure', 'Injected git context', 'Expanded task description'],
@@ -100,7 +99,7 @@ describe('Message Formatter', () => {
 
       expect(message).toContain('🎯');
       expect(message).toContain('Prompt improved');
-      expect(message).toContain('COMPLEX');
+      // Classification no longer shown - we always improve now
       expect(message).toContain('45');
       expect(message).toContain('78');
       expect(message).toContain('Added XML structure');
@@ -112,7 +111,6 @@ describe('Message Formatter', () => {
     it('should format applied message without summary', () => {
       const info: VisibilityInfo = {
         status: 'applied',
-        classification: 'SIMPLE',
         tokensBefore: 30,
         tokensAfter: 42,
         latencyMs: 1500,
@@ -122,7 +120,7 @@ describe('Message Formatter', () => {
 
       expect(message).toContain('🎯');
       expect(message).toContain('Prompt improved');
-      expect(message).toContain('SIMPLE');
+      // Classification no longer shown
       expect(message).toContain('30');
       expect(message).toContain('42');
       expect(message).toContain('1.5s');
@@ -132,7 +130,6 @@ describe('Message Formatter', () => {
     it('should format applied message with partial summary', () => {
       const info: VisibilityInfo = {
         status: 'applied',
-        classification: 'COMPLEX',
         tokensBefore: 50,
         tokensAfter: 95,
         summary: ['Added context injection'],
@@ -149,7 +146,6 @@ describe('Message Formatter', () => {
     it('should format latency in seconds with one decimal', () => {
       const info: VisibilityInfo = {
         status: 'applied',
-        classification: 'COMPLEX',
         tokensBefore: 40,
         tokensAfter: 60,
         latencyMs: 12456,
@@ -163,7 +159,6 @@ describe('Message Formatter', () => {
     it('should handle latency under 1 second', () => {
       const info: VisibilityInfo = {
         status: 'applied',
-        classification: 'SIMPLE',
         tokensBefore: 20,
         tokensAfter: 25,
         latencyMs: 850,
@@ -219,7 +214,6 @@ describe('Message Formatter', () => {
     it('should handle missing optional fields gracefully', () => {
       const info: VisibilityInfo = {
         status: 'applied',
-        classification: 'COMPLEX',
         tokensBefore: 50,
         tokensAfter: 70,
       };
@@ -227,7 +221,7 @@ describe('Message Formatter', () => {
       const message = formatSystemMessage(info);
 
       expect(message).toContain('🎯');
-      expect(message).toContain('COMPLEX');
+      // Classification no longer shown
       expect(message).not.toContain('undefined');
       expect(message).not.toContain('null');
     });
@@ -235,7 +229,6 @@ describe('Message Formatter', () => {
     it('should handle empty summary array', () => {
       const info: VisibilityInfo = {
         status: 'applied',
-        classification: 'SIMPLE',
         tokensBefore: 30,
         tokensAfter: 35,
         summary: [],
@@ -250,7 +243,6 @@ describe('Message Formatter', () => {
     it('should handle zero latency', () => {
       const info: VisibilityInfo = {
         status: 'applied',
-        classification: 'SIMPLE',
         tokensBefore: 20,
         tokensAfter: 25,
         latencyMs: 0,
@@ -266,7 +258,6 @@ describe('Message Formatter', () => {
     it('should use proper line breaks for applied messages', () => {
       const info: VisibilityInfo = {
         status: 'applied',
-        classification: 'COMPLEX',
         tokensBefore: 45,
         tokensAfter: 78,
         summary: ['Added XML structure', 'Injected git context'],
@@ -283,7 +274,6 @@ describe('Message Formatter', () => {
     it('should indent summary bullets properly', () => {
       const info: VisibilityInfo = {
         status: 'applied',
-        classification: 'COMPLEX',
         tokensBefore: 45,
         tokensAfter: 78,
         summary: ['First change', 'Second change'],

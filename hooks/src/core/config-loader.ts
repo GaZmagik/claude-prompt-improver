@@ -57,6 +57,7 @@ export const DEFAULT_CONFIG: Configuration = {
   compactionThreshold: 5,
   defaultSimpleModel: 'haiku',
   defaultComplexModel: 'sonnet',
+  improverModel: 'haiku', // Default to haiku (fast, cost-effective)
   integrations: DEFAULT_INTEGRATIONS,
   logging: DEFAULT_LOGGING,
 };
@@ -248,6 +249,11 @@ function yamlToConfig(yaml: Record<string, unknown>): Partial<Configuration> {
     config.forceImprove = forceImprove;
   }
 
+  const improverModel = yaml.improverModel ?? yaml.improver_model;
+  if (typeof improverModel === 'string') {
+    config.improverModel = improverModel;
+  }
+
   // Parse integrations section
   if (yaml.integrations && typeof yaml.integrations === 'object') {
     const src = yaml.integrations as Record<string, unknown>;
@@ -318,6 +324,7 @@ function mergeConfig(defaults: Configuration, partial: Partial<Configuration>): 
     compactionThreshold: partial.compactionThreshold ?? defaults.compactionThreshold,
     defaultSimpleModel: partial.defaultSimpleModel ?? defaults.defaultSimpleModel,
     defaultComplexModel: partial.defaultComplexModel ?? defaults.defaultComplexModel,
+    improverModel: partial.improverModel ?? defaults.improverModel,
     integrations: {
       git: partial.integrations?.git ?? defaults.integrations.git,
       lsp: partial.integrations?.lsp ?? defaults.integrations.lsp,

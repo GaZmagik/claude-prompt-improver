@@ -86,17 +86,17 @@ describe('XML Builder', () => {
     });
   });
 
-  describe('T042: shouldApplyXmlTags - skips tags for simple prompts', () => {
-    it('should return false for NONE classification', () => {
-      expect(shouldApplyXmlTags('NONE')).toBe(false);
+  describe('T042: shouldApplyXmlTags - applies tags based on prompt length', () => {
+    it('should return false for short prompts (<=100 chars)', () => {
+      expect(shouldApplyXmlTags(50)).toBe(false);
     });
 
-    it('should return false for SIMPLE classification', () => {
-      expect(shouldApplyXmlTags('SIMPLE')).toBe(false);
+    it('should return false for prompts at threshold', () => {
+      expect(shouldApplyXmlTags(100)).toBe(false);
     });
 
-    it('should return true for COMPLEX classification', () => {
-      expect(shouldApplyXmlTags('COMPLEX')).toBe(true);
+    it('should return true for long prompts (>100 chars)', () => {
+      expect(shouldApplyXmlTags(150)).toBe(true);
     });
   });
 

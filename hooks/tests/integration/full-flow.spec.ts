@@ -5,7 +5,6 @@
 import { describe, expect, it } from 'bun:test';
 import { parseHookInput } from '../../user-prompt-submit/improve-prompt.ts';
 import { detectBypass } from '../../src/core/bypass-detector.ts';
-import { classifyPrompt } from '../../src/services/classifier.ts';
 import { buildContext } from '../../src/context/context-builder.ts';
 import type { HookInput } from '../../src/core/types.ts';
 
@@ -79,7 +78,7 @@ describe('Integration Tests - Full Flow', () => {
       const result = detectBypass({
         prompt: input.prompt,
         sessionId: input.context.conversation_id,
-        contextUsage: input.context.context_usage,
+        ...(input.context.context_usage && { contextUsage: input.context.context_usage }),
       });
 
       expect(result.shouldBypass).toBe(true);
@@ -99,7 +98,7 @@ describe('Integration Tests - Full Flow', () => {
       const result = detectBypass({
         prompt: input.prompt,
         sessionId: input.context.conversation_id,
-        contextUsage: input.context.context_usage,
+        ...(input.context.context_usage && { contextUsage: input.context.context_usage }),
       });
 
       expect(result.shouldBypass).toBe(true);
@@ -119,7 +118,7 @@ describe('Integration Tests - Full Flow', () => {
       const result = detectBypass({
         prompt: input.prompt,
         sessionId: input.context.conversation_id,
-        contextUsage: input.context.context_usage,
+        ...(input.context.context_usage && { contextUsage: input.context.context_usage }),
       });
 
       expect(result.shouldBypass).toBe(true);
@@ -139,83 +138,14 @@ describe('Integration Tests - Full Flow', () => {
       const result = detectBypass({
         prompt: input.prompt,
         sessionId: input.context.conversation_id,
-        contextUsage: input.context.context_usage,
+        ...(input.context.context_usage && { contextUsage: input.context.context_usage }),
       });
 
       expect(result.shouldBypass).toBe(false);
     });
   });
 
-  describe('Classification Flow', () => {
-    it('should classify clear prompts as NONE', async () => {
-      const prompt =
-        '<task>Fix the authentication bug in user-service.ts by checking the token expiry</task>';
-
-      // Use mock Claude response for testing
-      const result = await classifyPrompt({
-        prompt,
-        sessionId: 'test-session',
-        _mockClaudeResponse: 'NONE: Prompt is already well-structured with clear task',
-      });
-
-      expect(result.level).toBe('NONE');
-      expect(result.reasoning).toContain('well-structured');
-    });
-
-    it('should classify unclear prompts as SIMPLE', async () => {
-      const prompt = 'fix the bug';
-
-      const result = await classifyPrompt({
-        prompt,
-        sessionId: 'test-session',
-        _mockClaudeResponse: 'SIMPLE: Moderately unclear, needs minor clarification',
-      });
-
-      expect(result.level).toBe('SIMPLE');
-      expect(result.reasoning).toContain('unclear');
-    });
-
-    it('should classify vague prompts as COMPLEX', async () => {
-      const prompt = 'help';
-
-      const result = await classifyPrompt({
-        prompt,
-        sessionId: 'test-session',
-        _mockClaudeResponse: 'COMPLEX: Extremely vague, requires significant restructuring',
-      });
-
-      expect(result.level).toBe('COMPLEX');
-      expect(result.reasoning).toContain('vague');
-    });
-
-    it('should handle classification with mock response', async () => {
-      const prompt = 'test prompt for classification';
-
-      const result = await classifyPrompt({
-        prompt,
-        sessionId: 'test-session',
-        _mockClaudeResponse: 'SIMPLE: Needs minor improvements',
-      });
-
-      expect(result.level).toBe('SIMPLE');
-      expect(result.latencyMs).toBeGreaterThanOrEqual(0);
-    });
-
-    it('should handle invalid classification responses', async () => {
-      const prompt = 'test prompt';
-
-      // Mock response that doesn't match expected format should return SIMPLE as fallback
-      const result = await classifyPrompt({
-        prompt,
-        sessionId: 'test-session',
-        _mockClaudeResponse: 'INVALID_RESPONSE',
-      });
-
-      // Classifier should have a fallback for invalid responses
-      expect(result.level).toBeDefined();
-      expect(['NONE', 'SIMPLE', 'COMPLEX']).toContain(result.level);
-    });
-  });
+  // Classification tests removed - we now always improve prompts (no classification step)
 
   describe('Context Building Flow', () => {
     it('should gather multiple context sources in parallel', async () => {
@@ -343,7 +273,7 @@ describe('Integration Tests - Full Flow', () => {
       const bypassResult = detectBypass({
         prompt: parseResult.input.prompt,
         sessionId: parseResult.input.context.conversation_id,
-        contextUsage: parseResult.input.context.context_usage,
+        ...(parseResult.input.context.context_usage && { contextUsage: parseResult.input.context.context_usage }),
       });
 
       // Bypass detector may return true for various reasons - just verify it runs
@@ -357,19 +287,10 @@ describe('Integration Tests - Full Flow', () => {
         return;
       }
 
-      // 3. Classify (with mock)
-      const classifyResult = await classifyPrompt({
-        prompt: parseResult.input.prompt,
-        sessionId: parseResult.input.context.conversation_id,
-        _mockClaudeResponse: 'COMPLEX: Needs significant restructuring and context',
-      });
-      expect(classifyResult.level).toBe('COMPLEX');
-      expect(classifyResult.reasoning).toBeDefined();
-
-      // 4. Build context
+      // 3. Build context (classification removed - we now always improve)
       const contextResult = await buildContext({
         prompt: parseResult.input.prompt,
-        availableTools: parseResult.input.context.available_tools,
+        ...(parseResult.input.context.available_tools && { availableTools: parseResult.input.context.available_tools }),
       });
       expect(contextResult).toBeDefined();
       expect(contextResult.sources).toBeDefined();
@@ -393,7 +314,7 @@ describe('Integration Tests - Full Flow', () => {
       const bypassResult = detectBypass({
         prompt: parseResult.input.prompt,
         sessionId: parseResult.input.context.conversation_id,
-        contextUsage: parseResult.input.context.context_usage,
+        ...(parseResult.input.context.context_usage && { contextUsage: parseResult.input.context.context_usage }),
       });
 
       expect(bypassResult.shouldBypass).toBe(true);

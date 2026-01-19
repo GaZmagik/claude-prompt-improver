@@ -4,8 +4,8 @@ A Claude Code plugin that automatically enhances and improves your prompts befor
 
 ## Features
 
-- **Automatic Classification**: Classifies prompts as NONE (already well-structured), SIMPLE, or COMPLEX
-- **Smart Improvement**: Uses Haiku for simple improvements, Sonnet for complex ones
+- **Automatic Improvement**: Enhances all prompts over 10 tokens with configurable AI models (haiku, sonnet, or opus)
+- **Smart Model Selection**: Configure your preferred model (haiku for speed, sonnet for balance, opus for quality)
 - **Context Injection**: Enriches prompts with relevant context from multiple sources:
   - Available tools and capabilities
   - Matching skills and agents
@@ -72,8 +72,7 @@ The configuration uses markdown with YAML frontmatter:
 enabled: true
 shortPromptThreshold: 10
 compactionThreshold: 5
-defaultSimpleModel: haiku
-defaultComplexModel: sonnet
+improverModel: haiku  # Model for all improvements: haiku, sonnet, or opus
 
 integrations:
   git: true
@@ -104,8 +103,7 @@ For backwards compatibility, the plugin also supports JSON configuration at `.cl
   "enabled": true,
   "shortPromptThreshold": 10,
   "compactionThreshold": 5,
-  "defaultSimpleModel": "haiku",
-  "defaultComplexModel": "sonnet",
+  "improverModel": "haiku",
   "integrations": {
     "git": true,
     "lsp": true,
@@ -135,8 +133,7 @@ For backwards compatibility, the plugin also supports JSON configuration at `.cl
 | `forceImprove` | boolean | `false` | Bypass all heuristic checks (for testing) |
 | `shortPromptThreshold` | number | `10` | Prompts with fewer tokens bypass improvement |
 | `compactionThreshold` | number | `5` | Skip when context availability is below this % |
-| `defaultSimpleModel` | string | `haiku` | Model for simple improvements |
-| `defaultComplexModel` | string | `sonnet` | Model for complex improvements |
+| `improverModel` | string | `haiku` | Model for all improvements: `haiku` (fast), `sonnet` (balanced), or `opus` (highest quality) |
 | `integrations.git` | boolean | `true` | Enable git context gathering |
 | `integrations.lsp` | boolean | `true` | Enable LSP diagnostics gathering |
 | `integrations.spec` | boolean | `true` | Enable specification awareness |
@@ -166,11 +163,19 @@ Add `#skip` anywhere in your prompt to bypass improvement:
 
 The tag is removed before the prompt is passed through.
 
-### Classification Levels
+### How It Works
 
-- **NONE**: Well-structured prompts pass through unchanged
-- **SIMPLE**: Minor clarity improvements using Haiku (faster, cheaper)
-- **COMPLEX**: Significant restructuring using Sonnet with XML tags
+The plugin automatically improves all prompts over 10 tokens (configurable via `shortPromptThreshold`). Short prompts, those tagged with `#skip`, and prompts during low context availability are bypassed.
+
+Improvements include:
+- **Clarity enhancement**: Removes ambiguity and adds structure
+- **Context enrichment**: Injects relevant git, LSP, spec, and memory context
+- **XML structuring**: Applies semantic tags (task, context, constraints) when helpful
+
+The `improverModel` config field controls which Claude model performs the improvement:
+- **haiku**: Fastest, most cost-effective (default)
+- **sonnet**: Balanced speed and quality
+- **opus**: Highest quality, slower
 
 ## Troubleshooting
 
@@ -195,12 +200,11 @@ The plugin uses the following hardcoded timeouts:
 | Operation | Timeout | Description |
 |-----------|---------|-------------|
 | Hook total | 90s | Maximum time for entire hook execution |
-| Classification | 5s | Prompt classification via Haiku |
-| Simple improvement | 30s | Haiku-based improvement for moderately unclear prompts |
-| Complex improvement | 60s | Sonnet-based improvement for vague prompts |
+| Haiku improvement | 30s | Prompt improvement using Haiku model |
+| Sonnet improvement | 60s | Prompt improvement using Sonnet model |
+| Opus improvement | 90s | Prompt improvement using Opus model |
 | Context gathering | 2s | Per-source timeout (git, LSP, spec, memory) |
 | Git commands | 2s | Per git command (status, log, diff) |
-| Session fork | 10s | Forking session for additional context |
 
 If you consistently experience timeout errors, please open an issue with your system details.
 

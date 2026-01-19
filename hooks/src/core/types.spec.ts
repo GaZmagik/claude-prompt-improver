@@ -7,7 +7,6 @@ import type {
   BypassDecision,
   BypassReason,
   Classification,
-  ClassificationLevel,
   ClaudeModel,
   Configuration,
   Context,
@@ -21,25 +20,15 @@ import type {
 } from './types.ts';
 
 describe('Core Types', () => {
-  describe('ClassificationLevel', () => {
-    it('should accept valid classification levels', () => {
-      const none: ClassificationLevel = 'NONE';
-      const simple: ClassificationLevel = 'SIMPLE';
-      const complex: ClassificationLevel = 'COMPLEX';
-
-      expect(none).toBe('NONE');
-      expect(simple).toBe('SIMPLE');
-      expect(complex).toBe('COMPLEX');
-    });
-  });
-
   describe('ClaudeModel', () => {
     it('should accept valid model names', () => {
       const haiku: ClaudeModel = 'haiku';
       const sonnet: ClaudeModel = 'sonnet';
+      const opus: ClaudeModel = 'opus';
 
       expect(haiku).toBe('haiku');
       expect(sonnet).toBe('sonnet');
+      expect(opus).toBe('opus');
     });
   });
 
@@ -177,6 +166,7 @@ describe('Core Types', () => {
         compactionThreshold: 5,
         defaultSimpleModel: 'haiku',
         defaultComplexModel: 'sonnet',
+        improverModel: 'haiku',
         integrations: {
           git: true,
           lsp: true,
@@ -224,7 +214,6 @@ describe('Core Types', () => {
         phase: 'complete',
         promptPreview: 'fix the bug...',
         improvedPrompt: '<task>Fix the bug...</task>',
-        classification: 'COMPLEX',
         bypassReason: null,
         modelUsed: 'sonnet',
         totalLatency: 4532,
@@ -244,7 +233,6 @@ describe('Core Types', () => {
         phase: 'bypass',
         promptPreview: 'yes...',
         improvedPrompt: null,
-        classification: 'NONE',
         bypassReason: 'short_prompt',
         modelUsed: null,
         totalLatency: 2,

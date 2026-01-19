@@ -242,60 +242,48 @@ describe('Hook Input/Output', () => {
       const output = createHookOutput({
         type: 'improved',
         improvedPrompt: '<task>Do something</task>',
-        classification: 'COMPLEX',
         tokensBefore: 10,
         tokensAfter: 25,
         latencyMs: 2500,
       });
 
       expect(output.continue).toBe(true);
-      expect(output.systemMessage).toContain('COMPLEX');
+      expect(output.systemMessage).toContain('Prompt improved');
       expect(output.additionalContext).toContain('<task>');
     });
 
-    it('should include classification in system message', () => {
+    it('should include prompt improved in system message', () => {
       const output = createHookOutput({
         type: 'improved',
         improvedPrompt: 'Better prompt',
-        classification: 'SIMPLE',
         tokensBefore: 5,
         tokensAfter: 8,
         latencyMs: 1200,
       });
 
-      expect(output.systemMessage).toContain('SIMPLE');
+      expect(output.systemMessage).toContain('Prompt improved');
     });
   });
 
-  describe('T049: processPrompt - integration of classification and improvement', () => {
+  describe('T049: processPrompt - always improve (no classification)', () => {
     // Note: prompts must be >10 tokens to avoid short prompt bypass
 
-    it('should passthrough when classification is NONE', async () => {
-      const result = await processPrompt({
-        prompt: 'Read the src/auth.ts file and explain how the JWT validation logic works in detail',
-        sessionId: 'session-123',
-        _mockClassification: 'NONE: Well-structured, clear prompt',
-      });
+    // Test removed - we no longer classify, just always improve
 
-      expect(result.type).toBe('passthrough');
-    });
-
-    it('should improve with haiku when classification is SIMPLE', async () => {
+    it('should improve prompts using config model', async () => {
       const result = await processPrompt({
         prompt: 'I need some help with testing the application but I am not sure where to start',
         sessionId: 'session-123',
-        _mockClassification: 'SIMPLE: Needs minor clarification about what to test',
         _mockImprovement: 'Help me write unit tests for the authentication module',
       });
 
       expect(result.type).toBe('improved');
       if (result.type === 'improved') {
         expect(result.improvedPrompt).toContain('unit tests');
-        expect(result.classification).toBe('SIMPLE');
       }
     });
 
-    it('should improve with sonnet when classification is COMPLEX', async () => {
+    it('should improve vague prompts', async () => {
       const result = await processPrompt({
         prompt: 'There is a bug somewhere in the code and it is causing issues with the user interface',
         sessionId: 'session-456',
@@ -306,7 +294,6 @@ describe('Hook Input/Output', () => {
       expect(result.type).toBe('improved');
       if (result.type === 'improved') {
         expect(result.improvedPrompt).toContain('authentication bug');
-        expect(result.classification).toBe('COMPLEX');
       }
     });
 
@@ -459,7 +446,6 @@ describe('Hook Input/Output', () => {
       const output = createHookOutput({
         type: 'improved',
         improvedPrompt: '<task>Fix the bug</task>',
-        classification: 'COMPLEX',
         tokensBefore: 45,
         tokensAfter: 78,
         summary: ['Added XML structure', 'Injected git context'],
@@ -470,7 +456,6 @@ describe('Hook Input/Output', () => {
       expect(output.systemMessage).toBeDefined();
       expect(output.systemMessage).toContain('🎯');
       expect(output.systemMessage).toContain('Prompt improved');
-      expect(output.systemMessage).toContain('COMPLEX');
       expect(output.systemMessage).toContain('45');
       expect(output.systemMessage).toContain('78');
       expect(output.systemMessage).toContain('Added XML structure');
@@ -480,7 +465,6 @@ describe('Hook Input/Output', () => {
       const output = createHookOutput({
         type: 'improved',
         improvedPrompt: 'Improved text',
-        classification: 'SIMPLE',
         tokensBefore: 30,
         tokensAfter: 42,
         latencyMs: 1500,
@@ -495,7 +479,6 @@ describe('Hook Input/Output', () => {
       const output = createHookOutput({
         type: 'improved',
         improvedPrompt: 'Improved text',
-        classification: 'COMPLEX',
         tokensBefore: 50,
         tokensAfter: 95,
         summary: ['Added context injection', 'Expanded task description', 'Structured with XML'],
@@ -512,7 +495,6 @@ describe('Hook Input/Output', () => {
       const output = createHookOutput({
         type: 'improved',
         improvedPrompt: 'Improved text',
-        classification: 'SIMPLE',
         tokensBefore: 20,
         tokensAfter: 25,
         latencyMs: 12456,

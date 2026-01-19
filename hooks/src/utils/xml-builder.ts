@@ -2,7 +2,7 @@
  * XML Builder for structured prompts
  * Applies XML tags per Anthropic best practices for complex prompts
  */
-import type { ClassificationLevel, XmlTag } from '../core/types.ts';
+import type { XmlTag } from '../core/types.ts';
 
 /**
  * Parts of an XML-structured prompt
@@ -46,11 +46,11 @@ export function wrapInTag(tag: XmlTag, content: string): string {
 }
 
 /**
- * Determines whether to apply XML tags based on classification
- * Only COMPLEX prompts get XML structure
+ * Determines whether to apply XML tags based on prompt length
+ * Longer prompts benefit from XML structure
  */
-export function shouldApplyXmlTags(classification: ClassificationLevel): boolean {
-  return classification === 'COMPLEX';
+export function shouldApplyXmlTags(promptLength: number): boolean {
+  return promptLength > 100;
 }
 
 /**

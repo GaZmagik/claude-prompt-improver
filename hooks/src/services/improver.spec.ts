@@ -1,50 +1,50 @@
 /**
- * T036-T040: Improver tests
- * T036: Test improver uses Haiku for SIMPLE classification
- * T037: Test improver uses Sonnet for COMPLEX classification
+ * T038-T040: Improver tests
  * T038: Test improver preserves original intent and tone
  * T039: Test improver injects context from context builder
  * T040: Test improver fallback to original on timeout
  */
 import { describe, expect, it } from 'bun:test';
+import type { Configuration } from '../core/types.ts';
 import {
   buildImprovementPrompt,
   generateImprovementSummary,
-  getModelForClassification,
-  getTimeoutForClassification,
   improvePrompt,
 } from './improver.ts';
 
+// Mock config for tests
+const mockConfig: Configuration = {
+  enabled: true,
+  forceImprove: false,
+  shortPromptThreshold: 10,
+  compactionThreshold: 5,
+  defaultSimpleModel: 'haiku',
+  defaultComplexModel: 'sonnet',
+  improverModel: 'haiku',
+  integrations: {
+    git: false,
+    lsp: false,
+    spec: false,
+    memory: false,
+    session: false,
+  },
+  logging: {
+    enabled: false,
+    logFilePath: '.claude/logs/test.log',
+    logLevel: 'ERROR',
+    maxLogSizeMB: 10,
+    maxLogAgeDays: 7,
+    displayImprovedPrompt: false,
+    useTimestampedLogs: false,
+  },
+};
+
 describe('Improver', () => {
-  describe('T036: getModelForClassification - uses Haiku for SIMPLE', () => {
-    it('should return haiku for SIMPLE classification', () => {
-      const model = getModelForClassification('SIMPLE');
-      expect(model).toBe('haiku');
-    });
-
-    it('should return haiku timeout (30s) for SIMPLE', () => {
-      const timeout = getTimeoutForClassification('SIMPLE');
-      expect(timeout).toBe(30_000);
-    });
-  });
-
-  describe('T037: getModelForClassification - uses Sonnet for COMPLEX', () => {
-    it('should return sonnet for COMPLEX classification', () => {
-      const model = getModelForClassification('COMPLEX');
-      expect(model).toBe('sonnet');
-    });
-
-    it('should return sonnet timeout (60s) for COMPLEX', () => {
-      const timeout = getTimeoutForClassification('COMPLEX');
-      expect(timeout).toBe(60_000);
-    });
-  });
 
   describe('T038: buildImprovementPrompt - preserves original intent and tone', () => {
     it('should include instruction to preserve intent', () => {
       const prompt = buildImprovementPrompt({
         originalPrompt: 'fix the bug',
-        classification: 'COMPLEX',
       });
 
       expect(prompt.toLowerCase()).toContain('intent');
@@ -53,7 +53,6 @@ describe('Improver', () => {
     it('should include instruction to preserve tone', () => {
       const prompt = buildImprovementPrompt({
         originalPrompt: 'help me please',
-        classification: 'SIMPLE',
       });
 
       expect(prompt.toLowerCase()).toContain('tone');
@@ -62,27 +61,18 @@ describe('Improver', () => {
     it('should include the original prompt', () => {
       const prompt = buildImprovementPrompt({
         originalPrompt: 'make it faster',
-        classification: 'COMPLEX',
       });
 
       expect(prompt).toContain('make it faster');
     });
 
-    it('should include classification level for context', () => {
-      const prompt = buildImprovementPrompt({
-        originalPrompt: 'test',
-        classification: 'COMPLEX',
-      });
-
-      expect(prompt).toContain('COMPLEX');
-    });
+    // Test removed - classification no longer included in prompt template
   });
 
   describe('T039: buildImprovementPrompt - injects context', () => {
     it('should include git context when provided', () => {
       const prompt = buildImprovementPrompt({
         originalPrompt: 'fix the bug',
-        classification: 'COMPLEX',
         context: {
           git: 'Branch: feature/auth\nRecent commit: Add JWT validation',
         },
@@ -95,7 +85,6 @@ describe('Improver', () => {
     it('should include LSP context when provided', () => {
       const prompt = buildImprovementPrompt({
         originalPrompt: 'fix the error',
-        classification: 'COMPLEX',
         context: {
           lsp: 'Error: Property "foo" does not exist on type "Bar"',
         },
@@ -108,7 +97,6 @@ describe('Improver', () => {
     it('should include multiple context sources', () => {
       const prompt = buildImprovementPrompt({
         originalPrompt: 'help',
-        classification: 'COMPLEX',
         context: {
           git: 'Branch: main',
           tools: 'Available: Read, Write, Edit',
@@ -124,7 +112,6 @@ describe('Improver', () => {
     it('should handle empty context gracefully', () => {
       const prompt = buildImprovementPrompt({
         originalPrompt: 'test',
-        classification: 'SIMPLE',
         context: {},
       });
 
@@ -135,8 +122,8 @@ describe('Improver', () => {
   describe('T040: improvePrompt - fallback to original on timeout', () => {
     it('should return original prompt on timeout/error', async () => {
       const result = await improvePrompt({
+        config: mockConfig,
         originalPrompt: 'fix the bug',
-        classification: 'COMPLEX',
         sessionId: 'session-123',
         _mockClaudeResponse: null, // Simulates timeout
       });
@@ -148,8 +135,8 @@ describe('Improver', () => {
 
     it('should return improved prompt on success', async () => {
       const result = await improvePrompt({
+        config: mockConfig,
         originalPrompt: 'fix the bug',
-        classification: 'COMPLEX',
         sessionId: 'session-123',
         _mockClaudeResponse: '<task>Investigate and fix the authentication bug</task>',
       });
@@ -161,8 +148,8 @@ describe('Improver', () => {
 
     it('should include latency in result', async () => {
       const result = await improvePrompt({
+        config: mockConfig,
         originalPrompt: 'test',
-        classification: 'SIMPLE',
         sessionId: 'session-123',
         _mockClaudeResponse: 'Improved: test with more detail',
       });
@@ -171,31 +158,52 @@ describe('Improver', () => {
       expect(result.latencyMs).toBeGreaterThanOrEqual(0);
     });
 
+    it('should use opus with 90s timeout when configured', async () => {
+      const opusConfig: Configuration = {
+        ...mockConfig,
+        improverModel: 'opus',
+      };
+
+      const result = await improvePrompt({
+        config: opusConfig,
+        originalPrompt: 'complex architectural decision requiring deep analysis',
+        sessionId: 'session-opus',
+        _mockClaudeResponse: 'Detailed architectural analysis with trade-offs...',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.modelUsed).toBe('opus');
+      expect(result.improvedPrompt).toContain('architectural');
+      // Opus timeout is 90s (90_000ms) - verify it completes within reasonable time
+      expect(result.latencyMs).toBeLessThan(90_000);
+    });
+
     it('should use correct model based on classification', async () => {
       const simpleResult = await improvePrompt({
+        config: mockConfig,
         originalPrompt: 'help',
-        classification: 'SIMPLE',
         sessionId: 'session-123',
         _mockClaudeResponse: 'Improved help prompt',
       });
 
       const complexResult = await improvePrompt({
+        config: mockConfig,
         originalPrompt: 'fix',
-        classification: 'COMPLEX',
         sessionId: 'session-456',
         _mockClaudeResponse: 'Improved complex prompt',
       });
 
+      // Both use the same model from config (no classification-based selection)
       expect(simpleResult.modelUsed).toBe('haiku');
-      expect(complexResult.modelUsed).toBe('sonnet');
+      expect(complexResult.modelUsed).toBe('haiku');
     });
   });
 
   describe('improvePrompt with context', () => {
     it('should pass context to improvement prompt', async () => {
       const result = await improvePrompt({
+        config: mockConfig,
         originalPrompt: 'fix the bug',
-        classification: 'COMPLEX',
         sessionId: 'session-123',
         context: {
           git: 'Branch: feature/auth',
@@ -209,8 +217,8 @@ describe('Improver', () => {
 
     it('should track which context sources were used', async () => {
       const result = await improvePrompt({
+        config: mockConfig,
         originalPrompt: 'help',
-        classification: 'COMPLEX',
         sessionId: 'session-123',
         context: {
           git: 'Branch info',
@@ -343,8 +351,8 @@ LSP errors: Type mismatch in auth handler
   describe('ImprovementResult with summary field', () => {
     it('should include summary in result when changes detected', async () => {
       const result = await improvePrompt({
+        config: mockConfig,
         originalPrompt: 'fix the bug',
-        classification: 'COMPLEX',
         sessionId: 'session-123',
         _mockClaudeResponse: '<task>Fix the authentication bug</task>',
       });
@@ -356,8 +364,8 @@ LSP errors: Type mismatch in auth handler
 
     it('should include summary array with max 3 items', async () => {
       const result = await improvePrompt({
+        config: mockConfig,
         originalPrompt: 'help',
-        classification: 'COMPLEX',
         sessionId: 'session-123',
         _mockClaudeResponse: `<task>Help debug the issue</task>
 <context>Branch: main, Errors: type mismatches</context>
@@ -374,8 +382,8 @@ This is expanded with lots of detail and context information.`,
 
     it('should include summary as readonly array', async () => {
       const result = await improvePrompt({
+        config: mockConfig,
         originalPrompt: 'test',
-        classification: 'SIMPLE',
         sessionId: 'session-123',
         _mockClaudeResponse: '<task>Test with structure</task>',
       });
@@ -390,8 +398,8 @@ This is expanded with lots of detail and context information.`,
 
     it('should omit summary when improvement fails', async () => {
       const result = await improvePrompt({
+        config: mockConfig,
         originalPrompt: 'fix the bug',
-        classification: 'COMPLEX',
         sessionId: 'session-123',
         _mockClaudeResponse: null, // Simulates timeout/failure
       });

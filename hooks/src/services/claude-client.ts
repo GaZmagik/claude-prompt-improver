@@ -32,9 +32,11 @@ export interface ClaudeCommandResult {
 function getModelIdentifier(model: ClaudeModel): string {
   switch (model) {
     case 'haiku':
-      return 'claude-3-5-haiku-latest';
+      return 'claude-haiku-4-5-20251001';
     case 'sonnet':
-      return 'claude-sonnet-4-5-20250514';
+      return 'claude-sonnet-4-5-20250929';
+    case 'opus':
+      return 'claude-opus-4-5-20251101';
   }
 }
 
@@ -52,16 +54,14 @@ export interface ClaudeCommandArgs {
  * Uses array-based approach to prevent shell injection
  */
 export function buildClaudeCommand(options: ClaudeClientOptions): ClaudeCommandArgs {
-  const { prompt, model, sessionId } = options;
+  const { prompt, model } = options;
   const modelId = getModelIdentifier(model);
 
   // Array-based arguments prevent shell injection
   // Arguments are passed directly to process, not through shell
+  // Note: No --resume or --fork-session needed - prompt improvement doesn't require conversation history
   const args = [
     'claude',
-    '--resume',
-    sessionId,
-    '--fork-session',
     '--print',
     '--model',
     modelId,

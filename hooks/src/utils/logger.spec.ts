@@ -40,7 +40,6 @@ describe('Logger', () => {
       const input: LogEntryInput = {
         originalPrompt: 'fix the bug',
         improvedPrompt: '<task>Fix the authentication bug</task>',
-        classification: 'COMPLEX',
         bypassReason: null,
         modelUsed: 'sonnet',
         totalLatency: 4532,
@@ -57,7 +56,6 @@ describe('Logger', () => {
       expect(entry.phase).toBe('complete');
       expect(entry.promptPreview).toContain('fix the bug');
       expect(entry.improvedPrompt).toBe('<task>Fix the authentication bug</task>...');
-      expect(entry.classification).toBe('COMPLEX');
       expect(entry.bypassReason).toBeNull();
       expect(entry.modelUsed).toBe('sonnet');
       expect(entry.totalLatency).toBe(4532);
@@ -69,7 +67,6 @@ describe('Logger', () => {
       const input: LogEntryInput = {
         originalPrompt: 'yes',
         improvedPrompt: null,
-        classification: 'NONE',
         bypassReason: 'short_prompt',
         modelUsed: null,
         totalLatency: 2,
@@ -86,7 +83,6 @@ describe('Logger', () => {
       expect(entry.phase).toBe('bypass');
       expect(entry.promptPreview).toContain('yes');
       expect(entry.improvedPrompt).toBeNull();
-      expect(entry.classification).toBe('NONE');
       expect(entry.bypassReason).toBe('short_prompt');
       expect(entry.modelUsed).toBeNull();
       expect(entry.totalLatency).toBe(2);
@@ -99,7 +95,6 @@ describe('Logger', () => {
       const entry = createLogEntry({
         originalPrompt: 'test',
         improvedPrompt: null,
-        classification: 'NONE',
         bypassReason: 'short_prompt',
         modelUsed: null,
         totalLatency: 1,
@@ -121,7 +116,6 @@ describe('Logger', () => {
       const input: LogEntryInput = {
         originalPrompt: 'fix the bug',
         improvedPrompt: '<task>Fix it</task>',
-        classification: 'COMPLEX',
         bypassReason: null,
         modelUsed: 'sonnet',
         totalLatency: 1000,
@@ -142,7 +136,6 @@ describe('Logger', () => {
       const input: LogEntryInput = {
         originalPrompt: 'test prompt',
         improvedPrompt: 'improved prompt',
-        classification: 'SIMPLE',
         bypassReason: null,
         modelUsed: 'haiku',
         totalLatency: 500,
@@ -159,7 +152,6 @@ describe('Logger', () => {
       expect(parsed).toHaveProperty('timestamp');
       expect(parsed).toHaveProperty('promptPreview');
       expect(parsed).toHaveProperty('improvedPrompt');
-      expect(parsed).toHaveProperty('classification');
       expect(parsed).toHaveProperty('bypassReason');
       expect(parsed).toHaveProperty('modelUsed');
       expect(parsed).toHaveProperty('totalLatency');
@@ -171,7 +163,6 @@ describe('Logger', () => {
       const input: LogEntryInput = {
         originalPrompt: 'test',
         improvedPrompt: null,
-        classification: 'NONE',
         bypassReason: 'short_prompt',
         modelUsed: null,
         totalLatency: 1,
@@ -193,7 +184,6 @@ describe('Logger', () => {
       const input: LogEntryInput = {
         originalPrompt: 'yes',
         improvedPrompt: null,
-        classification: 'NONE',
         bypassReason: 'short_prompt',
         modelUsed: null,
         totalLatency: 2,
@@ -215,7 +205,6 @@ describe('Logger', () => {
       const input: LogEntryInput = {
         originalPrompt: 'test "quotes" and\nnewlines',
         improvedPrompt: '<tag>with "quotes"</tag>',
-        classification: 'COMPLEX',
         bypassReason: null,
         modelUsed: 'sonnet',
         totalLatency: 100,
@@ -241,7 +230,6 @@ describe('Logger', () => {
       const input: LogEntryInput = {
         originalPrompt: 'test write',
         improvedPrompt: 'improved write',
-        classification: 'SIMPLE',
         bypassReason: null,
         modelUsed: 'haiku',
         totalLatency: 300,
@@ -262,7 +250,6 @@ describe('Logger', () => {
       const entry1 = createLogEntry({
         originalPrompt: 'first',
         improvedPrompt: null,
-        classification: 'NONE',
         bypassReason: 'short_prompt',
         modelUsed: null,
         totalLatency: 1,
@@ -277,7 +264,6 @@ describe('Logger', () => {
       const entry2 = createLogEntry({
         originalPrompt: 'second',
         improvedPrompt: null,
-        classification: 'NONE',
         bypassReason: 'short_prompt',
         modelUsed: null,
         totalLatency: 1,
@@ -306,7 +292,6 @@ describe('Logger', () => {
       const entry = createLogEntry({
         originalPrompt: 'nested test',
         improvedPrompt: null,
-        classification: 'NONE',
         bypassReason: 'short_prompt',
         modelUsed: null,
         totalLatency: 1,
@@ -325,7 +310,6 @@ describe('Logger', () => {
       const entry = createLogEntry({
         originalPrompt: 'jsonl test',
         improvedPrompt: 'improved',
-        classification: 'SIMPLE',
         bypassReason: null,
         modelUsed: 'haiku',
         totalLatency: 100,
@@ -350,7 +334,6 @@ describe('Logger', () => {
       const entry = createLogEntry({
         originalPrompt: 'fire-and-forget test',
         improvedPrompt: null,
-        classification: 'NONE',
         bypassReason: 'short_prompt',
         modelUsed: null,
         totalLatency: 1,
@@ -414,7 +397,6 @@ describe('Logger', () => {
       const input: LogEntryInput = {
         originalPrompt: 'fix the bug',
         improvedPrompt: sensitiveContext,
-        classification: 'COMPLEX',
         bypassReason: null,
         modelUsed: 'sonnet',
         totalLatency: 1000,
@@ -437,7 +419,6 @@ describe('Logger', () => {
       const input: LogEntryInput = {
         originalPrompt: 'test',
         improvedPrompt: null,
-        classification: 'NONE',
         bypassReason: 'short_prompt',
         modelUsed: null,
         totalLatency: 1,
@@ -537,7 +518,6 @@ describe('Logger', () => {
       const input: LogEntryInput = {
         originalPrompt: 'test',
         improvedPrompt: null,
-        classification: 'NONE',
         bypassReason: 'short_prompt',
         modelUsed: null,
         totalLatency: 1,
@@ -556,7 +536,6 @@ describe('Logger', () => {
       const input: LogEntryInput = {
         originalPrompt: 'test',
         improvedPrompt: 'improved',
-        classification: 'COMPLEX',
         bypassReason: null,
         modelUsed: 'sonnet',
         totalLatency: 1000,
@@ -576,7 +555,6 @@ describe('Logger', () => {
       const input: LogEntryInput = {
         originalPrompt: longPrompt,
         improvedPrompt: null,
-        classification: 'NONE',
         bypassReason: 'short_prompt',
         modelUsed: null,
         totalLatency: 1,
@@ -593,31 +571,12 @@ describe('Logger', () => {
       expect(entry).not.toHaveProperty('originalPrompt');
     });
 
-    it('should include classificationLatency when provided', () => {
-      const input: LogEntryInput = {
-        originalPrompt: 'test',
-        improvedPrompt: 'improved',
-        classification: 'COMPLEX',
-        bypassReason: null,
-        modelUsed: 'sonnet',
-        totalLatency: 2000,
-        classificationLatency: 500,
-        contextSources: [],
-        conversationId: 'conv-123',
-        level: 'INFO',
-        phase: 'complete',
-      };
-
-      const entry = createLogEntry(input);
-
-      expect(entry.classificationLatency).toBe(500);
-    });
+    // Test removed - classificationLatency no longer exists
 
     it('should include improvementLatency when provided', () => {
       const input: LogEntryInput = {
         originalPrompt: 'test',
         improvedPrompt: 'improved',
-        classification: 'COMPLEX',
         bypassReason: null,
         modelUsed: 'sonnet',
         totalLatency: 2000,
@@ -637,14 +596,13 @@ describe('Logger', () => {
       const input: LogEntryInput = {
         originalPrompt: 'test',
         improvedPrompt: null,
-        classification: 'NONE',
         bypassReason: 'classification_failed',
         modelUsed: null,
         totalLatency: 5000,
         contextSources: [],
         conversationId: 'conv-123',
         level: 'ERROR',
-        phase: 'classify',
+        phase: 'improve',
         error: 'Classification timeout after 5s',
       };
 
@@ -655,52 +613,14 @@ describe('Logger', () => {
   });
 
   describe('formatLogEntry - conditional property inclusion', () => {
-    it('should exclude classificationLatency when undefined', () => {
-      const entry = createLogEntry({
-        originalPrompt: 'test',
-        improvedPrompt: null,
-        classification: 'NONE',
-        bypassReason: 'short_prompt',
-        modelUsed: null,
-        totalLatency: 1,
-        contextSources: [],
-        conversationId: 'conv-123',
-        level: 'INFO',
-        phase: 'bypass',
-      });
+    // Test removed - classificationLatency no longer exists
 
-      const json = formatLogEntry(entry);
-      const parsed = JSON.parse(json);
-
-      expect(parsed).not.toHaveProperty('classificationLatency');
-    });
-
-    it('should include classificationLatency when defined', () => {
-      const entry = createLogEntry({
-        originalPrompt: 'test',
-        improvedPrompt: 'improved',
-        classification: 'COMPLEX',
-        bypassReason: null,
-        modelUsed: 'sonnet',
-        totalLatency: 2000,
-        classificationLatency: 500,
-        contextSources: [],
-        conversationId: 'conv-123',
-        level: 'INFO',
-        phase: 'complete',
-      });
-
-      const json = formatLogEntry(entry);
-      const parsed = JSON.parse(json);
-
-      expect(parsed.classificationLatency).toBe(500);
-    });
+    // Test removed - classificationLatency no longer exists
 
     it('should exclude improvementLatency when undefined', () => {
       const entry = createLogEntry({
         originalPrompt: 'test',
         improvedPrompt: null,
-        classification: 'NONE',
         bypassReason: 'short_prompt',
         modelUsed: null,
         totalLatency: 1,
@@ -720,7 +640,6 @@ describe('Logger', () => {
       const entry = createLogEntry({
         originalPrompt: 'test',
         improvedPrompt: 'improved',
-        classification: 'SIMPLE',
         bypassReason: null,
         modelUsed: 'haiku',
         totalLatency: 1000,
@@ -740,11 +659,9 @@ describe('Logger', () => {
       const entry = createLogEntry({
         originalPrompt: 'test prompt here',
         improvedPrompt: 'improved',
-        classification: 'COMPLEX',
         bypassReason: null,
         modelUsed: 'sonnet',
         totalLatency: 2500,
-        classificationLatency: 500,
         improvementLatency: 2000,
         contextSources: ['git', 'lsp'],
         conversationId: 'conv-123',
@@ -758,7 +675,6 @@ describe('Logger', () => {
       expect(parsed.level).toBe('INFO');
       expect(parsed.phase).toBe('complete');
       expect(parsed.promptPreview).toBeDefined();
-      expect(parsed.classificationLatency).toBe(500);
       expect(parsed.improvementLatency).toBe(2000);
     });
   });
@@ -768,14 +684,13 @@ describe('Logger', () => {
       const entry = createLogEntry({
         originalPrompt: 'test',
         improvedPrompt: null,
-        classification: 'NONE',
         bypassReason: 'classification_failed',
         modelUsed: null,
         totalLatency: 5000,
         contextSources: [],
         conversationId: 'conv-error',
         level: 'ERROR',
-        phase: 'classify',
+        phase: 'improve',
         error: 'Timeout',
       });
 
@@ -790,7 +705,6 @@ describe('Logger', () => {
       const entry = createLogEntry({
         originalPrompt: 'test',
         improvedPrompt: 'improved',
-        classification: 'SIMPLE',
         bypassReason: null,
         modelUsed: 'haiku',
         totalLatency: 1000,
@@ -813,21 +727,19 @@ describe('Logger', () => {
       const errorEntry = createLogEntry({
         originalPrompt: 'test',
         improvedPrompt: null,
-        classification: 'NONE',
         bypassReason: 'classification_failed',
         modelUsed: null,
         totalLatency: 5000,
         contextSources: [],
         conversationId: 'conv-error',
         level: 'ERROR',
-        phase: 'classify',
+        phase: 'improve',
         error: 'Timeout',
       });
 
       const infoEntry = createLogEntry({
         originalPrompt: 'test',
         improvedPrompt: 'improved',
-        classification: 'SIMPLE',
         bypassReason: null,
         modelUsed: 'haiku',
         totalLatency: 1000,

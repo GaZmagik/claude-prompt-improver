@@ -3,11 +3,10 @@
  * Based on data-model.md specification
  */
 
-// Classification levels for prompts
-export type ClassificationLevel = 'NONE' | 'SIMPLE' | 'COMPLEX';
+// Classification has been removed - we now always improve prompts
 
 // Claude model selection
-export type ClaudeModel = 'haiku' | 'sonnet';
+export type ClaudeModel = 'haiku' | 'sonnet' | 'opus';
 
 // Context sources that can contribute to prompt improvement
 export type ContextSource =
@@ -63,9 +62,10 @@ export interface ImprovedPrompt {
 
 /**
  * Classification assessment of a prompt
+ * @deprecated Classification has been removed in v2.0.0 - we now always improve prompts
  */
 export interface Classification {
-  readonly level: ClassificationLevel;
+  readonly level: 'NONE' | 'SIMPLE' | 'COMPLEX';
   readonly reasoning: string;
   readonly confidence?: number;
   readonly modelUsed: 'haiku';
@@ -118,8 +118,15 @@ export interface Configuration {
   readonly forceImprove: boolean;
   readonly shortPromptThreshold: number;
   readonly compactionThreshold: number;
+
+  /** @deprecated No longer used - use improverModel instead */
   readonly defaultSimpleModel: ClaudeModel;
+  /** @deprecated No longer used - use improverModel instead */
   readonly defaultComplexModel: ClaudeModel;
+
+  /** Model for all improvements (haiku, sonnet, or opus). Defaults to haiku */
+  readonly improverModel: ClaudeModel;
+
   readonly integrations: IntegrationToggles;
   readonly logging: LoggingConfig;
 }
@@ -140,14 +147,12 @@ export interface BypassDecision {
 export interface LogEntry {
   readonly timestamp: Date;
   readonly level: LogLevel;
-  readonly phase: 'bypass' | 'classify' | 'improve' | 'complete';
+  readonly phase: 'bypass' | 'improve' | 'complete';
   readonly promptPreview: string;
   readonly improvedPrompt: string | null;
-  readonly classification: ClassificationLevel;
   readonly bypassReason: BypassReason | null;
   readonly modelUsed: ClaudeModel | null;
   readonly totalLatency: number;
-  readonly classificationLatency?: number;
   readonly improvementLatency?: number;
   readonly contextSources: readonly ContextSource[];
   readonly conversationId: string;
@@ -208,7 +213,6 @@ export interface HookOutput {
 export interface VisibilityInfo {
   readonly status: 'bypassed' | 'applied' | 'failed';
   readonly bypassReason?: BypassReason;
-  readonly classification?: ClassificationLevel;
   readonly tokensBefore?: number;
   readonly tokensAfter?: number;
   readonly summary?: readonly string[];
