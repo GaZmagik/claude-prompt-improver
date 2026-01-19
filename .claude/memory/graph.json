@@ -27,11 +27,6 @@
       "title": "Retro - Checklist format clarity prevents gate blockers"
     },
     {
-      "id": "gotcha-gotcha-forked-session-retrospective-output-may-not-surface-completely-to-main-session",
-      "type": "gotcha",
-      "title": "Gotcha - Forked session retrospective output may not surface completely to main session"
-    },
-    {
       "id": "learning-spec-analysis-severity-categorisation-pattern",
       "type": "learning",
       "title": "Spec Analysis Severity Categorisation Pattern"
@@ -97,11 +92,6 @@
       "title": "Retro - Phase-based task organization enables parallel mental planning"
     },
     {
-      "id": "gotcha-gotcha-exactoptionalpropertytypes-requires-verbose-workarounds-in-test-object-construction",
-      "type": "gotcha",
-      "title": "Gotcha - exactOptionalPropertyTypes requires verbose workarounds in test object construction"
-    },
-    {
       "id": "learning-retro-clear-bypass-priority-ordering-prevents-edge-case-ambiguity",
       "type": "learning",
       "title": "Retro - Clear bypass priority ordering prevents edge case ambiguity"
@@ -117,11 +107,6 @@
       "title": "TDD stub-first pattern enables 290 tests across 6 phases"
     },
     {
-      "id": "gotcha-gotcha-exactoptionalpropertytypes-requires-conditional-property-inclusion-pattern",
-      "type": "gotcha",
-      "title": "Gotcha - exactOptionalPropertyTypes requires conditional property inclusion pattern"
-    },
-    {
       "id": "learning-learning-mock-patterns-for-external-command-execution-require-careful-test-setup",
       "type": "learning",
       "title": "Learning - Mock patterns for external command execution require careful test setup"
@@ -135,11 +120,6 @@
       "id": "learning-modular-context-sources-enable-extensible-prompt-enrichment",
       "type": "learning",
       "title": "Modular context sources enable extensible prompt enrichment"
-    },
-    {
-      "id": "learning-exactoptionalpropertytypes-requires-omission-based-test-construction",
-      "type": "learning",
-      "title": "exactOptionalPropertyTypes requires omission-based test construction"
     },
     {
       "id": "learning-retro-tdd-stub-first-pattern-scales-to-404-tests-with-zero-rework",
@@ -232,6 +212,78 @@
     {
       "id": "gotcha-vimock-global-pollution-across-test-files",
       "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-memory-curator-graph-linking-resolves-orphaned-nodes-at-scale",
+      "type": "learning"
+    },
+    {
+      "id": "learning-comprehensive-review-with-parallel-agents-catches-systemic-test-quality-issues",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-typescript-compilation-errors-should-block-review-phase",
+      "type": "gotcha"
+    },
+    {
+      "id": "gotcha-retro-security-vulnerabilities-in-v100-release-indicate-pre-merge-audit-gap",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-exactoptionalpropertytypes-requires-null-guards-on-regex-matches",
+      "type": "learning"
+    },
+    {
+      "id": "learning-nouncheckedindexedaccess-requires-non-null-assertion-after-length-verification-in-tests",
+      "type": "learning"
+    },
+    {
+      "id": "learning-parallel-expert-agents-for-review-save-context-and-catch-complementary-issues",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-non-null-assertions-in-tests-after-length-checks-work-well-for-strictoptionalpropertytypes",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-test-coverage-metrics-90-mask-systemic-test-quality-issues",
+      "type": "gotcha"
+    },
+    {
+      "id": "artifact-exactoptionalpropertytypes-solution-patterns",
+      "type": "artifact"
+    },
+    {
+      "id": "learning-retro-systematic-error-pattern-fixing-across-files-reduces-regression-risk",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-promiseallsettled-prevents-cascading-failure-in-parallel-async-operations",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-fire-and-forget-async-logging-prevents-blocking-hook-execution",
+      "type": "learning"
+    },
+    {
+      "id": "learning-configuration-caching-with-mtime-invalidation",
+      "type": "learning"
+    },
+    {
+      "id": "learning-timer-cleanup-prevents-resource-leaks-in-timeout-patterns",
+      "type": "learning"
+    },
+    {
+      "id": "artifact-keyword-matcher-shared-utility",
+      "type": "artifact"
+    },
+    {
+      "id": "gotcha-real-integration-tests-require-accurate-interface-property-names",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-tdd-pre-commit-hook-enforces-stub-first-pattern-for-new-modules",
+      "type": "learning"
     }
   ],
   "edges": [
@@ -261,11 +313,6 @@
       "label": "relates-to"
     },
     {
-      "source": "gotcha-gotcha-forked-session-retrospective-output-may-not-surface-completely-to-main-session",
-      "target": "learning-retro-exploration-phase-prevents-specification-rework",
-      "label": "relates-to"
-    },
-    {
       "source": "learning-spec-analysis-severity-categorisation-pattern",
       "target": "artifact-spec-analysis-issue-resolution",
       "label": "relates-to"
@@ -278,11 +325,6 @@
     {
       "source": "learning-spec-analysis-severity-categorisation-pattern",
       "target": "learning-specification-readiness-validation-checklist-format-vs-content-state",
-      "label": "relates-to"
-    },
-    {
-      "source": "learning-fork-session-execution-requires-tmp-working-directory",
-      "target": "gotcha-gotcha-forked-session-retrospective-output-may-not-surface-completely-to-main-session",
       "label": "relates-to"
     },
     {
@@ -331,11 +373,6 @@
       "label": "relates-to"
     },
     {
-      "source": "learning-exactoptionalpropertytypes-requires-omission-based-test-construction",
-      "target": "learning-conditional-property-inclusion-pattern-solves-exactoptionalpropertytypes-friction-in-test-construction",
-      "label": "relates-to"
-    },
-    {
       "source": "learning-modular-context-sources-enable-extensible-prompt-enrichment",
       "target": "learning-modular-context-sources-enable-extensible-prompt-enrichment-without-tight-coupling",
       "label": "relates-to"
@@ -361,11 +398,6 @@
       "label": "relates-to"
     },
     {
-      "source": "gotcha-gotcha-exactoptionalpropertytypes-requires-conditional-property-inclusion-pattern",
-      "target": "learning-conditional-property-inclusion-pattern-solves-exactoptionalpropertytypes-friction-in-test-construction",
-      "label": "relates-to"
-    },
-    {
       "source": "learning-phase-based-task-organization-enables-parallel-mental-planning",
       "target": "learning-retro-tdd-phase-based-organization-with-parallel-test-writing-accelerates-implementation",
       "label": "relates-to"
@@ -388,11 +420,6 @@
     {
       "source": "learning-agent-first-specification-analysis-prevents-rework-before-implementation",
       "target": "artifact-spec-analysis-issue-resolution",
-      "label": "relates-to"
-    },
-    {
-      "source": "gotcha-gotcha-exactoptionalpropertytypes-requires-verbose-workarounds-in-test-object-construction",
-      "target": "learning-exactoptionalpropertytypes-requires-omission-based-test-construction",
       "label": "relates-to"
     },
     {
@@ -453,6 +480,101 @@
     {
       "source": "gotcha-vimock-global-pollution-across-test-files",
       "target": "learning-learning-mock-patterns-for-external-command-execution-require-careful-test-setup",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-memory-curator-graph-linking-resolves-orphaned-nodes-at-scale",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-comprehensive-review-with-parallel-agents-catches-systemic-test-quality-issues",
+      "target": "gotcha-test-coverage-metrics-90-mask-systemic-test-quality-issues",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-retro-typescript-compilation-errors-should-block-review-phase",
+      "target": "learning-comprehensive-review-with-parallel-agents-catches-systemic-test-quality-issues",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-parallel-expert-agents-for-review-save-context-and-catch-complementary-issues",
+      "target": "learning-comprehensive-review-with-parallel-agents-catches-systemic-test-quality-issues",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-exactoptionalpropertytypes-requires-null-guards-on-regex-matches",
+      "target": "learning-typescript-exactoptionalpropertytypes-in-strict-mode",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-nouncheckedindexedaccess-requires-non-null-assertion-after-length-verification-in-tests",
+      "target": "learning-retro-non-null-assertions-in-tests-after-length-checks-work-well-for-strictoptionalpropertytypes",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-non-null-assertions-in-tests-after-length-checks-work-well-for-strictoptionalpropertytypes",
+      "target": "learning-nouncheckedindexedaccess-requires-non-null-assertion-after-length-verification-in-tests",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-retro-security-vulnerabilities-in-v100-release-indicate-pre-merge-audit-gap",
+      "target": "learning-retro-security-fix-blocked-pr-merge-until-resolved",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-retro-security-vulnerabilities-in-v100-release-indicate-pre-merge-audit-gap",
+      "target": "learning-comprehensive-review-with-parallel-agents-catches-systemic-test-quality-issues",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-typescript-exactoptionalpropertytypes-in-strict-mode",
+      "target": "artifact-exactoptionalpropertytypes-solution-patterns",
+      "label": "relates-to"
+    },
+    {
+      "source": "artifact-exactoptionalpropertytypes-solution-patterns",
+      "target": "learning-conditional-property-inclusion-pattern-solves-exactoptionalpropertytypes-friction-in-test-construction",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-fire-and-forget-async-logging-prevents-blocking-hook-execution",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-promiseallsettled-prevents-cascading-failure-in-parallel-async-operations",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-systematic-error-pattern-fixing-across-files-reduces-regression-risk",
+      "target": "gotcha-test-coverage-metrics-90-mask-systemic-test-quality-issues",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-configuration-caching-with-mtime-invalidation",
+      "target": "learning-retro-gotcha-caching-in-session-restore-prevented-fork-session-pitfall",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-timer-cleanup-prevents-resource-leaks-in-timeout-patterns",
+      "target": "learning-retro-tdd-stub-first-pattern-scales-to-404-tests-with-zero-rework",
+      "label": "relates-to"
+    },
+    {
+      "source": "artifact-keyword-matcher-shared-utility",
+      "target": "decision-classification-three-tier-cost-optimised",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-real-integration-tests-require-accurate-interface-property-names",
+      "target": "gotcha-vimock-global-pollution-across-test-files",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-tdd-pre-commit-hook-enforces-stub-first-pattern-for-new-modules",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
       "label": "relates-to"
     }
   ]

@@ -9,15 +9,12 @@ import { SHORT_PROMPT_THRESHOLD_TOKENS } from '../core/constants.ts';
  * Fast approximation for bypass detection (not exact tokenisation)
  */
 export function countTokens(text: string): number {
-  // Trim and split on whitespace, filter empty strings
   const trimmed = text.trim();
   if (trimmed.length === 0) {
     return 0;
   }
-
-  // Split on any whitespace (spaces, tabs, newlines, etc.)
-  const tokens = trimmed.split(/\s+/).filter(token => token.length > 0);
-  return tokens.length;
+  // After trim(), split(/\s+/) never produces empty strings
+  return trimmed.split(/\s+/).length;
 }
 
 /**

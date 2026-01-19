@@ -8,7 +8,13 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { createLogEntry, formatLogEntry, writeLogEntry, type LogEntryInput } from './logger.ts';
+import {
+  createLogEntry,
+  formatLogEntry,
+  writeLogEntry,
+  writeLogEntryAsync,
+  type LogEntryInput,
+} from './logger.ts';
 
 describe('Logger', () => {
   const testDir = join(tmpdir(), 'prompt-improver-test-' + Date.now());
@@ -208,7 +214,7 @@ describe('Logger', () => {
   });
 
   describe('T010: writeLogEntry - log file writing', () => {
-    it('should write log entry to specified file path', () => {
+    it('should write log entry to specified file path (async)', async () => {
       const input: LogEntryInput = {
         originalPrompt: 'test write',
         improvedPrompt: 'improved write',
@@ -221,12 +227,12 @@ describe('Logger', () => {
       };
 
       const entry = createLogEntry(input);
-      writeLogEntry(entry, testLogPath);
+      await writeLogEntryAsync(entry, testLogPath);
 
       expect(existsSync(testLogPath)).toBe(true);
     });
 
-    it('should append to existing log file', () => {
+    it('should append to existing log file (async)', async () => {
       // Write first entry
       const entry1 = createLogEntry({
         originalPrompt: 'first',
@@ -238,7 +244,7 @@ describe('Logger', () => {
         contextSources: [],
         conversationId: 'conv-1',
       });
-      writeLogEntry(entry1, testLogPath);
+      await writeLogEntryAsync(entry1, testLogPath);
 
       // Write second entry
       const entry2 = createLogEntry({
@@ -251,7 +257,7 @@ describe('Logger', () => {
         contextSources: [],
         conversationId: 'conv-2',
       });
-      writeLogEntry(entry2, testLogPath);
+      await writeLogEntryAsync(entry2, testLogPath);
 
       const content = readFileSync(testLogPath, 'utf-8');
       const lines = content.trim().split('\n');
@@ -265,7 +271,7 @@ describe('Logger', () => {
       expect(parsed2.originalPrompt).toBe('second');
     });
 
-    it('should create parent directories if they do not exist', () => {
+    it('should create parent directories if they do not exist (async)', async () => {
       const nestedPath = join(testDir, 'deep', 'nested', 'path', 'log.log');
 
       const entry = createLogEntry({
@@ -279,12 +285,12 @@ describe('Logger', () => {
         conversationId: 'conv-nested',
       });
 
-      writeLogEntry(entry, nestedPath);
+      await writeLogEntryAsync(entry, nestedPath);
 
       expect(existsSync(nestedPath)).toBe(true);
     });
 
-    it('should write valid JSON per line (JSONL format)', () => {
+    it('should write valid JSON per line (JSONL format) (async)', async () => {
       const entry = createLogEntry({
         originalPrompt: 'jsonl test',
         improvedPrompt: 'improved',
@@ -296,7 +302,7 @@ describe('Logger', () => {
         conversationId: 'conv-jsonl',
       });
 
-      writeLogEntry(entry, testLogPath);
+      await writeLogEntryAsync(entry, testLogPath);
 
       const content = readFileSync(testLogPath, 'utf-8');
       const lines = content.trim().split('\n');
@@ -305,6 +311,27 @@ describe('Logger', () => {
       for (const line of lines) {
         expect(() => JSON.parse(line)).not.toThrow();
       }
+    });
+
+    it('should fire-and-forget without blocking (sync wrapper)', () => {
+      const entry = createLogEntry({
+        originalPrompt: 'fire-and-forget test',
+        improvedPrompt: null,
+        classification: 'NONE',
+        bypassReason: 'short_prompt',
+        modelUsed: null,
+        totalLatency: 1,
+        contextSources: [],
+        conversationId: 'conv-sync',
+      });
+
+      // This should return immediately without blocking
+      const start = Date.now();
+      writeLogEntry(entry, testLogPath);
+      const elapsed = Date.now() - start;
+
+      // Should complete nearly instantly (fire-and-forget)
+      expect(elapsed).toBeLessThan(50);
     });
   });
 });

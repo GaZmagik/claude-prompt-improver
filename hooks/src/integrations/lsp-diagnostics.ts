@@ -81,7 +81,7 @@ export interface LspDiagnosticsResult {
  */
 export function isDebuggingPrompt(prompt: string): boolean {
   const promptLower = prompt.toLowerCase();
-  return DEBUGGING_KEYWORDS.some(keyword => promptLower.includes(keyword));
+  return DEBUGGING_KEYWORDS.some((keyword) => promptLower.includes(keyword));
 }
 
 /**
@@ -109,10 +109,10 @@ export function filterDiagnostics(diagnostics: Diagnostic[]): Diagnostic[] {
  */
 export function matchDiagnosticsToPrompt(diagnostics: Diagnostic[], prompt: string): Diagnostic[] {
   const promptLower = prompt.toLowerCase();
-  const words = promptLower.split(/\s+/).filter(w => w.length > 2);
+  const words = promptLower.split(/\s+/).filter((w) => w.length > 2);
 
   // Score each diagnostic by how many prompt keywords match its file path or message
-  const scored = diagnostics.map(d => {
+  const scored = diagnostics.map((d) => {
     const pathLower = d.filePath.toLowerCase();
     const messageLower = d.message.toLowerCase();
 
@@ -137,7 +137,7 @@ export function matchDiagnosticsToPrompt(diagnostics: Diagnostic[], prompt: stri
     return severityOrder[a.diagnostic.severity] - severityOrder[b.diagnostic.severity];
   });
 
-  return scored.map(s => s.diagnostic);
+  return scored.map((s) => s.diagnostic);
 }
 
 /**
@@ -218,7 +218,7 @@ export function formatLspContext(context: LspContext): string {
     return '';
   }
 
-  const lines = context.diagnostics.map(d => {
+  const lines = context.diagnostics.map((d) => {
     return `[${d.severity}] ${d.filePath}:${d.line}:${d.column} - ${d.message}`;
   });
 

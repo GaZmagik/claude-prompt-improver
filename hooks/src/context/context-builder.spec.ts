@@ -11,7 +11,6 @@ import {
   formatContextForInjection,
   type ContextBuilderInput,
   type BuiltContext,
-  type ContextSource,
 } from './context-builder.ts';
 import { CONTEXT_GATHERING_TIMEOUT_MS } from '../core/constants.ts';
 
@@ -33,9 +32,7 @@ describe('Context Builder', () => {
     it('should aggregate skills context when rules provided', async () => {
       const input: ContextBuilderInput = {
         prompt: 'help me commit changes',
-        skillRules: [
-          { name: 'commit', keywords: ['commit', 'git'], description: 'Git workflow' },
-        ],
+        skillRules: [{ name: 'commit', keywords: ['commit', 'git'], description: 'Git workflow' }],
       };
 
       const result = await buildContext(input);
@@ -68,9 +65,7 @@ describe('Context Builder', () => {
       const input: ContextBuilderInput = {
         prompt: 'commit TypeScript code',
         availableTools: ['Read', 'Write'],
-        skillRules: [
-          { name: 'commit', keywords: ['commit'], description: 'Git commit' },
-        ],
+        skillRules: [{ name: 'commit', keywords: ['commit'], description: 'Git commit' }],
         agentDefinitions: [
           {
             name: 'typescript-expert',
@@ -104,9 +99,7 @@ describe('Context Builder', () => {
       const input: ContextBuilderInput = {
         prompt: 'help',
         // availableTools omitted to test failure path
-        skillRules: [
-          { name: 'memory', keywords: ['help'], description: 'Memory' },
-        ],
+        skillRules: [{ name: 'memory', keywords: ['help'], description: 'Memory' }],
       };
 
       const result = await buildContext(input);
@@ -145,9 +138,7 @@ describe('Context Builder', () => {
       const input: ContextBuilderInput = {
         prompt: 'commit code',
         availableTools: ['Read'],
-        skillRules: [
-          { name: 'commit', keywords: ['commit'], description: 'Git' },
-        ],
+        skillRules: [{ name: 'commit', keywords: ['commit'], description: 'Git' }],
       };
 
       const result = await buildContext(input);
@@ -181,9 +172,7 @@ describe('Context Builder', () => {
       const input: ContextBuilderInput = {
         prompt: 'help with code',
         availableTools: ['Read', 'Write', 'Edit'],
-        skillRules: [
-          { name: 'commit', keywords: ['commit'], description: 'Git' },
-        ],
+        skillRules: [{ name: 'commit', keywords: ['commit'], description: 'Git' }],
         agentDefinitions: [
           { name: 'ts', description: 'TS', keywords: ['typescript'], filePath: '' },
         ],

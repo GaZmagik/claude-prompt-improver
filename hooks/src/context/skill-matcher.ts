@@ -2,6 +2,7 @@
  * Skill matcher for matching prompts to available skills
  * Reads skill rules and matches keywords to suggest relevant skills
  */
+import { matchItemsByKeywords } from '../utils/keyword-matcher.ts';
 
 /**
  * Skill rule definition
@@ -31,14 +32,15 @@ export function loadSkillRules(jsonContent: string): SkillRule[] {
     }
 
     return parsed.skills
-      .filter((s): s is { name: string; keywords: string[]; description: string } =>
-        typeof s === 'object' &&
-        s !== null &&
-        typeof (s as { name?: unknown }).name === 'string' &&
-        Array.isArray((s as { keywords?: unknown }).keywords) &&
-        typeof (s as { description?: unknown }).description === 'string'
+      .filter(
+        (s): s is { name: string; keywords: string[]; description: string } =>
+          typeof s === 'object' &&
+          s !== null &&
+          typeof (s as { name?: unknown }).name === 'string' &&
+          Array.isArray((s as { keywords?: unknown }).keywords) &&
+          typeof (s as { description?: unknown }).description === 'string'
       )
-      .map(s => ({
+      .map((s) => ({
         name: s.name,
         keywords: s.keywords,
         description: s.description,
@@ -56,28 +58,13 @@ export function matchSkills(prompt: string, rules: SkillRule[] | null | undefine
     return [];
   }
 
-  const promptLower = prompt.toLowerCase();
-  const matches: MatchedSkill[] = [];
+  // Use shared keyword matching utility
+  const results = matchItemsByKeywords(prompt, rules, (skill) => skill.keywords);
 
-  for (const skill of rules) {
-    const matchedKeywords: string[] = [];
-
-    for (const keyword of skill.keywords) {
-      if (promptLower.includes(keyword.toLowerCase())) {
-        matchedKeywords.push(keyword);
-      }
-    }
-
-    if (matchedKeywords.length > 0) {
-      matches.push({
-        skill,
-        matchedKeywords,
-      });
-    }
-  }
-
-  // Sort by number of matched keywords (most relevant first)
-  return matches.sort((a, b) => b.matchedKeywords.length - a.matchedKeywords.length);
+  return results.map(({ item, matchedKeywords }) => ({
+    skill: item,
+    matchedKeywords,
+  }));
 }
 
 /**
@@ -88,7 +75,5 @@ export function formatSkillsContext(matches: MatchedSkill[]): string {
     return '';
   }
 
-  return matches
-    .map(m => `- ${m.skill.name}: ${m.skill.description}`)
-    .join('\n');
+  return matches.map((m) => `- ${m.skill.name}: ${m.skill.description}`).join('\n');
 }

@@ -152,9 +152,21 @@ Check if any bypass condition is triggered:
 - Context availability is below 5%
 - Running in a forked session
 
-### Timeout Errors
+### Timeout Values
 
-Timeouts are currently hardcoded. If you experience timeout errors, please open an issue.
+The plugin uses the following hardcoded timeouts:
+
+| Operation | Timeout | Description |
+|-----------|---------|-------------|
+| Hook total | 90s | Maximum time for entire hook execution |
+| Classification | 5s | Prompt classification via Haiku |
+| Simple improvement | 30s | Haiku-based improvement for moderately unclear prompts |
+| Complex improvement | 60s | Sonnet-based improvement for vague prompts |
+| Context gathering | 2s | Per-source timeout (git, LSP, spec, memory) |
+| Git commands | 2s | Per git command (status, log, diff) |
+| Session fork | 10s | Forking session for additional context |
+
+If you consistently experience timeout errors, please open an issue with your system details.
 
 ### Integration Not Working
 

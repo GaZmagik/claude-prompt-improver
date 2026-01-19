@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-19T09:40:08.226Z",
+  "lastUpdated": "2026-01-19T11:07:31.868Z",
   "memories": [
     {
       "id": "learning-retro-agent-first-sdd-workflow-reduces-iteration",
@@ -84,23 +84,6 @@
       "updated": "2026-01-18T23:05:34.870Z",
       "scope": "project",
       "relativePath": "permanent/learning-retro-checklist-format-clarity-prevents-gate-blockers.md",
-      "severity": "medium"
-    },
-    {
-      "id": "gotcha-gotcha-forked-session-retrospective-output-may-not-surface-completely-to-main-session",
-      "type": "gotcha",
-      "title": "Gotcha - Forked session retrospective output may not surface completely to main session",
-      "tags": [
-        "retrospective",
-        "process",
-        "hooks",
-        "gotcha",
-        "project"
-      ],
-      "created": "2026-01-18T23:05:40.377Z",
-      "updated": "2026-01-18T23:05:40.377Z",
-      "scope": "project",
-      "relativePath": "permanent/gotcha-gotcha-forked-session-retrospective-output-may-not-surface-completely-to-main-session.md",
       "severity": "medium"
     },
     {
@@ -301,22 +284,6 @@
       "severity": "medium"
     },
     {
-      "id": "gotcha-gotcha-exactoptionalpropertytypes-requires-verbose-workarounds-in-test-object-construction",
-      "type": "gotcha",
-      "title": "Gotcha - exactOptionalPropertyTypes requires verbose workarounds in test object construction",
-      "tags": [
-        "retrospective",
-        "typescript",
-        "strictness",
-        "project"
-      ],
-      "created": "2026-01-19T04:41:51.708Z",
-      "updated": "2026-01-19T04:41:51.708Z",
-      "scope": "project",
-      "relativePath": "permanent/gotcha-gotcha-exactoptionalpropertytypes-requires-verbose-workarounds-in-test-object-construction.md",
-      "severity": "medium"
-    },
-    {
       "id": "learning-retro-clear-bypass-priority-ordering-prevents-edge-case-ambiguity",
       "type": "learning",
       "title": "Retro - Clear bypass priority ordering prevents edge case ambiguity",
@@ -365,23 +332,6 @@
       "updated": "2026-01-19T07:39:04.224Z",
       "scope": "project",
       "relativePath": "permanent/learning-tdd-stub-first-pattern-enables-290-tests-across-6-phases.md"
-    },
-    {
-      "id": "gotcha-gotcha-exactoptionalpropertytypes-requires-conditional-property-inclusion-pattern",
-      "type": "gotcha",
-      "title": "Gotcha - exactOptionalPropertyTypes requires conditional property inclusion pattern",
-      "tags": [
-        "retrospective",
-        "typescript",
-        "gotcha",
-        "strictness",
-        "project"
-      ],
-      "created": "2026-01-19T07:39:08.772Z",
-      "updated": "2026-01-19T07:39:08.772Z",
-      "scope": "project",
-      "relativePath": "permanent/gotcha-gotcha-exactoptionalpropertytypes-requires-conditional-property-inclusion-pattern.md",
-      "severity": "high"
     },
     {
       "id": "learning-learning-mock-patterns-for-external-command-execution-require-careful-test-setup",
@@ -449,23 +399,6 @@
       "updated": "2026-01-19T07:39:40.954Z",
       "scope": "project",
       "relativePath": "permanent/learning-modular-context-sources-enable-extensible-prompt-enrichment.md"
-    },
-    {
-      "id": "learning-exactoptionalpropertytypes-requires-omission-based-test-construction",
-      "type": "learning",
-      "title": "exactOptionalPropertyTypes requires omission-based test construction",
-      "tags": [
-        "typescript",
-        "testing",
-        "pattern",
-        "strictmode",
-        "prompt-improver",
-        "project"
-      ],
-      "created": "2026-01-19T07:39:48.184Z",
-      "updated": "2026-01-19T07:39:48.184Z",
-      "scope": "project",
-      "relativePath": "permanent/learning-exactoptionalpropertytypes-requires-omission-based-test-construction.md"
     },
     {
       "id": "learning-retro-tdd-stub-first-pattern-scales-to-404-tests-with-zero-rework",
@@ -807,6 +740,301 @@
       "updated": "2026-01-19T09:40:08.221Z",
       "scope": "project",
       "relativePath": "permanent/gotcha-vimock-global-pollution-across-test-files.md"
+    },
+    {
+      "id": "learning-retro-memory-curator-graph-linking-resolves-orphaned-nodes-at-scale",
+      "type": "learning",
+      "title": "Retro - Memory curator graph linking resolves orphaned nodes at scale",
+      "tags": [
+        "retrospective",
+        "process",
+        "memory-system",
+        "quality",
+        "project"
+      ],
+      "created": "2026-01-19T10:04:39.468Z",
+      "updated": "2026-01-19T10:04:39.468Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-memory-curator-graph-linking-resolves-orphaned-nodes-at-scale.md",
+      "severity": "low"
+    },
+    {
+      "id": "learning-comprehensive-review-with-parallel-agents-catches-systemic-test-quality-issues",
+      "type": "learning",
+      "title": "Comprehensive review with parallel agents catches systemic test quality issues",
+      "tags": [
+        "speckit",
+        "review",
+        "testing",
+        "quality-assurance",
+        "project"
+      ],
+      "created": "2026-01-19T10:04:43.213Z",
+      "updated": "2026-01-19T10:04:43.213Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-comprehensive-review-with-parallel-agents-catches-systemic-test-quality-issues.md"
+    },
+    {
+      "id": "gotcha-retro-typescript-compilation-errors-should-block-review-phase",
+      "type": "gotcha",
+      "title": "Retro - TypeScript compilation errors should block review phase",
+      "tags": [
+        "retrospective",
+        "process",
+        "typescript",
+        "quality",
+        "ci",
+        "project"
+      ],
+      "created": "2026-01-19T10:04:44.090Z",
+      "updated": "2026-01-19T10:04:44.090Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-typescript-compilation-errors-should-block-review-phase.md",
+      "severity": "high"
+    },
+    {
+      "id": "gotcha-retro-security-vulnerabilities-in-v100-release-indicate-pre-merge-audit-gap",
+      "type": "gotcha",
+      "title": "Retro - Security vulnerabilities in v1.0.0 release indicate pre-merge audit gap",
+      "tags": [
+        "retrospective",
+        "process",
+        "security",
+        "ci",
+        "workflow",
+        "project"
+      ],
+      "created": "2026-01-19T10:04:48.656Z",
+      "updated": "2026-01-19T10:04:48.656Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-security-vulnerabilities-in-v100-release-indicate-pre-merge-audit-gap.md",
+      "severity": "critical"
+    },
+    {
+      "id": "learning-exactoptionalpropertytypes-requires-null-guards-on-regex-matches",
+      "type": "learning",
+      "title": "exactOptionalPropertyTypes requires null-guards on regex matches",
+      "tags": [
+        "typescript",
+        "strictness",
+        "regex",
+        "pattern",
+        "project"
+      ],
+      "created": "2026-01-19T10:04:51.482Z",
+      "updated": "2026-01-19T10:04:51.482Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-exactoptionalpropertytypes-requires-null-guards-on-regex-matches.md"
+    },
+    {
+      "id": "learning-nouncheckedindexedaccess-requires-non-null-assertion-after-length-verification-in-tests",
+      "type": "learning",
+      "title": "noUncheckedIndexedAccess requires non-null assertion after length verification in tests",
+      "tags": [
+        "typescript",
+        "testing",
+        "strictness",
+        "project"
+      ],
+      "created": "2026-01-19T10:04:52.001Z",
+      "updated": "2026-01-19T10:04:52.001Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-nouncheckedindexedaccess-requires-non-null-assertion-after-length-verification-in-tests.md"
+    },
+    {
+      "id": "learning-parallel-expert-agents-for-review-save-context-and-catch-complementary-issues",
+      "type": "learning",
+      "title": "Parallel expert agents for review save context and catch complementary issues",
+      "tags": [
+        "speckit",
+        "review",
+        "agents",
+        "coordination",
+        "project"
+      ],
+      "created": "2026-01-19T10:04:52.617Z",
+      "updated": "2026-01-19T10:04:52.617Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-parallel-expert-agents-for-review-save-context-and-catch-complementary-issues.md"
+    },
+    {
+      "id": "learning-retro-non-null-assertions-in-tests-after-length-checks-work-well-for-strictoptionalpropertytypes",
+      "type": "learning",
+      "title": "Retro - Non-null assertions in tests after length checks work well for strictOptionalPropertyTypes",
+      "tags": [
+        "retrospective",
+        "process",
+        "typescript",
+        "testing",
+        "pattern",
+        "project"
+      ],
+      "created": "2026-01-19T10:04:53.180Z",
+      "updated": "2026-01-19T10:04:53.180Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-non-null-assertions-in-tests-after-length-checks-work-well-for-strictoptionalpropertytypes.md",
+      "severity": "low"
+    },
+    {
+      "id": "gotcha-test-coverage-metrics-90-mask-systemic-test-quality-issues",
+      "type": "gotcha",
+      "title": "Test coverage metrics (90%+) mask systemic test quality issues",
+      "tags": [
+        "testing",
+        "quality-assurance",
+        "metrics",
+        "project"
+      ],
+      "created": "2026-01-19T10:04:53.300Z",
+      "updated": "2026-01-19T10:04:53.300Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-test-coverage-metrics-90-mask-systemic-test-quality-issues.md"
+    },
+    {
+      "id": "artifact-exactoptionalpropertytypes-solution-patterns",
+      "type": "artifact",
+      "title": "exactOptionalPropertyTypes Solutions Comparison",
+      "tags": [
+        "typescript",
+        "patterns",
+        "comparison",
+        "project"
+      ],
+      "created": "2026-01-19T10:09:25.155Z",
+      "updated": "2026-01-19T10:09:25.155Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-exactoptionalpropertytypes-solution-patterns.md"
+    },
+    {
+      "id": "learning-retro-systematic-error-pattern-fixing-across-files-reduces-regression-risk",
+      "type": "learning",
+      "title": "Retro - Systematic error pattern fixing across files reduces regression risk",
+      "tags": [
+        "retrospective",
+        "process",
+        "testing",
+        "error-fixing",
+        "project"
+      ],
+      "created": "2026-01-19T10:29:24.582Z",
+      "updated": "2026-01-19T10:29:24.582Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-systematic-error-pattern-fixing-across-files-reduces-regression-risk.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-retro-promiseallsettled-prevents-cascading-failure-in-parallel-async-operations",
+      "type": "learning",
+      "title": "Retro - Promise.allSettled prevents cascading failure in parallel async operations",
+      "tags": [
+        "retrospective",
+        "process",
+        "performance",
+        "async-patterns",
+        "project"
+      ],
+      "created": "2026-01-19T10:29:29.516Z",
+      "updated": "2026-01-19T10:29:29.516Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-promiseallsettled-prevents-cascading-failure-in-parallel-async-operations.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-retro-fire-and-forget-async-logging-prevents-blocking-hook-execution",
+      "type": "learning",
+      "title": "Retro - Fire-and-forget async logging prevents blocking hook execution",
+      "tags": [
+        "retrospective",
+        "process",
+        "performance",
+        "logging",
+        "project"
+      ],
+      "created": "2026-01-19T10:29:34.916Z",
+      "updated": "2026-01-19T10:29:34.916Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-fire-and-forget-async-logging-prevents-blocking-hook-execution.md",
+      "severity": "low"
+    },
+    {
+      "id": "learning-configuration-caching-with-mtime-invalidation",
+      "type": "learning",
+      "title": "Configuration caching with mtime invalidation",
+      "tags": [
+        "caching",
+        "performance",
+        "config",
+        "testing",
+        "project"
+      ],
+      "created": "2026-01-19T11:02:22.354Z",
+      "updated": "2026-01-19T11:02:22.354Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-configuration-caching-with-mtime-invalidation.md"
+    },
+    {
+      "id": "learning-timer-cleanup-prevents-resource-leaks-in-timeout-patterns",
+      "type": "learning",
+      "title": "Timer cleanup prevents resource leaks in timeout patterns",
+      "tags": [
+        "timers",
+        "performance",
+        "cleanup",
+        "resource-management",
+        "project"
+      ],
+      "created": "2026-01-19T11:02:26.610Z",
+      "updated": "2026-01-19T11:02:26.610Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-timer-cleanup-prevents-resource-leaks-in-timeout-patterns.md"
+    },
+    {
+      "id": "artifact-keyword-matcher-shared-utility",
+      "type": "artifact",
+      "title": "Shared keyword matching utility",
+      "tags": [
+        "refactoring",
+        "utilities",
+        "deduplication",
+        "matching",
+        "project"
+      ],
+      "created": "2026-01-19T11:02:36.745Z",
+      "updated": "2026-01-19T11:02:36.745Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-keyword-matcher-shared-utility.md"
+    },
+    {
+      "id": "gotcha-real-integration-tests-require-accurate-interface-property-names",
+      "type": "gotcha",
+      "title": "Real integration tests require accurate interface property names",
+      "tags": [
+        "testing",
+        "integration-tests",
+        "interfaces",
+        "type-safety",
+        "project"
+      ],
+      "created": "2026-01-19T11:02:42.591Z",
+      "updated": "2026-01-19T11:02:42.591Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-real-integration-tests-require-accurate-interface-property-names.md"
+    },
+    {
+      "id": "learning-tdd-pre-commit-hook-enforces-stub-first-pattern-for-new-modules",
+      "type": "learning",
+      "title": "TDD pre-commit hook enforces stub-first pattern for new modules",
+      "tags": [
+        "tdd",
+        "pre-commit-hooks",
+        "testing",
+        "workflow",
+        "project"
+      ],
+      "created": "2026-01-19T11:02:48.773Z",
+      "updated": "2026-01-19T11:02:48.773Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-tdd-pre-commit-hook-enforces-stub-first-pattern-for-new-modules.md"
     }
   ]
 }

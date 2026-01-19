@@ -99,7 +99,8 @@ describe('Token Counter', () => {
     });
 
     it('should correctly identify longer prompts as not short', () => {
-      const longPrompt = 'Please help me understand how the authentication module works and fix any bugs you find in the JWT validation logic';
+      const longPrompt =
+        'Please help me understand how the authentication module works and fix any bugs you find in the JWT validation logic';
       expect(isShortPrompt(longPrompt)).toBe(false);
     });
   });

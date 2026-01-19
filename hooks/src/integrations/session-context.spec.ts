@@ -20,7 +20,7 @@ describe('Session Context Integration', () => {
   describe('T123: gatherSessionContext - forks session with claude --fork-session', () => {
     it('should invoke claude --fork-session command', async () => {
       let commandExecuted = '';
-      const result = await gatherSessionContext({
+      await gatherSessionContext({
         _mockCommandExecution: async (cmd: string) => {
           commandExecuted = cmd;
           return { success: true, output: 'Forked session output' };

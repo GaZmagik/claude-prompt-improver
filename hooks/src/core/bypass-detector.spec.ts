@@ -29,7 +29,8 @@ describe('Bypass Detector', () => {
 
     it('should not bypass prompts above threshold', () => {
       const input: BypassCheckInput = {
-        prompt: 'Please help me understand how the authentication module works and identify any potential security issues',
+        prompt:
+          'Please help me understand how the authentication module works and identify any potential security issues',
         sessionId: 'session-123',
       };
 
@@ -292,7 +293,8 @@ describe('Bypass Detector', () => {
   describe('T058: detectBypass - performance (<100ms)', () => {
     it('should complete bypass detection in under 100ms', () => {
       const input: BypassCheckInput = {
-        prompt: 'a longer prompt that would normally be processed by the improvement engine for testing performance',
+        prompt:
+          'a longer prompt that would normally be processed by the improvement engine for testing performance',
         sessionId: 'session-123',
         permissionMode: 'default',
         contextUsage: {

@@ -5,6 +5,7 @@
 import type { ClassificationLevel } from '../core/types.ts';
 import { CLASSIFICATION_TIMEOUT_MS } from '../core/constants.ts';
 import { executeClaudeCommand } from './claude-client.ts';
+import { escapeXmlContent } from '../utils/xml-builder.ts';
 
 /**
  * Result of classifying a prompt
@@ -51,16 +52,21 @@ Example: COMPLEX: The prompt is vague without specifying which bug or where to l
 
 /**
  * Builds the classification prompt with the user's prompt inserted
+ * Escapes XML special characters to prevent prompt injection
  */
 export function buildClassificationPrompt(userPrompt: string): string {
-  return CLASSIFICATION_PROMPT_TEMPLATE.replace('{PROMPT}', userPrompt);
+  // Escape user content to prevent XML/prompt injection attacks
+  const escapedPrompt = escapeXmlContent(userPrompt);
+  return CLASSIFICATION_PROMPT_TEMPLATE.replace('{PROMPT}', escapedPrompt);
 }
 
 /**
  * Parses Claude's classification response into structured result
  * Defaults to NONE on any parsing failure (fail-safe)
  */
-export function parseClassificationResponse(response: string): Omit<ClassificationResult, 'latencyMs'> {
+export function parseClassificationResponse(
+  response: string
+): Omit<ClassificationResult, 'latencyMs'> {
   if (!response || response.trim().length === 0) {
     return {
       level: 'NONE',
@@ -112,7 +118,9 @@ export function parseClassificationResponse(response: string): Omit<Classificati
  * Classifies a prompt using Claude Haiku
  * Returns NONE on any error (fail-safe for user experience)
  */
-export async function classifyPrompt(options: ClassifyPromptOptions): Promise<ClassificationResult> {
+export async function classifyPrompt(
+  options: ClassifyPromptOptions
+): Promise<ClassificationResult> {
   const { prompt, sessionId, _mockClaudeResponse } = options;
   const startTime = Date.now();
 

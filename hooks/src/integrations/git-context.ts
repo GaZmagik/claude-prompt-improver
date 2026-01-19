@@ -71,6 +71,8 @@ export async function executeGitCommand(
   }
 
   // Real command execution
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
   try {
     const proc = Bun.spawn(['git', ...command.split(' ')], {
       cwd: cwd || process.cwd(),
@@ -80,10 +82,15 @@ export async function executeGitCommand(
 
     // Race between completion and timeout
     const timeoutPromise = new Promise<null>((resolve) => {
-      setTimeout(() => resolve(null), timeoutMs);
+      timeoutId = setTimeout(() => resolve(null), timeoutMs);
     });
 
     const result = await Promise.race([proc.exited, timeoutPromise]);
+
+    // Clean up timeout if process completed first
+    if (timeoutId !== undefined) {
+      clearTimeout(timeoutId);
+    }
 
     if (result === null) {
       // Timeout
@@ -100,6 +107,10 @@ export async function executeGitCommand(
 
     return { success: true, output: stdout.trim() };
   } catch (err) {
+    // Clean up timeout on error
+    if (timeoutId !== undefined) {
+      clearTimeout(timeoutId);
+    }
     return {
       success: false,
       error: err instanceof Error ? err.message : 'Unknown error',
@@ -291,16 +302,12 @@ export function formatGitContext(context: GitContext): string {
   }
 
   if (context.recentCommits.length > 0) {
-    const commitsStr = context.recentCommits
-      .map((c) => `  ${c.hash} ${c.message}`)
-      .join('\n');
+    const commitsStr = context.recentCommits.map((c) => `  ${c.hash} ${c.message}`).join('\n');
     parts.push(`Recent commits:\n${commitsStr}`);
   }
 
   if (context.changedFiles.length > 0) {
-    const filesStr = context.changedFiles
-      .map((f) => `  [${f.status}] ${f.path}`)
-      .join('\n');
+    const filesStr = context.changedFiles.map((f) => `  [${f.status}] ${f.path}`).join('\n');
     parts.push(`Changed files:\n${filesStr}`);
   }
 

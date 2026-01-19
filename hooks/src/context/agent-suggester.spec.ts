@@ -127,7 +127,7 @@ description: Use for Python async await and type hints
       const result = suggestAgents('security review of TypeScript code', sampleAgents);
 
       expect(result.length).toBe(2);
-      const names = result.map(r => r.agent.name);
+      const names = result.map((r) => r.agent.name);
       expect(names).toContain('typescript-expert');
       expect(names).toContain('security-reviewer');
     });

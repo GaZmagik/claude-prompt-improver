@@ -59,29 +59,71 @@ describe('LSP Diagnostics Integration', () => {
   describe('T091: filterDiagnostics - filters errors first, then warnings', () => {
     it('should prioritize errors over warnings', () => {
       const diagnostics: Diagnostic[] = [
-        { filePath: 'a.ts', line: 1, column: 1, severity: 'warning', message: 'Warning 1', source: 'ts' },
-        { filePath: 'b.ts', line: 2, column: 1, severity: 'error', message: 'Error 1', source: 'ts' },
-        { filePath: 'c.ts', line: 3, column: 1, severity: 'warning', message: 'Warning 2', source: 'ts' },
-        { filePath: 'd.ts', line: 4, column: 1, severity: 'error', message: 'Error 2', source: 'ts' },
+        {
+          filePath: 'a.ts',
+          line: 1,
+          column: 1,
+          severity: 'warning',
+          message: 'Warning 1',
+          source: 'ts',
+        },
+        {
+          filePath: 'b.ts',
+          line: 2,
+          column: 1,
+          severity: 'error',
+          message: 'Error 1',
+          source: 'ts',
+        },
+        {
+          filePath: 'c.ts',
+          line: 3,
+          column: 1,
+          severity: 'warning',
+          message: 'Warning 2',
+          source: 'ts',
+        },
+        {
+          filePath: 'd.ts',
+          line: 4,
+          column: 1,
+          severity: 'error',
+          message: 'Error 2',
+          source: 'ts',
+        },
       ];
 
       const filtered = filterDiagnostics(diagnostics);
 
-      expect(filtered[0].severity).toBe('error');
-      expect(filtered[1].severity).toBe('error');
+      expect(filtered[0]!.severity).toBe('error');
+      expect(filtered[1]!.severity).toBe('error');
     });
 
     it('should include warnings after errors', () => {
       const diagnostics: Diagnostic[] = [
-        { filePath: 'a.ts', line: 1, column: 1, severity: 'warning', message: 'Warning 1', source: 'ts' },
-        { filePath: 'b.ts', line: 2, column: 1, severity: 'error', message: 'Error 1', source: 'ts' },
+        {
+          filePath: 'a.ts',
+          line: 1,
+          column: 1,
+          severity: 'warning',
+          message: 'Warning 1',
+          source: 'ts',
+        },
+        {
+          filePath: 'b.ts',
+          line: 2,
+          column: 1,
+          severity: 'error',
+          message: 'Error 1',
+          source: 'ts',
+        },
       ];
 
       const filtered = filterDiagnostics(diagnostics);
 
       expect(filtered.length).toBe(2);
-      expect(filtered[0].severity).toBe('error');
-      expect(filtered[1].severity).toBe('warning');
+      expect(filtered[0]!.severity).toBe('error');
+      expect(filtered[1]!.severity).toBe('warning');
     });
 
     it('should handle info and hint severity levels', () => {
@@ -93,7 +135,7 @@ describe('LSP Diagnostics Integration', () => {
 
       const filtered = filterDiagnostics(diagnostics);
 
-      expect(filtered[0].severity).toBe('error');
+      expect(filtered[0]!.severity).toBe('error');
     });
   });
 
@@ -136,7 +178,7 @@ describe('LSP Diagnostics Integration', () => {
       const filtered = filterDiagnostics(diagnostics);
 
       // Should have all 3 errors and 2 warnings to make 5
-      const errorCount = filtered.filter(d => d.severity === 'error').length;
+      const errorCount = filtered.filter((d) => d.severity === 'error').length;
       expect(errorCount).toBe(3);
       expect(filtered.length).toBe(5);
     });
@@ -145,19 +187,47 @@ describe('LSP Diagnostics Integration', () => {
   describe('T093: matchDiagnosticsToPrompt - matches file paths to keywords', () => {
     it('should prioritize diagnostics matching prompt keywords', () => {
       const diagnostics: Diagnostic[] = [
-        { filePath: 'src/utils/helper.ts', line: 1, column: 1, severity: 'error', message: 'Error 1', source: 'ts' },
-        { filePath: 'src/auth/login.ts', line: 2, column: 1, severity: 'error', message: 'Error 2', source: 'ts' },
-        { filePath: 'src/api/users.ts', line: 3, column: 1, severity: 'error', message: 'Error 3', source: 'ts' },
+        {
+          filePath: 'src/utils/helper.ts',
+          line: 1,
+          column: 1,
+          severity: 'error',
+          message: 'Error 1',
+          source: 'ts',
+        },
+        {
+          filePath: 'src/auth/login.ts',
+          line: 2,
+          column: 1,
+          severity: 'error',
+          message: 'Error 2',
+          source: 'ts',
+        },
+        {
+          filePath: 'src/api/users.ts',
+          line: 3,
+          column: 1,
+          severity: 'error',
+          message: 'Error 3',
+          source: 'ts',
+        },
       ];
 
       const matched = matchDiagnosticsToPrompt(diagnostics, 'fix the authentication login bug');
 
-      expect(matched[0].filePath).toContain('auth');
+      expect(matched[0]!.filePath).toContain('auth');
     });
 
     it('should return all diagnostics if no keywords match', () => {
       const diagnostics: Diagnostic[] = [
-        { filePath: 'src/utils.ts', line: 1, column: 1, severity: 'error', message: 'Error', source: 'ts' },
+        {
+          filePath: 'src/utils.ts',
+          line: 1,
+          column: 1,
+          severity: 'error',
+          message: 'Error',
+          source: 'ts',
+        },
       ];
 
       const matched = matchDiagnosticsToPrompt(diagnostics, 'do something');
@@ -167,8 +237,22 @@ describe('LSP Diagnostics Integration', () => {
 
     it('should handle multiple keyword matches', () => {
       const diagnostics: Diagnostic[] = [
-        { filePath: 'src/auth/login.ts', line: 1, column: 1, severity: 'error', message: 'Auth error', source: 'ts' },
-        { filePath: 'src/api/auth.ts', line: 2, column: 1, severity: 'error', message: 'API auth error', source: 'ts' },
+        {
+          filePath: 'src/auth/login.ts',
+          line: 1,
+          column: 1,
+          severity: 'error',
+          message: 'Auth error',
+          source: 'ts',
+        },
+        {
+          filePath: 'src/api/auth.ts',
+          line: 2,
+          column: 1,
+          severity: 'error',
+          message: 'API auth error',
+          source: 'ts',
+        },
       ];
 
       const matched = matchDiagnosticsToPrompt(diagnostics, 'fix auth api issue');
@@ -203,8 +287,22 @@ describe('LSP Diagnostics Integration', () => {
     it('should include severity in output', () => {
       const context: LspContext = {
         diagnostics: [
-          { filePath: 'a.ts', line: 1, column: 1, severity: 'error', message: 'Error msg', source: 'ts' },
-          { filePath: 'b.ts', line: 2, column: 1, severity: 'warning', message: 'Warning msg', source: 'ts' },
+          {
+            filePath: 'a.ts',
+            line: 1,
+            column: 1,
+            severity: 'error',
+            message: 'Error msg',
+            source: 'ts',
+          },
+          {
+            filePath: 'b.ts',
+            line: 2,
+            column: 1,
+            severity: 'warning',
+            message: 'Warning msg',
+            source: 'ts',
+          },
         ],
       };
 
@@ -300,8 +398,22 @@ describe('LSP Diagnostics Integration', () => {
   describe('gatherLspDiagnostics - full integration', () => {
     it('should gather and filter diagnostics for debugging prompt', async () => {
       const mockDiagnostics: Diagnostic[] = [
-        { filePath: 'src/auth.ts', line: 10, column: 1, severity: 'error', message: 'Auth error', source: 'ts' },
-        { filePath: 'src/utils.ts', line: 20, column: 1, severity: 'warning', message: 'Unused var', source: 'ts' },
+        {
+          filePath: 'src/auth.ts',
+          line: 10,
+          column: 1,
+          severity: 'error',
+          message: 'Auth error',
+          source: 'ts',
+        },
+        {
+          filePath: 'src/utils.ts',
+          line: 20,
+          column: 1,
+          severity: 'warning',
+          message: 'Unused var',
+          source: 'ts',
+        },
       ];
 
       const result = await gatherLspDiagnostics({

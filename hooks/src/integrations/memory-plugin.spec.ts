@@ -19,7 +19,6 @@ import {
   parseMemoryIndex,
   type Memory,
   type MemoryContext,
-  type MemoryIndex,
 } from './memory-plugin.ts';
 
 describe('Memory Plugin Integration', () => {
@@ -69,7 +68,12 @@ describe('Memory Plugin Integration', () => {
     it('should parse index.json with memories array', () => {
       const indexContent = JSON.stringify({
         memories: [
-          { id: 'mem-1', title: 'Decision about auth', type: 'decision', tags: ['auth', 'security'] },
+          {
+            id: 'mem-1',
+            title: 'Decision about auth',
+            type: 'decision',
+            tags: ['auth', 'security'],
+          },
           { id: 'mem-2', title: 'Learning about caching', type: 'learning', tags: ['performance'] },
         ],
       });
@@ -77,16 +81,14 @@ describe('Memory Plugin Integration', () => {
       const index = parseMemoryIndex(indexContent);
 
       expect(index.memories.length).toBe(2);
-      expect(index.memories[0].id).toBe('mem-1');
+      expect(index.memories[0]!.id).toBe('mem-1');
     });
 
     it('should handle index with additional fields', () => {
       const indexContent = JSON.stringify({
         version: '1.0.0',
         lastUpdated: '2024-01-01',
-        memories: [
-          { id: 'mem-1', title: 'Test memory', type: 'artifact', tags: [] },
-        ],
+        memories: [{ id: 'mem-1', title: 'Test memory', type: 'artifact', tags: [] }],
       });
 
       const index = parseMemoryIndex(indexContent);
@@ -118,7 +120,7 @@ describe('Memory Plugin Integration', () => {
       const matched = matchMemoriesByTitle(memories, 'fix authentication login');
 
       expect(matched.length).toBeGreaterThan(0);
-      expect(matched.some(m => m.id === 'mem-1')).toBe(true);
+      expect(matched.some((m) => m.id === 'mem-1')).toBe(true);
     });
 
     it('should return empty when no titles match', () => {
@@ -152,7 +154,7 @@ describe('Memory Plugin Integration', () => {
       const matched = matchMemoriesByTags(memories, 'implement security feature');
 
       expect(matched.length).toBeGreaterThan(0);
-      expect(matched.some(m => m.id === 'mem-1')).toBe(true);
+      expect(matched.some((m) => m.id === 'mem-1')).toBe(true);
     });
 
     it('should return empty when no tags match', () => {
@@ -166,9 +168,7 @@ describe('Memory Plugin Integration', () => {
     });
 
     it('should handle memories without tags', () => {
-      const memories: Memory[] = [
-        { id: 'mem-1', title: 'Test', type: 'learning', tags: [] },
-      ];
+      const memories: Memory[] = [{ id: 'mem-1', title: 'Test', type: 'learning', tags: [] }];
 
       const matched = matchMemoriesByTags(memories, 'anything');
 
@@ -213,7 +213,7 @@ describe('Memory Plugin Integration', () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.context?.memories[0].id).toBe('mem-2');
+      expect(result.context?.memories[0]!.id).toBe('mem-2');
     });
   });
 
@@ -293,8 +293,18 @@ describe('Memory Plugin Integration', () => {
   describe('gatherMemoryContext - full integration', () => {
     it('should gather complete memory context', async () => {
       const memories: Memory[] = [
-        { id: 'decision-auth', title: 'Auth approach decision', type: 'decision', tags: ['auth', 'security'] },
-        { id: 'learning-jwt', title: 'JWT best practices', type: 'learning', tags: ['auth', 'jwt'] },
+        {
+          id: 'decision-auth',
+          title: 'Auth approach decision',
+          type: 'decision',
+          tags: ['auth', 'security'],
+        },
+        {
+          id: 'learning-jwt',
+          title: 'JWT best practices',
+          type: 'learning',
+          tags: ['auth', 'jwt'],
+        },
         { id: 'artifact-schema', title: 'Database schema', type: 'artifact', tags: ['database'] },
       ];
 
@@ -329,7 +339,12 @@ describe('Memory Plugin Integration', () => {
     it('should format memory context as readable string', () => {
       const context: MemoryContext = {
         memories: [
-          { id: 'decision-auth', title: 'Auth approach decision', type: 'decision', tags: ['auth'] },
+          {
+            id: 'decision-auth',
+            title: 'Auth approach decision',
+            type: 'decision',
+            tags: ['auth'],
+          },
           { id: 'learning-jwt', title: 'JWT best practices', type: 'learning', tags: ['jwt'] },
         ],
       };
