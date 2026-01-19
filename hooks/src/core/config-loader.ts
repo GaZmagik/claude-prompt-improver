@@ -105,6 +105,10 @@ export function clearConfigCache(): void {
 /**
  * Parses YAML frontmatter from markdown content
  * Extracts key-value pairs between --- delimiters
+ *
+ * @param content - Markdown content with YAML frontmatter
+ * @returns Parsed YAML object, or empty object if no frontmatter found
+ * @throws Error with specific message if YAML syntax is invalid
  */
 export function parseYamlFrontmatter(content: string): Record<string, unknown> {
   const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
@@ -351,13 +355,29 @@ export async function loadConfig(filePath: string): Promise<Configuration> {
 
     // Detect format by file extension or content
     if (filePath.endsWith('.md')) {
-      const yaml = parseYamlFrontmatter(content);
-      const partial = yamlToConfig(yaml);
-      config = mergeConfig(DEFAULT_CONFIG, partial);
+      try {
+        const yaml = parseYamlFrontmatter(content);
+        const partial = yamlToConfig(yaml);
+        config = mergeConfig(DEFAULT_CONFIG, partial);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.warn(
+          `Warning: Failed to parse YAML frontmatter in ${filePath}: ${message}\nUsing default configuration.`
+        );
+        return DEFAULT_CONFIG;
+      }
     } else {
       // Legacy JSON format
-      const parsed = JSON.parse(content) as Partial<Configuration>;
-      config = mergeConfig(DEFAULT_CONFIG, parsed);
+      try {
+        const parsed = JSON.parse(content) as Partial<Configuration>;
+        config = mergeConfig(DEFAULT_CONFIG, parsed);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.warn(
+          `Warning: Failed to parse JSON in ${filePath}: ${message}\nUsing default configuration.`
+        );
+        return DEFAULT_CONFIG;
+      }
     }
 
     // Cache the result with current mtime
@@ -366,8 +386,8 @@ export async function loadConfig(filePath: string): Promise<Configuration> {
     }
 
     return config;
-  } catch {
-    // Invalid content or read error - return defaults
+  } catch (error) {
+    // File read error - return defaults silently (file may not exist, which is OK)
     return DEFAULT_CONFIG;
   }
 }
