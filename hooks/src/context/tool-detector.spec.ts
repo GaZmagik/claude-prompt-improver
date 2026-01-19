@@ -5,10 +5,10 @@
  */
 import { describe, expect, it } from 'bun:test';
 import {
-  detectTools,
-  formatToolsContext,
   CORE_TOOLS,
   type DetectedTools,
+  detectTools,
+  formatToolsContext,
 } from './tool-detector.ts';
 
 describe('Tool Detector', () => {

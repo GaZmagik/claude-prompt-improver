@@ -3,8 +3,8 @@
  * Tests for user-facing system messages showing prompt improvement status
  */
 import { describe, expect, it } from 'bun:test';
-import { formatSystemMessage } from './message-formatter.ts';
 import type { VisibilityInfo } from '../core/types.ts';
+import { formatSystemMessage } from './message-formatter.ts';
 
 describe('Message Formatter', () => {
   describe('formatSystemMessage - bypassed status', () => {

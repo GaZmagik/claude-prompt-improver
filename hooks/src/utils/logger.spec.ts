@@ -9,18 +9,18 @@ import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
+  type LogEntryInput,
   createLogEntry,
-  formatLogEntry,
-  writeLogEntry,
-  writeLogEntryAsync,
   createPromptPreview,
+  formatLogEntry,
   generateLogFilePath,
   shouldLog,
-  type LogEntryInput,
+  writeLogEntry,
+  writeLogEntryAsync,
 } from './logger.ts';
 
 describe('Logger', () => {
-  const testDir = join(tmpdir(), 'prompt-improver-test-' + Date.now());
+  const testDir = join(tmpdir(), `prompt-improver-test-${Date.now()}`);
   const testLogPath = join(testDir, '.claude', 'logs', 'prompt-improver-latest.log');
 
   beforeEach(() => {
@@ -409,7 +409,8 @@ describe('Logger', () => {
     });
 
     it('should truncate improvedPrompt to prevent sensitive context exposure', () => {
-      const sensitiveContext = 'git commit abc123\nLSP diagnostic: auth.ts:42\nFile: /home/user/.env\nAPI_KEY=secret123';
+      const sensitiveContext =
+        'git commit abc123\nLSP diagnostic: auth.ts:42\nFile: /home/user/.env\nAPI_KEY=secret123';
       const input: LogEntryInput = {
         originalPrompt: 'fix the bug',
         improvedPrompt: sensitiveContext,
@@ -426,7 +427,7 @@ describe('Logger', () => {
       const entry = createLogEntry(input);
 
       expect(entry.improvedPrompt).toBeDefined();
-      expect(entry.improvedPrompt!.length).toBeLessThanOrEqual(53);
+      expect(entry.improvedPrompt?.length).toBeLessThanOrEqual(53);
       expect(entry.improvedPrompt).not.toContain('secret123');
       expect(entry.improvedPrompt).not.toContain('/home/user/.env');
       expect(entry.improvedPrompt).toContain('...');
@@ -781,7 +782,7 @@ describe('Logger', () => {
       writeLogEntry(entry, testLogPath, 'ERROR');
 
       // Give fire-and-forget time to complete
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
       expect(existsSync(testLogPath)).toBe(true);
     });
 
@@ -803,7 +804,7 @@ describe('Logger', () => {
       writeLogEntry(entry, testLogPath, 'ERROR');
 
       // Give fire-and-forget time to complete
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
       const afterSize = existsSync(testLogPath) ? readFileSync(testLogPath, 'utf-8').length : 0;
       expect(afterSize).toBe(beforeSize);
     });
@@ -840,7 +841,7 @@ describe('Logger', () => {
       writeLogEntry(infoEntry, testLogPath, 'INFO');
 
       // Give fire-and-forget time to complete
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
       expect(existsSync(testLogPath)).toBe(true);
     });
   });

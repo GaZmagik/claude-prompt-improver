@@ -1,11 +1,11 @@
+import { CLASSIFICATION_TIMEOUT_MS } from '../core/constants.ts';
 /**
  * Prompt classifier for determining improvement strategy
  * Uses Haiku for cost-effective classification
  */
 import type { ClassificationLevel } from '../core/types.ts';
-import { CLASSIFICATION_TIMEOUT_MS } from '../core/constants.ts';
-import { executeClaudeCommand } from './claude-client.ts';
 import { escapeXmlContent } from '../utils/xml-builder.ts';
+import { executeClaudeCommand } from './claude-client.ts';
 
 /**
  * Result of classifying a prompt
@@ -89,17 +89,17 @@ export function parseClassificationResponse(
       };
     }
 
-    const level = looseMatch[1]!.toUpperCase() as ClassificationLevel;
+    const level = looseMatch[1]?.toUpperCase() as ClassificationLevel;
     return {
       level,
       reasoning: trimmed,
     };
   }
 
-  const level = levelMatch[1]!.toUpperCase() as ClassificationLevel;
+  const level = levelMatch[1]?.toUpperCase() as ClassificationLevel;
 
   // Extract reasoning after the level
-  const reasoningStart = trimmed.indexOf(levelMatch[0]!) + levelMatch[0]!.length;
+  const reasoningStart = trimmed.indexOf(levelMatch[0]!) + levelMatch[0]?.length;
   let reasoning = trimmed.slice(reasoningStart).trim();
 
   // Remove leading colon or dash if present

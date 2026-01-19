@@ -4,8 +4,8 @@
  * T051: Test token counter accuracy for ~10 token threshold
  */
 import { describe, expect, it } from 'bun:test';
-import { countTokens, isShortPrompt } from './token-counter.ts';
 import { SHORT_PROMPT_THRESHOLD_TOKENS } from '../core/constants.ts';
+import { countTokens, isShortPrompt } from './token-counter.ts';
 
 describe('Token Counter', () => {
   describe('T050: countTokens - whitespace-split heuristic', () => {

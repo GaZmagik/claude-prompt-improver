@@ -5,7 +5,7 @@
  */
 import { access, readFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { Configuration, IntegrationToggles, LoggingConfig, LogLevel } from './types.ts';
+import type { Configuration, IntegrationToggles, LogLevel, LoggingConfig } from './types.ts';
 
 /**
  * Validation error for configuration fields
@@ -128,7 +128,7 @@ export function parseYamlFrontmatter(content: string): Record<string, unknown> {
 
     // Check for section header (key followed by colon with no value)
     const sectionMatch = line.match(/^(\w+):$/);
-    if (sectionMatch && sectionMatch[1]) {
+    if (sectionMatch?.[1]) {
       // Save previous section if exists
       if (currentSection && Object.keys(currentSectionData).length > 0) {
         result[currentSection] = currentSectionData;
@@ -140,7 +140,7 @@ export function parseYamlFrontmatter(content: string): Record<string, unknown> {
 
     // Check for indented key-value (nested in section)
     const nestedMatch = line.match(/^\s+(\w+):\s*(.+)$/);
-    if (nestedMatch && nestedMatch[1] && nestedMatch[2] && currentSection) {
+    if (nestedMatch?.[1] && nestedMatch[2] && currentSection) {
       const key = nestedMatch[1];
       const value = nestedMatch[2];
       currentSectionData[key] = parseYamlValue(value);
@@ -149,7 +149,7 @@ export function parseYamlFrontmatter(content: string): Record<string, unknown> {
 
     // Check for top-level key-value
     const kvMatch = line.match(/^(\w+):\s*(.+)$/);
-    if (kvMatch && kvMatch[1] && kvMatch[2]) {
+    if (kvMatch?.[1] && kvMatch[2]) {
       // Save any open section first
       if (currentSection && Object.keys(currentSectionData).length > 0) {
         result[currentSection] = currentSectionData;
@@ -181,8 +181,8 @@ function parseYamlValue(value: string): unknown {
   if (trimmed === 'false') return false;
 
   // Number
-  if (/^-?\d+$/.test(trimmed)) return parseInt(trimmed, 10);
-  if (/^-?\d+\.\d+$/.test(trimmed)) return parseFloat(trimmed);
+  if (/^-?\d+$/.test(trimmed)) return Number.parseInt(trimmed, 10);
+  if (/^-?\d+\.\d+$/.test(trimmed)) return Number.parseFloat(trimmed);
 
   // Quoted string - remove quotes
   if (
@@ -376,16 +376,13 @@ export async function loadConfig(filePath: string): Promise<Configuration> {
  * Finds and loads configuration from standard locations
  * Checks paths in order of precedence
  */
-export async function loadConfigFromStandardPaths(baseDir: string = '.'): Promise<Configuration> {
+export async function loadConfigFromStandardPaths(baseDir = '.'): Promise<Configuration> {
   for (const configPath of CONFIG_PATHS) {
     const fullPath = join(baseDir, configPath);
     try {
       await access(fullPath);
       return await loadConfig(fullPath);
-    } catch {
-      // File doesn't exist, try next path
-      continue;
-    }
+    } catch {}
   }
   return DEFAULT_CONFIG;
 }

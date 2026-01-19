@@ -9,9 +9,9 @@
  * T058: Test bypass detection completes in <100ms
  */
 import { describe, expect, it } from 'bun:test';
-import type { BypassReason } from './types.ts';
+import { type BypassCheckInput, detectBypass } from './bypass-detector.ts';
 import { COMPACTION_THRESHOLD_PERCENT, SKIP_TAG } from './constants.ts';
-import { detectBypass, type BypassCheckInput } from './bypass-detector.ts';
+import type { BypassReason } from './types.ts';
 
 describe('Bypass Detector', () => {
   describe('T052: detectBypass - short prompts (≤10 tokens)', () => {

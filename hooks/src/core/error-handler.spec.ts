@@ -7,10 +7,10 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { existsSync, mkdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { createPassthroughOutput, handleError, type ErrorContext } from './error-handler.ts';
+import { type ErrorContext, createPassthroughOutput, handleError } from './error-handler.ts';
 
 describe('Error Handler', () => {
-  const testDir = join(tmpdir(), 'prompt-improver-error-test-' + Date.now());
+  const testDir = join(tmpdir(), `prompt-improver-error-test-${Date.now()}`);
 
   beforeEach(() => {
     mkdirSync(join(testDir, '.claude', 'logs'), { recursive: true });

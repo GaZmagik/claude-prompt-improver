@@ -9,19 +9,19 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { Configuration } from './types.ts';
 import {
-  clearConfigCache,
   CONFIG_PATHS,
   DEFAULT_CONFIG,
+  clearConfigCache,
   loadConfig,
   loadConfigFromStandardPaths,
   parseYamlFrontmatter,
   validateConfig,
 } from './config-loader.ts';
+import type { Configuration } from './types.ts';
 
 describe('Config Loader', () => {
-  const testDir = join(tmpdir(), 'prompt-improver-config-test-' + Date.now());
+  const testDir = join(tmpdir(), `prompt-improver-config-test-${Date.now()}`);
   const testConfigPathMd = join(testDir, '.claude', 'prompt-improver.local.md');
   const testConfigPathJson = join(testDir, '.claude', 'prompt-improver-config.json');
 

@@ -1,10 +1,10 @@
+import { isShortPrompt } from '../utils/token-counter.ts';
+import { COMPACTION_THRESHOLD_PERCENT, SKIP_TAG } from './constants.ts';
 /**
  * Bypass detector for efficient prompt processing
  * Detects conditions where prompt improvement should be skipped
  */
 import type { BypassReason } from './types.ts';
-import { COMPACTION_THRESHOLD_PERCENT, SKIP_TAG } from './constants.ts';
-import { isShortPrompt } from '../utils/token-counter.ts';
 
 /**
  * Input for bypass detection

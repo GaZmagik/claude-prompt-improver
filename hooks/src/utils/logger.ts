@@ -3,8 +3,8 @@
  * Provides JSON logging to file with JSONL format
  * Uses async fire-and-forget pattern to avoid blocking the event loop
  */
-import { appendFile, mkdir, access } from 'node:fs/promises';
-import { dirname, basename, join } from 'node:path';
+import { access, appendFile, mkdir } from 'node:fs/promises';
+import { basename, dirname, join } from 'node:path';
 import type {
   BypassReason,
   ClassificationLevel,
@@ -38,7 +38,7 @@ export interface LogEntryInput {
  * Never log full prompts to protect user privacy
  */
 export function createPromptPreview(prompt: string): string {
-  return prompt.slice(0, 50).replace(/\n/g, ' ').trim() + '...';
+  return `${prompt.slice(0, 50).replace(/\n/g, ' ').trim()}...`;
 }
 
 /**
@@ -72,16 +72,16 @@ export function createLogEntry(input: LogEntryInput): LogEntry {
     level: input.level,
     phase: input.phase,
     promptPreview: createPromptPreview(input.originalPrompt),
-    improvedPrompt: input.improvedPrompt
-      ? createPromptPreview(input.improvedPrompt)
-      : null,
+    improvedPrompt: input.improvedPrompt ? createPromptPreview(input.improvedPrompt) : null,
     classification: input.classification,
     bypassReason: input.bypassReason,
     modelUsed: input.modelUsed,
     totalLatency: input.totalLatency,
     contextSources: input.contextSources,
     conversationId: input.conversationId,
-    ...(input.classificationLatency !== undefined && { classificationLatency: input.classificationLatency }),
+    ...(input.classificationLatency !== undefined && {
+      classificationLatency: input.classificationLatency,
+    }),
     ...(input.improvementLatency !== undefined && { improvementLatency: input.improvementLatency }),
     ...(input.error !== undefined && { error: input.error }),
   };
@@ -101,7 +101,9 @@ export function formatLogEntry(entry: LogEntry): string {
     bypassReason: entry.bypassReason,
     modelUsed: entry.modelUsed,
     totalLatency: entry.totalLatency,
-    ...(entry.classificationLatency !== undefined && { classificationLatency: entry.classificationLatency }),
+    ...(entry.classificationLatency !== undefined && {
+      classificationLatency: entry.classificationLatency,
+    }),
     ...(entry.improvementLatency !== undefined && { improvementLatency: entry.improvementLatency }),
     contextSources: entry.contextSources,
     conversationId: entry.conversationId,
@@ -114,7 +116,11 @@ export function formatLogEntry(entry: LogEntry): string {
  * Creates parent directories if they don't exist
  * Uses fire-and-forget async pattern to avoid blocking the event loop
  */
-export function writeLogEntry(entry: LogEntry, filePath: string, configLevel: LogLevel = 'INFO'): void {
+export function writeLogEntry(
+  entry: LogEntry,
+  filePath: string,
+  configLevel: LogLevel = 'INFO'
+): void {
   // Check log level filtering before writing
   if (!shouldLog(entry.level, configLevel)) {
     return;
@@ -141,7 +147,7 @@ export async function writeLogEntryAsync(entry: LogEntry, filePath: string): Pro
     }
 
     const json = formatLogEntry(entry);
-    await appendFile(filePath, json + '\n', 'utf-8');
+    await appendFile(filePath, `${json}\n`, 'utf-8');
   } catch {
     // Silently ignore logging errors - logging should never break the hook
   }

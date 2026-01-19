@@ -1,14 +1,14 @@
+import {
+  COMPLEX_IMPROVEMENT_TIMEOUT_MS,
+  SIMPLE_IMPROVEMENT_TIMEOUT_MS,
+} from '../core/constants.ts';
 /**
  * Prompt improver for enhancing user prompts
  * Uses Haiku for SIMPLE, Sonnet for COMPLEX improvements
  */
 import type { ClassificationLevel, ClaudeModel, ContextSource } from '../core/types.ts';
-import {
-  SIMPLE_IMPROVEMENT_TIMEOUT_MS,
-  COMPLEX_IMPROVEMENT_TIMEOUT_MS,
-} from '../core/constants.ts';
-import { executeClaudeCommand } from './claude-client.ts';
 import { escapeXmlContent } from '../utils/xml-builder.ts';
+import { executeClaudeCommand } from './claude-client.ts';
 
 /**
  * Context gathered from various sources
@@ -90,20 +90,28 @@ function getContextSources(context?: ImprovementContext): ContextSource[] {
  */
 export function generateImprovementSummary(
   originalPrompt: string,
-  improvedPrompt: string,
+  improvedPrompt: string
 ): readonly string[] {
   const changes: string[] = [];
 
   // Detect XML structuring added
   const hasXmlTags = /<(task|context|constraints|output_format|examples)>/.test(improvedPrompt);
-  const originalHasXmlTags = /<(task|context|constraints|output_format|examples)>/.test(originalPrompt);
+  const originalHasXmlTags = /<(task|context|constraints|output_format|examples)>/.test(
+    originalPrompt
+  );
   if (hasXmlTags && !originalHasXmlTags) {
     changes.push('Added XML structure');
   }
 
   // Detect context injection (both specific and generic context tags)
-  const hasContextTags = /<(context|git_context|lsp_diagnostics|specification|available_tools|available_skills|suggested_agents|relevant_memories|session_context)>/.test(improvedPrompt);
-  const originalHasContextTags = /<(context|git_context|lsp_diagnostics|specification|available_tools|available_skills|suggested_agents|relevant_memories|session_context)>/.test(originalPrompt);
+  const hasContextTags =
+    /<(context|git_context|lsp_diagnostics|specification|available_tools|available_skills|suggested_agents|relevant_memories|session_context)>/.test(
+      improvedPrompt
+    );
+  const originalHasContextTags =
+    /<(context|git_context|lsp_diagnostics|specification|available_tools|available_skills|suggested_agents|relevant_memories|session_context)>/.test(
+      originalPrompt
+    );
   if (hasContextTags && !originalHasContextTags) {
     changes.push('Injected context');
   }

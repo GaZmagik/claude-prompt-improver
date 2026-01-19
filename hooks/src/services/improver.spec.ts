@@ -8,11 +8,11 @@
  */
 import { describe, expect, it } from 'bun:test';
 import {
-  improvePrompt,
   buildImprovementPrompt,
+  generateImprovementSummary,
   getModelForClassification,
   getTimeoutForClassification,
-  generateImprovementSummary,
+  improvePrompt,
 } from './improver.ts';
 
 describe('Improver', () => {
@@ -235,7 +235,11 @@ describe('Improver', () => {
 
       expect(summary).toBeDefined();
       expect(summary.length).toBeGreaterThan(0);
-      expect(summary.some(s => s.toLowerCase().includes('xml') || s.toLowerCase().includes('structure'))).toBe(true);
+      expect(
+        summary.some(
+          (s) => s.toLowerCase().includes('xml') || s.toLowerCase().includes('structure')
+        )
+      ).toBe(true);
     });
 
     it('should detect context injection', () => {
@@ -249,17 +253,26 @@ Recent commit: Add JWT validation
       const summary = generateImprovementSummary(originalPrompt, improvedPrompt);
 
       expect(summary).toBeDefined();
-      expect(summary.some(s => s.toLowerCase().includes('context') || s.toLowerCase().includes('inject'))).toBe(true);
+      expect(
+        summary.some(
+          (s) => s.toLowerCase().includes('context') || s.toLowerCase().includes('inject')
+        )
+      ).toBe(true);
     });
 
     it('should detect expansion (>20% token increase)', () => {
       const originalPrompt = 'fix bug';
-      const improvedPrompt = 'fix the authentication bug in the login service by investigating the JWT validation logic and ensuring proper token expiry handling';
+      const improvedPrompt =
+        'fix the authentication bug in the login service by investigating the JWT validation logic and ensuring proper token expiry handling';
 
       const summary = generateImprovementSummary(originalPrompt, improvedPrompt);
 
       expect(summary).toBeDefined();
-      expect(summary.some(s => s.toLowerCase().includes('expand') || s.toLowerCase().includes('detail'))).toBe(true);
+      expect(
+        summary.some(
+          (s) => s.toLowerCase().includes('expand') || s.toLowerCase().includes('detail')
+        )
+      ).toBe(true);
     });
 
     it('should return maximum 3 bullets', () => {
@@ -318,7 +331,7 @@ LSP errors: Type mismatch in auth handler
 
     it('should handle very long prompts efficiently', () => {
       const originalPrompt = 'a'.repeat(1000);
-      const improvedPrompt = '<task>' + 'a'.repeat(1000) + ' with additional context</task>';
+      const improvedPrompt = `<task>${'a'.repeat(1000)} with additional context</task>`;
 
       const summary = generateImprovementSummary(originalPrompt, improvedPrompt);
 

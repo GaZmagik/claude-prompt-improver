@@ -6,10 +6,10 @@
  */
 import { describe, expect, it } from 'bun:test';
 import {
+  type ContextUsage,
   calculateAvailableContext,
   parseContextUsage,
   shouldSkipProcessing,
-  type ContextUsage,
 } from './compaction-detector.ts';
 
 describe('Compaction Detector', () => {

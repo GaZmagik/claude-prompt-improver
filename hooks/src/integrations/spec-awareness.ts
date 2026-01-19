@@ -133,14 +133,14 @@ export function parseFrontmatter(content: string): Record<string, unknown> {
   for (const line of lines) {
     // Check for array item
     const arrayMatch = line.match(/^\s+-\s+(.+)$/);
-    if (arrayMatch && arrayMatch[1] && currentKey && currentArray) {
+    if (arrayMatch?.[1] && currentKey && currentArray) {
       currentArray.push(arrayMatch[1].trim());
       continue;
     }
 
     // Check for key: value
     const kvMatch = line.match(/^(\w+):\s*(.*)$/);
-    if (kvMatch && kvMatch[1]) {
+    if (kvMatch?.[1]) {
       // Save previous array if exists
       if (currentKey && currentArray) {
         result[currentKey] = currentArray;
@@ -224,7 +224,7 @@ export function parsePlanPhases(content: string): PlanPhase[] {
     let status: 'pending' | 'in_progress' | 'completed' | undefined;
     for (const line of lines) {
       const statusMatch = line.match(/Status:\s*(\w+)/i);
-      if (statusMatch && statusMatch[1]) {
+      if (statusMatch?.[1]) {
         const rawStatus = statusMatch[1].toLowerCase();
         if (rawStatus === 'completed') status = 'completed';
         else if (rawStatus === 'in_progress') status = 'in_progress';
@@ -262,7 +262,7 @@ export function parseTasks(content: string): SpecTask[] {
 
     // Extract user story reference [US{n}]
     const usMatch = rest.match(/\[US(\d+)\]/);
-    const userStory = usMatch && usMatch[1] ? `US${usMatch[1]}` : undefined;
+    const userStory = usMatch?.[1] ? `US${usMatch[1]}` : undefined;
 
     // Extract title - remove [P], [US{n}], and path references
     const title = rest

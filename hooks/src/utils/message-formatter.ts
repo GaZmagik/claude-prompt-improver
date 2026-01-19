@@ -18,7 +18,7 @@ export function formatSystemMessage(info: VisibilityInfo): string {
         info.tokensBefore!,
         info.tokensAfter!,
         info.summary,
-        info.latencyMs,
+        info.latencyMs
       );
     case 'failed':
       return formatFailureMessage(info.errorHint);
@@ -65,7 +65,7 @@ function formatAppliedMessage(
   tokensBefore: number,
   tokensAfter: number,
   summary?: readonly string[],
-  latencyMs?: number,
+  latencyMs?: number
 ): string {
   let message = `🎯 Prompt improved (${classification})`;
 

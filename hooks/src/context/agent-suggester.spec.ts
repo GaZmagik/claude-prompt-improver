@@ -6,11 +6,11 @@
  */
 import { describe, expect, it } from 'bun:test';
 import {
-  suggestAgents,
-  parseAgentDefinition,
-  formatAgentsContext,
   type AgentDefinition,
   type SuggestedAgent,
+  formatAgentsContext,
+  parseAgentDefinition,
+  suggestAgents,
 } from './agent-suggester.ts';
 
 describe('Agent Suggester', () => {
@@ -120,7 +120,7 @@ description: Use for Python async await and type hints
       const result = suggestAgents('help with TypeScript generics', sampleAgents);
 
       expect(result.length).toBeGreaterThan(0);
-      expect(result[0]!.agent.name).toBe('typescript-expert');
+      expect(result[0]?.agent.name).toBe('typescript-expert');
     });
 
     it('should match multiple agents when relevant', () => {
@@ -136,7 +136,7 @@ description: Use for Python async await and type hints
       const result = suggestAgents('TYPESCRIPT HELP', sampleAgents);
 
       expect(result.length).toBeGreaterThan(0);
-      expect(result[0]!.agent.name).toBe('typescript-expert');
+      expect(result[0]?.agent.name).toBe('typescript-expert');
     });
 
     it('should return empty array for no matches', () => {
@@ -149,14 +149,14 @@ description: Use for Python async await and type hints
       const result = suggestAgents('TypeScript type system and generics', sampleAgents);
 
       // TypeScript expert should be first with multiple matches
-      expect(result[0]!.agent.name).toBe('typescript-expert');
-      expect(result[0]!.score).toBeGreaterThan(1);
+      expect(result[0]?.agent.name).toBe('typescript-expert');
+      expect(result[0]?.score).toBeGreaterThan(1);
     });
 
     it('should include match reason in result', () => {
       const result = suggestAgents('help with testing', sampleAgents);
 
-      expect(result[0]!.matchedKeywords).toContain('testing');
+      expect(result[0]?.matchedKeywords).toContain('testing');
     });
   });
 

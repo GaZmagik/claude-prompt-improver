@@ -6,13 +6,13 @@
  * T073: Test context builder formats context for injection
  */
 import { describe, expect, it } from 'bun:test';
+import { CONTEXT_GATHERING_TIMEOUT_MS } from '../core/constants.ts';
 import {
+  type BuiltContext,
+  type ContextBuilderInput,
   buildContext,
   formatContextForInjection,
-  type ContextBuilderInput,
-  type BuiltContext,
 } from './context-builder.ts';
-import { CONTEXT_GATHERING_TIMEOUT_MS } from '../core/constants.ts';
 
 describe('Context Builder', () => {
   describe('T070: buildContext - aggregates from multiple sources', () => {

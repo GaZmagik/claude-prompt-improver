@@ -6,17 +6,17 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { checkSpecifyDirectory, clearSpecFileCache, gatherSpecContext } from './spec-awareness.ts';
-import { checkMemoryPluginInstalled, gatherMemoryContext } from './memory-plugin.ts';
-import { gatherGitContext, executeGitCommand } from './git-context.ts';
 import {
+  clearConfigCache,
   loadConfig,
   loadConfigFromStandardPaths,
-  clearConfigCache,
 } from '../core/config-loader.ts';
+import { executeGitCommand, gatherGitContext } from './git-context.ts';
+import { checkMemoryPluginInstalled, gatherMemoryContext } from './memory-plugin.ts';
+import { checkSpecifyDirectory, clearSpecFileCache, gatherSpecContext } from './spec-awareness.ts';
 
 describe('Integration Tests - Real Filesystem', () => {
-  const testDir = join(tmpdir(), 'prompt-improver-integration-' + Date.now());
+  const testDir = join(tmpdir(), `prompt-improver-integration-${Date.now()}`);
 
   beforeEach(() => {
     clearConfigCache();

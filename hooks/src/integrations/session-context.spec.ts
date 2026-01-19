@@ -7,14 +7,14 @@
  * T127: Test session context gracefully skips if configuration disabled
  */
 import { describe, expect, it } from 'bun:test';
+import { SESSION_FORK_TIMEOUT_MS } from '../core/constants.ts';
 import {
+  type SessionContext,
   detectForkedSession,
   formatSessionContext,
   gatherSessionContext,
   isForkedSession,
-  type SessionContext,
 } from './session-context.ts';
-import { SESSION_FORK_TIMEOUT_MS } from '../core/constants.ts';
 
 describe('Session Context Integration', () => {
   describe('T123: gatherSessionContext - forks session with claude --fork-session', () => {

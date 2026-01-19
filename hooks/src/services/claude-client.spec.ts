@@ -11,9 +11,9 @@ import {
   SIMPLE_IMPROVEMENT_TIMEOUT_MS,
 } from '../core/constants.ts';
 import {
+  type ClaudeClientOptions,
   buildClaudeCommand,
   executeClaudeCommand,
-  type ClaudeClientOptions,
 } from './claude-client.ts';
 
 describe('Claude Client', () => {

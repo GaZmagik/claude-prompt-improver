@@ -11,14 +11,14 @@
  */
 import { describe, expect, it } from 'bun:test';
 import {
+  type Memory,
+  type MemoryContext,
   checkMemoryPluginInstalled,
   formatMemoryContext,
   gatherMemoryContext,
   matchMemoriesByTags,
   matchMemoriesByTitle,
   parseMemoryIndex,
-  type Memory,
-  type MemoryContext,
 } from './memory-plugin.ts';
 
 describe('Memory Plugin Integration', () => {
@@ -81,7 +81,7 @@ describe('Memory Plugin Integration', () => {
       const index = parseMemoryIndex(indexContent);
 
       expect(index.memories.length).toBe(2);
-      expect(index.memories[0]!.id).toBe('mem-1');
+      expect(index.memories[0]?.id).toBe('mem-1');
     });
 
     it('should handle index with additional fields', () => {
@@ -213,7 +213,7 @@ describe('Memory Plugin Integration', () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.context?.memories[0]!.id).toBe('mem-2');
+      expect(result.context?.memories[0]?.id).toBe('mem-2');
     });
   });
 
