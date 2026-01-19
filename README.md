@@ -58,10 +58,10 @@ hooks/
 
 ## Configuration
 
-Copy the example configuration to your project:
+Configuration is **optional** - the plugin works with sensible defaults. To customise:
 
 ```bash
-cp prompt-improver.example.md .claude/prompt-improver.local.md
+cp .claude/prompt-improver.example.md .claude/prompt-improver.local.md
 ```
 
 The configuration uses markdown with YAML frontmatter:
