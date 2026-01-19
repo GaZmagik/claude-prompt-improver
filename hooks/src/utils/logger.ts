@@ -4,7 +4,7 @@
  * Uses async fire-and-forget pattern to avoid blocking the event loop
  */
 import { appendFile, mkdir, access } from 'node:fs/promises';
-import { dirname, basename } from 'node:path';
+import { dirname, basename, join } from 'node:path';
 import type {
   BypassReason,
   ClassificationLevel,
@@ -52,7 +52,7 @@ export function generateLogFilePath(basePath: string, useTimestamp: boolean): st
   const ext = basePath.endsWith('.log') ? '.log' : '';
   const base = basename(basePath, ext);
 
-  return `${dir}/${base}-${timestamp}${ext}`;
+  return join(dir, `${base}-${timestamp}${ext}`);
 }
 
 /**

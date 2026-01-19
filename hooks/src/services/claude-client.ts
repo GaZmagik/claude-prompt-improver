@@ -2,6 +2,7 @@
  * Claude CLI client for executing prompts via fork-session
  * Handles model selection, timeouts, and error handling
  */
+import { tmpdir } from 'node:os';
 import type { ClaudeModel } from '../core/types.ts';
 
 /**
@@ -69,7 +70,7 @@ export function buildClaudeCommand(options: ClaudeClientOptions): ClaudeCommandA
 
   return {
     args,
-    cwd: '/tmp', // Run from /tmp to avoid project hooks
+    cwd: tmpdir(), // Run from temp dir to avoid project hooks
   };
 }
 
