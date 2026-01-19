@@ -1,0 +1,352 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "id": "learning-retro-agent-first-sdd-workflow-reduces-iteration",
+      "type": "learning",
+      "title": "Retro - Agent-first SDD workflow reduces iteration"
+    },
+    {
+      "id": "learning-retro-template-review-prevents-regeneration",
+      "type": "learning",
+      "title": "Retro - Template review prevents regeneration"
+    },
+    {
+      "id": "learning-retro-exploration-phase-prevents-specification-rework",
+      "type": "learning",
+      "title": "Retro - Exploration phase prevents specification rework"
+    },
+    {
+      "id": "learning-retro-analysis-driven-fixes-prevent-rework-before-implementation",
+      "type": "learning",
+      "title": "Retro - Analysis-driven fixes prevent rework before implementation"
+    },
+    {
+      "id": "learning-retro-checklist-format-clarity-prevents-gate-blockers",
+      "type": "learning",
+      "title": "Retro - Checklist format clarity prevents gate blockers"
+    },
+    {
+      "id": "gotcha-gotcha-forked-session-retrospective-output-may-not-surface-completely-to-main-session",
+      "type": "gotcha",
+      "title": "Gotcha - Forked session retrospective output may not surface completely to main session"
+    },
+    {
+      "id": "learning-spec-analysis-severity-categorisation-pattern",
+      "type": "learning",
+      "title": "Spec Analysis Severity Categorisation Pattern"
+    },
+    {
+      "id": "learning-specification-readiness-validation-checklist-format-vs-content-state",
+      "type": "learning",
+      "title": "Specification Readiness Validation: Checklist Format vs Content State"
+    },
+    {
+      "id": "artifact-spec-analysis-issue-resolution",
+      "type": "artifact",
+      "title": "Specification Analysis Issue Resolution Template"
+    },
+    {
+      "id": "learning-retro-tdd-stub-first-pattern-accelerates-phase-startup",
+      "type": "learning",
+      "title": "Retro - TDD stub-first pattern accelerates phase startup"
+    },
+    {
+      "id": "learning-retro-gotcha-caching-in-session-restore-prevented-fork-session-pitfall",
+      "type": "learning",
+      "title": "Retro - Gotcha caching in session restore prevented fork-session pitfall"
+    },
+    {
+      "id": "learning-typescript-exactoptionalpropertytypes-in-strict-mode",
+      "type": "learning",
+      "title": "TypeScript exactOptionalPropertyTypes in strict mode"
+    },
+    {
+      "id": "gotcha-retro-exactoptionalpropertytypes-friction-in-object-building-patterns",
+      "type": "gotcha",
+      "title": "Retro - exactOptionalPropertyTypes friction in object building patterns"
+    },
+    {
+      "id": "learning-bun-typescript-requires-allowimportingtsextensions-for-ts-imports",
+      "type": "learning",
+      "title": "Bun TypeScript requires allowImportingTsExtensions for .ts imports"
+    },
+    {
+      "id": "decision-classification-three-tier-cost-optimised",
+      "type": "decision",
+      "title": "Three-tier classification with cost optimisation"
+    },
+    {
+      "id": "artifact-sdd-tdd-phase-completion-pattern",
+      "type": "artifact",
+      "title": "SDD + TDD phase completion pattern"
+    },
+    {
+      "id": "learning-fork-session-execution-requires-tmp-working-directory",
+      "type": "learning",
+      "title": "Fork-session execution requires /tmp working directory"
+    },
+    {
+      "id": "learning-retro-tdd-stub-first-pattern-with-211-tests-in-single-session",
+      "type": "learning",
+      "title": "Retro - TDD stub-first pattern with 211 tests in single session"
+    },
+    {
+      "id": "learning-retro-phase-based-task-organization-enables-parallel-mental-planning",
+      "type": "learning",
+      "title": "Retro - Phase-based task organization enables parallel mental planning"
+    },
+    {
+      "id": "gotcha-gotcha-exactoptionalpropertytypes-requires-verbose-workarounds-in-test-object-construction",
+      "type": "gotcha",
+      "title": "Gotcha - exactOptionalPropertyTypes requires verbose workarounds in test object construction"
+    },
+    {
+      "id": "learning-retro-clear-bypass-priority-ordering-prevents-edge-case-ambiguity",
+      "type": "learning",
+      "title": "Retro - Clear bypass priority ordering prevents edge case ambiguity"
+    },
+    {
+      "id": "learning-retro-tdd-phase-based-organization-with-parallel-test-writing-accelerates-implementation",
+      "type": "learning",
+      "title": "Retro - TDD phase-based organization with parallel test writing accelerates implementation"
+    },
+    {
+      "id": "learning-tdd-stub-first-pattern-enables-290-tests-across-6-phases",
+      "type": "learning",
+      "title": "TDD stub-first pattern enables 290 tests across 6 phases"
+    },
+    {
+      "id": "gotcha-gotcha-exactoptionalpropertytypes-requires-conditional-property-inclusion-pattern",
+      "type": "gotcha",
+      "title": "Gotcha - exactOptionalPropertyTypes requires conditional property inclusion pattern"
+    },
+    {
+      "id": "learning-learning-mock-patterns-for-external-command-execution-require-careful-test-setup",
+      "type": "learning",
+      "title": "Learning - Mock patterns for external command execution require careful test setup"
+    },
+    {
+      "id": "learning-phase-based-task-organization-enables-parallel-mental-planning",
+      "type": "learning",
+      "title": "Phase-based task organization enables parallel mental planning"
+    },
+    {
+      "id": "learning-modular-context-sources-enable-extensible-prompt-enrichment",
+      "type": "learning",
+      "title": "Modular context sources enable extensible prompt enrichment"
+    },
+    {
+      "id": "learning-exactoptionalpropertytypes-requires-omission-based-test-construction",
+      "type": "learning",
+      "title": "exactOptionalPropertyTypes requires omission-based test construction"
+    },
+    {
+      "id": "learning-retro-tdd-stub-first-pattern-scales-to-404-tests-with-zero-rework",
+      "type": "learning",
+      "title": "Retro - TDD stub-first pattern scales to 404 tests with zero rework"
+    },
+    {
+      "id": "learning-phase-based-task-organization-with-testimplementation-pairs-enables-clear-mental-models",
+      "type": "learning",
+      "title": "Phase-based task organization with test/implementation pairs enables clear mental models"
+    },
+    {
+      "id": "learning-retro-modular-context-builder-design-enabled-6-incremental-integrations-without-conflicts",
+      "type": "learning",
+      "title": "Retro - Modular context builder design enabled 6 incremental integrations without conflicts"
+    },
+    {
+      "id": "gotcha-retro-memory-graph-deduplication-complexity-increased-post-hoc",
+      "type": "gotcha",
+      "title": "Retro - Memory graph deduplication complexity increased post-hoc"
+    },
+    {
+      "id": "learning-modular-context-sources-enable-extensible-prompt-enrichment-without-tight-coupling",
+      "type": "learning",
+      "title": "Modular context sources enable extensible prompt enrichment without tight coupling"
+    },
+    {
+      "id": "learning-agent-first-specification-analysis-prevents-rework-before-implementation",
+      "type": "learning",
+      "title": "Agent-first specification analysis prevents rework before implementation"
+    },
+    {
+      "id": "learning-conditional-property-inclusion-pattern-solves-exactoptionalpropertytypes-friction-in-test-construction",
+      "type": "learning",
+      "title": "Conditional property inclusion pattern solves exactOptionalPropertyTypes friction in test construction"
+    },
+    {
+      "id": "gotcha-forked-session-retrospective-output-may-not-surface-completely-to-main-session",
+      "type": "gotcha",
+      "title": "Forked session retrospective output may not surface completely to main session"
+    }
+  ],
+  "edges": [
+    {
+      "source": "learning-retro-exploration-phase-prevents-specification-rework",
+      "target": "learning-retro-agent-first-sdd-workflow-reduces-iteration",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-agent-first-sdd-workflow-reduces-iteration",
+      "target": "learning-retro-template-review-prevents-regeneration",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-template-review-prevents-regeneration",
+      "target": "learning-retro-agent-first-sdd-workflow-reduces-iteration",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-analysis-driven-fixes-prevent-rework-before-implementation",
+      "target": "learning-retro-agent-first-sdd-workflow-reduces-iteration",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-checklist-format-clarity-prevents-gate-blockers",
+      "target": "learning-retro-template-review-prevents-regeneration",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-gotcha-forked-session-retrospective-output-may-not-surface-completely-to-main-session",
+      "target": "learning-retro-exploration-phase-prevents-specification-rework",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-spec-analysis-severity-categorisation-pattern",
+      "target": "artifact-spec-analysis-issue-resolution",
+      "label": "relates-to"
+    },
+    {
+      "source": "artifact-spec-analysis-issue-resolution",
+      "target": "learning-specification-readiness-validation-checklist-format-vs-content-state",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-spec-analysis-severity-categorisation-pattern",
+      "target": "learning-specification-readiness-validation-checklist-format-vs-content-state",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-fork-session-execution-requires-tmp-working-directory",
+      "target": "gotcha-gotcha-forked-session-retrospective-output-may-not-surface-completely-to-main-session",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-fork-session-execution-requires-tmp-working-directory",
+      "target": "learning-retro-gotcha-caching-in-session-restore-prevented-fork-session-pitfall",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-tdd-stub-first-pattern-accelerates-phase-startup",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-typescript-exactoptionalpropertytypes-in-strict-mode",
+      "target": "gotcha-retro-exactoptionalpropertytypes-friction-in-object-building-patterns",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-bun-typescript-requires-allowimportingtsextensions-for-ts-imports",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-classification-three-tier-cost-optimised",
+      "target": "artifact-spec-analysis-issue-resolution",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-agent-first-sdd-workflow-reduces-iteration",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-tdd-stub-first-pattern-with-211-tests-in-single-session",
+      "target": "learning-tdd-stub-first-pattern-enables-290-tests-across-6-phases",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-tdd-stub-first-pattern-enables-290-tests-across-6-phases",
+      "target": "learning-retro-tdd-stub-first-pattern-scales-to-404-tests-with-zero-rework",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-phase-based-task-organization-enables-parallel-mental-planning",
+      "target": "learning-phase-based-task-organization-enables-parallel-mental-planning",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-exactoptionalpropertytypes-requires-omission-based-test-construction",
+      "target": "learning-conditional-property-inclusion-pattern-solves-exactoptionalpropertytypes-friction-in-test-construction",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-modular-context-sources-enable-extensible-prompt-enrichment",
+      "target": "learning-modular-context-sources-enable-extensible-prompt-enrichment-without-tight-coupling",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-learning-mock-patterns-for-external-command-execution-require-careful-test-setup",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-phase-based-task-organization-with-testimplementation-pairs-enables-clear-mental-models",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-tdd-stub-first-pattern-enables-290-tests-across-6-phases",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-modular-context-sources-enable-extensible-prompt-enrichment-without-tight-coupling",
+      "target": "decision-classification-three-tier-cost-optimised",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-gotcha-exactoptionalpropertytypes-requires-conditional-property-inclusion-pattern",
+      "target": "learning-conditional-property-inclusion-pattern-solves-exactoptionalpropertytypes-friction-in-test-construction",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-phase-based-task-organization-enables-parallel-mental-planning",
+      "target": "learning-retro-tdd-phase-based-organization-with-parallel-test-writing-accelerates-implementation",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-tdd-phase-based-organization-with-parallel-test-writing-accelerates-implementation",
+      "target": "learning-phase-based-task-organization-with-testimplementation-pairs-enables-clear-mental-models",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-retro-memory-graph-deduplication-complexity-increased-post-hoc",
+      "target": "learning-retro-modular-context-builder-design-enabled-6-incremental-integrations-without-conflicts",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-clear-bypass-priority-ordering-prevents-edge-case-ambiguity",
+      "target": "decision-classification-three-tier-cost-optimised",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-agent-first-specification-analysis-prevents-rework-before-implementation",
+      "target": "artifact-spec-analysis-issue-resolution",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-gotcha-exactoptionalpropertytypes-requires-verbose-workarounds-in-test-object-construction",
+      "target": "learning-exactoptionalpropertytypes-requires-omission-based-test-construction",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-forked-session-retrospective-output-may-not-surface-completely-to-main-session",
+      "target": "learning-fork-session-execution-requires-tmp-working-directory",
+      "label": "relates-to"
+    }
+  ]
+}

@@ -1,0 +1,318 @@
+openapi: 3.0.0
+info:
+  title: User Prompt Submit Hook Interface
+  version: 1.0.0
+  description: |
+    Contract for the `user-prompt-submit` hook that intercepts and improves prompts.
+    This defines the stdin/stdout interface between Claude Code and the plugin.
+
+paths:
+  /hook/user-prompt-submit:
+    post:
+      summary: Process user prompt submission
+      description: |
+        Hook entry point invoked by Claude Code when user submits a prompt.
+        Reads JSON from stdin, processes prompt, outputs to stdout.
+
+      operationId: processPromptSubmission
+
+      requestBody:
+        description: Hook input from stdin (provided by Claude Code)
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - prompt
+                - context
+              properties:
+                prompt:
+                  type: string
+                  description: User's submitted prompt text
+                  example: "fix the bug"
+
+                context:
+                  type: object
+                  description: Session and environment context
+                  required:
+                    - conversation_id
+                    - message_index
+                  properties:
+                    conversation_id:
+                      type: string
+                      format: uuid
+                      description: Unique conversation identifier
+                      example: "a1b2c3d4-e5f6-4g7h-8i9j-0k1l2m3n4o5p"
+
+                    message_index:
+                      type: integer
+                      description: Position in conversation history
+                      example: 42
+
+                    permission_mode:
+                      type: string
+                      nullable: true
+                      description: |
+                        Indicates if running in special mode (e.g., "fork" for forked session).
+                        Use to prevent recursion.
+                      enum:
+                        - null
+                        - fork
+                      example: null
+
+                    available_tools:
+                      type: array
+                      items:
+                        type: string
+                      description: Tools available in this session
+                      example: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "WebSearch"]
+
+                    enabled_mcp_servers:
+                      type: array
+                      items:
+                        type: string
+                      description: MCP servers configured and running
+                      example: ["ripgrep", "lsp", "filesystem"]
+
+                    context_usage:
+                      type: object
+                      description: Context window usage statistics
+                      properties:
+                        used:
+                          type: integer
+                          description: Tokens used so far
+                          example: 12345
+                        max:
+                          type: integer
+                          description: Maximum tokens available
+                          example: 200000
+                        auto_compaction_enabled:
+                          type: boolean
+                          description: Whether auto-compaction is enabled
+                          example: true
+
+                    session_settings:
+                      type: object
+                      properties:
+                        model:
+                          type: string
+                          description: Current model in use
+                          example: "claude-sonnet-4-5"
+                        skills:
+                          type: array
+                          items:
+                            type: string
+                          description: Active skills
+                          example: ["memory", "typescript-expert"]
+                        working_directory:
+                          type: string
+                          description: Current working directory
+                          example: "/home/user/projects/my-app"
+
+      responses:
+        '200':
+          description: Successfully processed prompt
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - prompt
+                properties:
+                  prompt:
+                    type: string
+                    description: Processed prompt (improved or original if bypassed)
+                    example: "<task>Investigate and fix the bug...</task>"
+
+                  additionalContext:
+                    type: object
+                    description: Metadata about processing
+                    properties:
+                      classification:
+                        type: string
+                        enum:
+                          - NONE
+                          - SIMPLE
+                          - COMPLEX
+                        example: "COMPLEX"
+
+                      bypassReason:
+                        type: string
+                        nullable: true
+                        enum:
+                          - null
+                          - short_prompt
+                          - explicit_skip
+                          - low_context
+                          - forked_session
+                          - plugin_disabled
+                          - classification_failed
+                          - improvement_failed
+                        example: null
+
+                      modelUsed:
+                        type: string
+                        nullable: true
+                        enum:
+                          - null
+                          - haiku
+                          - sonnet
+                        example: "sonnet"
+
+                      latency:
+                        type: integer
+                        description: Total processing time (milliseconds)
+                        example: 4532
+
+                      contextSources:
+                        type: array
+                        items:
+                          type: string
+                          enum:
+                            - tools
+                            - skills
+                            - agents
+                            - git
+                            - lsp
+                            - spec
+                            - memory
+                            - session
+                        example: ["git", "lsp"]
+
+                      improved:
+                        type: boolean
+                        description: Whether prompt was actually improved
+                        example: true
+
+              examples:
+                improvedPrompt:
+                  summary: Successfully improved prompt
+                  value:
+                    prompt: |
+                      <task>
+                      Investigate and fix the bug in the authentication module.
+                      </task>
+
+                      <context>
+                      Recent commits show work on JWT token refresh logic.
+                      LSP reports error in src/auth.ts line 45.
+                      </context>
+                    additionalContext:
+                      classification: "COMPLEX"
+                      bypassReason: null
+                      modelUsed: "sonnet"
+                      latency: 4532
+                      contextSources: ["git", "lsp"]
+                      improved: true
+
+                bypassedPrompt:
+                  summary: Bypassed short prompt
+                  value:
+                    prompt: "yes"
+                    additionalContext:
+                      classification: "NONE"
+                      bypassReason: "short_prompt"
+                      modelUsed: null
+                      latency: 2
+                      contextSources: []
+                      improved: false
+
+        '500':
+          description: Hook error (should never block prompt)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  prompt:
+                    type: string
+                    description: Original prompt (passthrough on error)
+                  error:
+                    type: string
+                    description: Error message
+                  additionalContext:
+                    type: object
+                    properties:
+                      bypassReason:
+                        type: string
+                        example: "plugin_error"
+
+components:
+  schemas:
+    HookInput:
+      type: object
+      description: stdin JSON structure from Claude Code
+      required:
+        - prompt
+        - context
+      properties:
+        prompt:
+          type: string
+        context:
+          $ref: '#/components/schemas/SessionContext'
+
+    HookOutput:
+      type: object
+      description: stdout JSON structure to Claude Code
+      required:
+        - prompt
+      properties:
+        prompt:
+          type: string
+        additionalContext:
+          type: object
+
+    SessionContext:
+      type: object
+      description: Context information from Claude Code session
+      properties:
+        conversation_id:
+          type: string
+          format: uuid
+        message_index:
+          type: integer
+        permission_mode:
+          type: string
+          nullable: true
+        available_tools:
+          type: array
+          items:
+            type: string
+        enabled_mcp_servers:
+          type: array
+          items:
+            type: string
+        context_usage:
+          type: object
+          properties:
+            used:
+              type: integer
+            max:
+              type: integer
+            auto_compaction_enabled:
+              type: boolean
+        session_settings:
+          type: object
+
+  examples:
+    bypassConditions:
+      summary: Bypass detection logic
+      description: |
+        The hook checks these conditions in order (first match wins):
+
+        1. plugin_disabled: Configuration.enabled = false
+        2. forked_session: context.permission_mode === "fork"
+        3. low_context: (context_usage.max - context_usage.used) / context_usage.max < 0.05
+        4. explicit_skip: prompt.includes("#skip")
+        5. short_prompt: tokenCount(prompt) <= configuration.shortPromptThreshold
+
+        Any bypass results in:
+        - Original prompt returned unchanged
+        - additionalContext.bypassReason set
+        - additionalContext.improved = false
+        - Total latency <100ms
+
+tags:
+  - name: Hook
+    description: Hook interface operations
