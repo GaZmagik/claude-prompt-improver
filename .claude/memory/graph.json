@@ -180,6 +180,58 @@
       "id": "gotcha-forked-session-retrospective-output-may-not-surface-completely-to-main-session",
       "type": "gotcha",
       "title": "Forked session retrospective output may not surface completely to main session"
+    },
+    {
+      "id": "learning-retro-tdd-stub-first-with-phase-based-organization-scales-to-454-tests-with-zero-rework",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-configuration-format-decisions-should-be-made-in-phase-0-research",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-config-redesign-markdown-localmd-format",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-integration-point-test-coverage-66-73-should-be-prioritised-before-expanding-features",
+      "type": "learning"
+    },
+    {
+      "id": "learning-test-coverage-strategy-systematic-gap-analysis-to-reach-100",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-config-format-redesign-required-parallel-file-management",
+      "type": "learning"
+    },
+    {
+      "id": "learning-config-redesign-markdown-yaml-frontmatter",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-security-fix-blocked-pr-merge-until-resolved",
+      "type": "learning"
+    },
+    {
+      "id": "learning-command-injection-vulnerability-sessionid-escaping",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-default-branch-constraint-required-workflow-adjustment",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-test-coverage-strategy-systematic-gap-analysis",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-test-coverage-reached-9035-with-focused-improvements",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-vimock-global-pollution-across-test-files",
+      "type": "gotcha"
     }
   ],
   "edges": [
@@ -346,6 +398,61 @@
     {
       "source": "gotcha-forked-session-retrospective-output-may-not-surface-completely-to-main-session",
       "target": "learning-fork-session-execution-requires-tmp-working-directory",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-tdd-stub-first-with-phase-based-organization-scales-to-454-tests-with-zero-rework",
+      "target": "learning-tdd-stub-first-pattern-enables-290-tests-across-6-phases",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-tdd-stub-first-with-phase-based-organization-scales-to-454-tests-with-zero-rework",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-retro-configuration-format-decisions-should-be-made-in-phase-0-research",
+      "target": "learning-retro-agent-first-sdd-workflow-reduces-iteration",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-config-redesign-markdown-localmd-format",
+      "target": "learning-config-redesign-markdown-yaml-frontmatter",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-integration-point-test-coverage-66-73-should-be-prioritised-before-expanding-features",
+      "target": "learning-test-coverage-strategy-systematic-gap-analysis",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-test-coverage-strategy-systematic-gap-analysis-to-reach-100",
+      "target": "learning-test-coverage-strategy-systematic-gap-analysis",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-config-format-redesign-required-parallel-file-management",
+      "target": "learning-config-redesign-markdown-yaml-frontmatter",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-command-injection-vulnerability-sessionid-escaping",
+      "target": "learning-retro-security-fix-blocked-pr-merge-until-resolved",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-retro-default-branch-constraint-required-workflow-adjustment",
+      "target": "learning-retro-agent-first-sdd-workflow-reduces-iteration",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-test-coverage-reached-9035-with-focused-improvements",
+      "target": "learning-test-coverage-strategy-systematic-gap-analysis",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-vimock-global-pollution-across-test-files",
+      "target": "learning-learning-mock-patterns-for-external-command-execution-require-careful-test-setup",
       "label": "relates-to"
     }
   ]

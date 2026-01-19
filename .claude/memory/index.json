@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-19T08:16:47.645Z",
+  "lastUpdated": "2026-01-19T09:40:08.226Z",
   "memories": [
     {
       "id": "learning-retro-agent-first-sdd-workflow-reduces-iteration",
@@ -595,6 +595,218 @@
       "updated": "2026-01-19T08:13:33.170Z",
       "scope": "project",
       "relativePath": "permanent/gotcha-forked-session-retrospective-output-may-not-surface-completely-to-main-session.md"
+    },
+    {
+      "id": "learning-retro-tdd-stub-first-with-phase-based-organization-scales-to-454-tests-with-zero-rework",
+      "type": "learning",
+      "title": "Retro - TDD stub-first with phase-based organization scales to 454 tests with zero rework",
+      "tags": [
+        "retrospective",
+        "process",
+        "tdd",
+        "phase-based-organization",
+        "project"
+      ],
+      "created": "2026-01-19T08:44:06.458Z",
+      "updated": "2026-01-19T08:44:06.458Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-tdd-stub-first-with-phase-based-organization-scales-to-454-tests-with-zero-rework.md",
+      "severity": "high"
+    },
+    {
+      "id": "gotcha-retro-configuration-format-decisions-should-be-made-in-phase-0-research",
+      "type": "gotcha",
+      "title": "Retro - Configuration format decisions should be made in Phase 0 research",
+      "tags": [
+        "retrospective",
+        "process",
+        "planning",
+        "architecture",
+        "project"
+      ],
+      "created": "2026-01-19T08:44:11.095Z",
+      "updated": "2026-01-19T08:44:11.095Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-configuration-format-decisions-should-be-made-in-phase-0-research.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-config-redesign-markdown-localmd-format",
+      "type": "learning",
+      "title": "Config redesign: markdown .local.md format",
+      "tags": [
+        "configuration",
+        "design",
+        "plugin-standards",
+        "project"
+      ],
+      "created": "2026-01-19T08:44:16.796Z",
+      "updated": "2026-01-19T08:44:16.796Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-config-redesign-markdown-localmd-format.md"
+    },
+    {
+      "id": "learning-retro-integration-point-test-coverage-66-73-should-be-prioritised-before-expanding-features",
+      "type": "learning",
+      "title": "Retro - Integration point test coverage (66-73%) should be prioritised before expanding features",
+      "tags": [
+        "retrospective",
+        "process",
+        "testing",
+        "coverage",
+        "project"
+      ],
+      "created": "2026-01-19T08:44:17.497Z",
+      "updated": "2026-01-19T08:44:17.497Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-integration-point-test-coverage-66-73-should-be-prioritised-before-expanding-features.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-test-coverage-strategy-systematic-gap-analysis-to-reach-100",
+      "type": "learning",
+      "title": "Test coverage strategy: systematic gap analysis to reach ~100%",
+      "tags": [
+        "testing",
+        "coverage",
+        "quality-assurance",
+        "tdd",
+        "project"
+      ],
+      "created": "2026-01-19T08:44:23.983Z",
+      "updated": "2026-01-19T08:44:23.983Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-test-coverage-strategy-systematic-gap-analysis-to-reach-100.md"
+    },
+    {
+      "id": "learning-retro-config-format-redesign-required-parallel-file-management",
+      "type": "learning",
+      "title": "Retro - Config format redesign required parallel file management",
+      "tags": [
+        "retrospective",
+        "process",
+        "config",
+        "project"
+      ],
+      "created": "2026-01-19T09:39:48.937Z",
+      "updated": "2026-01-19T09:39:48.937Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-config-format-redesign-required-parallel-file-management.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-config-redesign-markdown-yaml-frontmatter",
+      "type": "learning",
+      "title": "Config redesign markdown YAML frontmatter",
+      "tags": [
+        "configuration",
+        "design-pattern",
+        "yaml",
+        "plugin",
+        "plugin-development",
+        "project"
+      ],
+      "created": "2026-01-19T09:39:52.893Z",
+      "updated": "2026-01-19T09:39:52.893Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-config-redesign-markdown-yaml-frontmatter.md"
+    },
+    {
+      "id": "learning-retro-security-fix-blocked-pr-merge-until-resolved",
+      "type": "learning",
+      "title": "Retro - Security fix blocked PR merge until resolved",
+      "tags": [
+        "retrospective",
+        "process",
+        "security",
+        "project"
+      ],
+      "created": "2026-01-19T09:39:57.939Z",
+      "updated": "2026-01-19T09:39:57.939Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-security-fix-blocked-pr-merge-until-resolved.md",
+      "severity": "high"
+    },
+    {
+      "id": "learning-command-injection-vulnerability-sessionid-escaping",
+      "type": "learning",
+      "title": "Command injection vulnerability sessionId escaping",
+      "tags": [
+        "security",
+        "command-injection",
+        "shell-escaping",
+        "vulnerability",
+        "project"
+      ],
+      "created": "2026-01-19T09:39:58.408Z",
+      "updated": "2026-01-19T09:39:58.408Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-command-injection-vulnerability-sessionid-escaping.md"
+    },
+    {
+      "id": "gotcha-retro-default-branch-constraint-required-workflow-adjustment",
+      "type": "gotcha",
+      "title": "Retro - Default branch constraint required workflow adjustment",
+      "tags": [
+        "retrospective",
+        "process",
+        "git",
+        "project"
+      ],
+      "created": "2026-01-19T09:40:02.383Z",
+      "updated": "2026-01-19T09:40:02.383Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-default-branch-constraint-required-workflow-adjustment.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-test-coverage-strategy-systematic-gap-analysis",
+      "type": "learning",
+      "title": "Test coverage strategy systematic gap analysis",
+      "tags": [
+        "testing",
+        "test-coverage",
+        "quality-assurance",
+        "tdd",
+        "project"
+      ],
+      "created": "2026-01-19T09:40:03.087Z",
+      "updated": "2026-01-19T09:40:03.087Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-test-coverage-strategy-systematic-gap-analysis.md"
+    },
+    {
+      "id": "learning-retro-test-coverage-reached-9035-with-focused-improvements",
+      "type": "learning",
+      "title": "Retro - Test coverage reached 90.35% with focused improvements",
+      "tags": [
+        "retrospective",
+        "process",
+        "testing",
+        "project"
+      ],
+      "created": "2026-01-19T09:40:07.682Z",
+      "updated": "2026-01-19T09:40:07.682Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-test-coverage-reached-9035-with-focused-improvements.md",
+      "severity": "low"
+    },
+    {
+      "id": "gotcha-vimock-global-pollution-across-test-files",
+      "type": "gotcha",
+      "title": "vi.mock() global pollution across test files",
+      "tags": [
+        "testing",
+        "bun",
+        "vitest",
+        "mocking",
+        "gotcha",
+        "project"
+      ],
+      "created": "2026-01-19T09:40:08.221Z",
+      "updated": "2026-01-19T09:40:08.221Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-vimock-global-pollution-across-test-files.md"
     }
   ]
 }
