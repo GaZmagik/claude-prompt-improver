@@ -117,6 +117,8 @@ export function generateImprovementSummary(
   }
 
   // Detect expansion (>20% token increase)
+  // Threshold: 20% ensures we only flag significant expansions while allowing
+  // minor additions like XML tags or context injections without triggering
   const originalTokens = originalPrompt.split(/\s+/).length;
   const improvedTokens = improvedPrompt.split(/\s+/).length;
   const growthPercent = ((improvedTokens - originalTokens) / originalTokens) * 100;
@@ -125,6 +127,7 @@ export function generateImprovementSummary(
   }
 
   // Return max 3 bullets, or fallback if no specific changes detected
+  // Limit: 3 bullets keeps the summary concise and readable in terminal output
   if (changes.length === 0) {
     return ['Enhanced clarity'];
   }

@@ -393,7 +393,8 @@ export async function loadConfigFromStandardPaths(baseDir = '.'): Promise<Config
 export function validateConfig(config: Partial<Configuration>): ConfigValidationError[] {
   const errors: ConfigValidationError[] = [];
 
-  // Validate shortPromptThreshold (1-100)
+  // Validate shortPromptThreshold (1-100 tokens)
+  // Range: 1-100 covers reasonable prompt lengths; <1 would disable feature, >100 is impractical
   if (config.shortPromptThreshold !== undefined) {
     if (config.shortPromptThreshold < 1 || config.shortPromptThreshold > 100) {
       errors.push({
@@ -404,7 +405,8 @@ export function validateConfig(config: Partial<Configuration>): ConfigValidation
     }
   }
 
-  // Validate compactionThreshold (0-100)
+  // Validate compactionThreshold (0-100 percent)
+  // Range: 0-100 represents percentage; <0 invalid, >100 impossible for percentage
   if (config.compactionThreshold !== undefined) {
     if (config.compactionThreshold < 0 || config.compactionThreshold > 100) {
       errors.push({
@@ -417,7 +419,8 @@ export function validateConfig(config: Partial<Configuration>): ConfigValidation
 
   // Validate logging config if present
   if (config.logging) {
-    // Validate maxLogSizeMB (1-1000)
+    // Validate maxLogSizeMB (1-1000 MB)
+    // Range: 1 MB minimum for useful logs, 1000 MB (1 GB) maximum to prevent disk exhaustion
     if (config.logging.maxLogSizeMB !== undefined) {
       if (config.logging.maxLogSizeMB < 1 || config.logging.maxLogSizeMB > 1000) {
         errors.push({
@@ -428,7 +431,8 @@ export function validateConfig(config: Partial<Configuration>): ConfigValidation
       }
     }
 
-    // Validate maxLogAgeDays (1-365)
+    // Validate maxLogAgeDays (1-365 days)
+    // Range: 1 day minimum for log retention, 365 days (1 year) maximum for practical rotation
     if (config.logging.maxLogAgeDays !== undefined) {
       if (config.logging.maxLogAgeDays < 1 || config.logging.maxLogAgeDays > 365) {
         errors.push({

@@ -118,6 +118,7 @@ export function parseMemoryIndex(content: string): MemoryIndex {
  */
 export function matchMemoriesByTitle(memories: Memory[], prompt: string): Memory[] {
   const promptLower = prompt.toLowerCase();
+  // Filter words with >2 characters (min 3 chars) to exclude articles/prepositions like "a", "in", "of"
   const words = promptLower.split(/\s+/).filter((w) => w.length > 2);
 
   return memories.filter((memory) => {
@@ -136,6 +137,7 @@ export function matchMemoriesByTitle(memories: Memory[], prompt: string): Memory
  */
 export function matchMemoriesByTags(memories: Memory[], prompt: string): Memory[] {
   const promptLower = prompt.toLowerCase();
+  // Filter words with >2 characters (min 3 chars) to exclude articles/prepositions
   const words = promptLower.split(/\s+/).filter((w) => w.length > 2);
 
   return memories.filter((memory) => {
@@ -169,6 +171,7 @@ function scoreMemories(
   prompt: string
 ): Array<{ memory: Memory; score: number }> {
   const promptLower = prompt.toLowerCase();
+  // Filter words with >2 characters (min 3 chars) to exclude articles/prepositions
   const words = promptLower.split(/\s+/).filter((w) => w.length > 2);
 
   return memories.map((memory) => {
