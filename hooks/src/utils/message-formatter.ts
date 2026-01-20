@@ -17,7 +17,8 @@ export function formatSystemMessage(info: VisibilityInfo): string {
         info.tokensBefore!,
         info.tokensAfter!,
         info.summary,
-        info.latencyMs
+        info.latencyMs,
+        info.improvedPrompt
       );
     case 'failed':
       return formatFailureMessage(info.errorHint);
@@ -63,7 +64,8 @@ function formatAppliedMessage(
   tokensBefore: number,
   tokensAfter: number,
   summary?: readonly string[],
-  latencyMs?: number
+  latencyMs?: number,
+  improvedPrompt?: string
 ): string {
   let message = `🎯 Prompt improved`;
 
@@ -82,6 +84,11 @@ function formatAppliedMessage(
   if (latencyMs !== undefined) {
     const latencySec = (Math.round((latencyMs / 1000) * 10) / 10).toFixed(1);
     message += `\n   (${latencySec}s)`;
+  }
+
+  // Display improved prompt if provided
+  if (improvedPrompt !== undefined) {
+    message += `\n\n📝 Improved Prompt:\n${improvedPrompt}`;
   }
 
   return message;
