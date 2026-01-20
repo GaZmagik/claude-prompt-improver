@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2026-01-20
+
+### Fixed
+
+- **Hook command syntax corrected** - Removed `run` from hook command (`bun run` → `bun`)
+  - Hook was using `bun run` which is for package.json scripts
+  - Changed to `bun` for direct TypeScript execution (matches claude-memory-plugin pattern)
+  - Fixes silent hook failures preventing plugin from running when installed
+
+### Technical Details
+
+- Updated hooks.json command from `bun run ${CLAUDE_PLUGIN_ROOT}/...` to `bun ${CLAUDE_PLUGIN_ROOT}/...`
+- This matches the pattern used by other working plugins (claude-memory-plugin)
+
 ## [1.1.1] - 2026-01-20
 
 ### Fixed
