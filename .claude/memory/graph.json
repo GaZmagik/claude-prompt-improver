@@ -457,11 +457,6 @@
       "title": "Post-compaction context restoration via memory system effective"
     },
     {
-      "id": "thought-20260119-125700073",
-      "type": "breadcrumb",
-      "title": "Think: Potential new features for Claude Prompt Improver Plugin"
-    },
-    {
       "id": "learning-post-mvp-remediation-completed-6-phases-systematically",
       "type": "learning",
       "title": "Post-MVP remediation completed 6 phases systematically"
@@ -663,35 +658,98 @@
     },
     {
       "id": "learning-retro-systematic-priority-based-task-ordering-prevents-context-thrashing",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Systematic priority-based task ordering prevents context thrashing"
     },
     {
       "id": "learning-session-restoration-with-parallel-agents-improves-memory-curation",
-      "type": "learning"
+      "type": "learning",
+      "title": "Session restoration with parallel agents improves memory curation"
     },
     {
       "id": "learning-retro-pre-identify-all-code-locations-before-refactoring-to-avoid-incremental-discovery",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Pre-identify all code locations before refactoring to avoid incremental discovery"
     },
     {
       "id": "gotcha-security-vulnerabilities-v100-merged-with-2-critical-issues-indicate-need-for-mandatory-pre-merge-security-audit-gate",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Security vulnerabilities (v1.0.0 merged with 2 critical issues) indicate need for mandatory pre-merge security audit gate"
     },
     {
       "id": "learning-retro-parallel-agent-launches-for-complex-reviews-8-agents-dramatically-more-efficient-than-sequential",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Parallel agent launches for complex reviews (8 agents) dramatically more efficient than sequential"
     },
     {
       "id": "gotcha-retro-defer-medium-priority-schema-refactoring-when-existing-manual-validation-adequate",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Retro - Defer medium-priority schema refactoring when existing manual validation adequate"
     },
     {
       "id": "decision-git-command-array-based-arguments",
-      "type": "decision"
+      "type": "decision",
+      "title": "Refactor executeGitCommand to use array-based arguments instead of string splitting"
     },
     {
       "id": "decision-featurepath-traversal-validation",
-      "type": "decision"
+      "type": "decision",
+      "title": "Add path traversal validation for featurePath in spec-awareness integration"
+    },
+    {
+      "id": "gotcha-postinstall-script-path-calculation-caused-catastrophic-deletion",
+      "type": "gotcha",
+      "title": "Postinstall script path calculation caused catastrophic deletion"
+    },
+    {
+      "id": "gotcha-retro-postinstall-scripts-need-environment-detection-guards",
+      "type": "gotcha",
+      "title": "Retro - Postinstall scripts need environment detection guards"
+    },
+    {
+      "id": "gotcha-postinstall-script-path-calculation-destroyed-23-projects",
+      "type": "gotcha",
+      "title": "Postinstall script path calculation destroyed 23 projects"
+    },
+    {
+      "id": "learning-retro-photorec-recovery-succeeded-but-required-correct-syntax",
+      "type": "learning",
+      "title": "Retro - PhotoRec recovery succeeded but required correct syntax"
+    },
+    {
+      "id": "learning-postinstall-scripts-must-validate-paths-before-destructive-operations",
+      "type": "learning",
+      "title": "Postinstall scripts must validate paths before destructive operations"
+    },
+    {
+      "id": "learning-retro-user-accountability-and-recovery-mindset-made-difference",
+      "type": "learning",
+      "title": "Retro - User accountability and recovery mindset made difference"
+    },
+    {
+      "id": "decision-claude-code-sandboxing",
+      "type": "decision",
+      "title": "Claude Code must run in sandboxed environment"
+    },
+    {
+      "id": "learning-retro-test-quality-improvements-were-derailed-by-infrastructure-disaster",
+      "type": "learning",
+      "title": "Retro - Test quality improvements were derailed by infrastructure disaster"
+    },
+    {
+      "id": "learning-retro-systematic-file-type-enumeration-accelerates-recovery",
+      "type": "learning",
+      "title": "Retro - Systematic file type enumeration accelerates recovery"
+    },
+    {
+      "id": "gotcha-retro-validate-complex-cli-commands-before-execution",
+      "type": "gotcha",
+      "title": "Retro - Validate complex CLI commands before execution"
+    },
+    {
+      "id": "learning-retro-user-domain-intuition-often-outweighs-initial-technical-assumptions",
+      "type": "learning",
+      "title": "Retro - User domain intuition often outweighs initial technical assumptions"
     }
   ],
   "edges": [
