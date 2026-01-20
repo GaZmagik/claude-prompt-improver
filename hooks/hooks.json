@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun run ${CLAUDE_PLUGIN_ROOT}/hooks/user-prompt-submit/improve-prompt.ts",
+            "command": "bun ${CLAUDE_PLUGIN_ROOT}/hooks/user-prompt-submit/improve-prompt.ts",
             "timeout": 90
           }
         ]
