@@ -42,6 +42,7 @@ export type HookOutputOptions =
       tokensAfter: number;
       summary?: readonly string[];
       latencyMs: number;
+      displayImprovedPrompt?: boolean;
     };
 
 /**
@@ -168,6 +169,9 @@ export function createHookOutput(options: HookOutputOptions): HookOutput {
     tokensAfter: options.tokensAfter,
     latencyMs: options.latencyMs,
     ...(options.summary !== undefined && { summary: options.summary }),
+    ...(options.displayImprovedPrompt && options.improvedPrompt !== undefined && {
+      improvedPrompt: options.improvedPrompt
+    }),
   };
 
   return {
@@ -473,6 +477,7 @@ async function main(): Promise<void> {
       tokensBefore: result.tokensBefore,
       tokensAfter: result.tokensAfter,
       latencyMs: result.latencyMs,
+      displayImprovedPrompt: config.logging.displayImprovedPrompt,
       ...(result.summary !== undefined && { summary: result.summary }),
     });
   } else {

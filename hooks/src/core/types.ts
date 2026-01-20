@@ -218,4 +218,5 @@ export interface VisibilityInfo {
   readonly summary?: readonly string[];
   readonly errorHint?: string;
   readonly latencyMs?: number;
+  readonly improvedPrompt?: string;
 }
