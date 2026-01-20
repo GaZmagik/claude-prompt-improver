@@ -16,31 +16,26 @@ A Claude Code plugin that automatically enhances and improves your prompts befor
 - **Bypass Mechanisms**: Skips processing for short prompts, #skip tagged prompts, low context, or forked sessions
 - **XML Structuring**: Applies semantic XML tags (task, context, constraints) to complex prompts
 
-## Installation
+## Requirements
 
-### Prerequisites
+- **[Bun](https://bun.sh/docs/installation)** >= 1.0.0 (required - used for hooks and package management)
+- **Claude Code** >= 2.0.0
 
-- [Bun](https://bun.sh/) runtime (v1.0.0 or later)
-- Claude Code CLI
+## Quick Start
 
-### Steps
+### Installation
 
-1. Clone or copy this plugin to your project:
-
-```bash
-git clone <repository-url> .claude-plugin
-```
-
-2. Install dependencies:
+Using the [Enhance marketplace](https://github.com/GaZmagik/enhance):
 
 ```bash
-cd .claude-plugin
-bun install
+# Add the marketplace (one-time)
+/plugin marketplace add GaZmagik/enhance
+
+# Install the plugin
+/plugin install claude-prompt-improver
 ```
 
-3. The plugin hooks are automatically detected by Claude Code from the `hooks/` directory.
-
-### Plugin Structure
+## Plugin Structure
 
 ```
 .claude-plugin/
