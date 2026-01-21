@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-21T13:58:28.444Z",
+  "lastUpdated": "2026-01-21T14:25:57.419Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -405,22 +405,6 @@
       "relativePath": "permanent/learning-log-level-filtering-with-hierarchical-ordering.md"
     },
     {
-      "id": "gotcha-plugin-logger-utility-exists-but-not-integrated",
-      "type": "gotcha",
-      "title": "plugin-logger-utility-now-integrated-with-active-logging",
-      "tags": [
-        "prompt-improver",
-        "logging",
-        "integration",
-        "resolved",
-        "project"
-      ],
-      "created": "2026-01-19T21:17:08.124Z",
-      "updated": "2026-01-19T21:17:08.124Z",
-      "scope": "global",
-      "relativePath": "permanent/gotcha-plugin-logger-utility-exists-but-not-integrated.md"
-    },
-    {
       "id": "learning-postinstall-scripts-must-validate-paths-before-destructive-operations",
       "type": "learning",
       "title": "Postinstall scripts must validate paths before destructive operations",
@@ -541,18 +525,6 @@
       "scope": "global",
       "relativePath": "permanent/learning-retro-analysis-driven-fixes-prevent-rework-before-implementation.md",
       "severity": "high"
-    },
-    {
-      "id": "gotcha-postinstall-script-path-calculation-destroyed-23-projects",
-      "type": "gotcha",
-      "title": "Postinstall script path calculation destroyed 23 projects",
-      "tags": [
-        "project"
-      ],
-      "created": "2026-01-20T11:53:19.057Z",
-      "updated": "2026-01-20T11:53:19.057Z",
-      "scope": "global",
-      "relativePath": "permanent/gotcha-postinstall-script-path-calculation-destroyed-23-projects.md"
     },
     {
       "id": "learning-security-pattern-50-char-prompt-preview-prevents-accidental-log-exposure",
@@ -1396,23 +1368,6 @@
       "scope": "global",
       "relativePath": "permanent/gotcha-retro-integration-tests-must-validate-interface-signatures-before-writing-assertions.md",
       "severity": "high"
-    },
-    {
-      "id": "gotcha-security-vulnerabilities-v100-merged-with-2-critical-issues-indicate-need-for-mandatory-pre-merge-security-audit-gate",
-      "type": "gotcha",
-      "title": "Security vulnerabilities (v1.0.0 merged with 2 critical issues) indicate need for mandatory pre-merge security audit gate",
-      "tags": [
-        "security",
-        "gate-requirement",
-        "pre-merge-validation",
-        "always-improve",
-        "project"
-      ],
-      "created": "2026-01-19T23:06:13.806Z",
-      "updated": "2026-01-19T23:06:13.806Z",
-      "scope": "global",
-      "relativePath": "permanent/gotcha-security-vulnerabilities-v100-merged-with-2-critical-issues-indicate-need-for-mandatory-pre-merge-security-audit-gate.md",
-      "severity": "critical"
     },
     {
       "id": "learning-post-mvp-remediation-completed-6-phases-systematically",
@@ -2590,22 +2545,6 @@
       "severity": "medium"
     },
     {
-      "id": "gotcha-classification-adds-unacceptable-latency-and-cost",
-      "type": "gotcha",
-      "title": "Classification adds unacceptable latency and cost",
-      "tags": [
-        "architecture",
-        "prompt-improver",
-        "performance",
-        "cost",
-        "project"
-      ],
-      "created": "2026-01-21T13:31:47.941Z",
-      "updated": "2026-01-21T13:31:47.941Z",
-      "scope": "project",
-      "relativePath": "permanent/gotcha-classification-adds-unacceptable-latency-and-cost.md"
-    },
-    {
       "id": "learning-spec-vs-implementation-audit-revealed-major-feature-gaps",
       "type": "learning",
       "title": "Spec-vs-implementation audit revealed major feature gaps",
@@ -2747,6 +2686,150 @@
       "scope": "project",
       "relativePath": "permanent/learning-retro-bundled-template-files-enable-seamless-auto-setup-without-embedding-strings.md",
       "severity": "low"
+    },
+    {
+      "id": "learning-retro-parallel-expert-agents-dramatically-improved-review-efficiency",
+      "type": "learning",
+      "title": "Retro - Parallel expert agents dramatically improved review efficiency",
+      "tags": [
+        "retrospective",
+        "process",
+        "review",
+        "agents",
+        "efficiency",
+        "project"
+      ],
+      "created": "2026-01-21T14:14:45.148Z",
+      "updated": "2026-01-21T14:14:45.148Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-parallel-expert-agents-dramatically-improved-review-efficiency.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-retro-memory-curator-proactively-surfaces-decision-conflicts-for-cleanup",
+      "type": "learning",
+      "title": "Retro - Memory curator proactively surfaces decision conflicts for cleanup",
+      "tags": [
+        "retrospective",
+        "process",
+        "memory",
+        "decision-tracking",
+        "project"
+      ],
+      "created": "2026-01-21T14:14:49.710Z",
+      "updated": "2026-01-21T14:14:49.710Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-memory-curator-proactively-surfaces-decision-conflicts-for-cleanup.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-bundled-template-path-resolution-requires-relative-traversal-from-srccore",
+      "type": "learning",
+      "title": "Bundled template path resolution requires relative traversal from src/core",
+      "tags": [
+        "config-loader",
+        "bundled-templates",
+        "path-resolution",
+        "project"
+      ],
+      "created": "2026-01-21T14:14:52.108Z",
+      "updated": "2026-01-21T14:14:52.108Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-bundled-template-path-resolution-requires-relative-traversal-from-srccore.md"
+    },
+    {
+      "id": "gotcha-gotcha-specify-symlinks-not-auto-created-in-project-clone",
+      "type": "gotcha",
+      "title": "Gotcha - Specify symlinks not auto-created in project clone",
+      "tags": [
+        "retrospective",
+        "process",
+        "setup",
+        "gotcha",
+        "project"
+      ],
+      "created": "2026-01-21T14:14:54.298Z",
+      "updated": "2026-01-21T14:14:54.298Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-gotcha-specify-symlinks-not-auto-created-in-project-clone.md",
+      "severity": "low"
+    },
+    {
+      "id": "learning-ensureconfigsetup-test-coverage-required-8-tests-for-4-status-outcomes",
+      "type": "learning",
+      "title": "ensureConfigSetup() test coverage required 8 tests for 4 status outcomes",
+      "tags": [
+        "testing",
+        "config-loader",
+        "coverage",
+        "project"
+      ],
+      "created": "2026-01-21T14:14:58.491Z",
+      "updated": "2026-01-21T14:14:58.491Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-ensureconfigsetup-test-coverage-required-8-tests-for-4-status-outcomes.md"
+    },
+    {
+      "id": "gotcha-gotcha-dead-code-unused-constants-only-discovered-during-comprehensive-review",
+      "type": "gotcha",
+      "title": "Gotcha - Dead code (unused constants) only discovered during comprehensive review",
+      "tags": [
+        "retrospective",
+        "process",
+        "code-quality",
+        "linting",
+        "project"
+      ],
+      "created": "2026-01-21T14:14:58.770Z",
+      "updated": "2026-01-21T14:14:58.770Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-gotcha-dead-code-unused-constants-only-discovered-during-comprehensive-review.md",
+      "severity": "low"
+    },
+    {
+      "id": "learning-pre-shipping-review-identified-5-major-issues-and-12-minor-issues-across-7-expert-reviews",
+      "type": "learning",
+      "title": "Pre-shipping review identified 5 major issues and 12 minor issues across 7 expert reviews",
+      "tags": [
+        "review",
+        "quality-assurance",
+        "pre-shipping",
+        "project"
+      ],
+      "created": "2026-01-21T14:15:05.659Z",
+      "updated": "2026-01-21T14:15:05.659Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-pre-shipping-review-identified-5-major-issues-and-12-minor-issues-across-7-expert-reviews.md"
+    },
+    {
+      "id": "artifact-config-default-sync-validation",
+      "type": "artifact",
+      "title": "Ensure example config defaults match actual code defaults",
+      "tags": [
+        "config",
+        "defaults",
+        "validation",
+        "project"
+      ],
+      "created": "2026-01-21T14:15:13.540Z",
+      "updated": "2026-01-21T14:15:13.540Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-config-default-sync-validation.md"
+    },
+    {
+      "id": "decision-integration-wiring-fixed-issues-before-shipping",
+      "type": "decision",
+      "title": "Fixed 5 major and 12 minor issues before shipping v1.2.0",
+      "tags": [
+        "integration",
+        "pre-shipping",
+        "quality",
+        "project"
+      ],
+      "created": "2026-01-21T14:15:22.303Z",
+      "updated": "2026-01-21T14:15:22.303Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-integration-wiring-fixed-issues-before-shipping.md"
     }
   ]
 }
