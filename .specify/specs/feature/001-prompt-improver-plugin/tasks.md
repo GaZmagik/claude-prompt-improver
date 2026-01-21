@@ -528,14 +528,21 @@ Before finalising tasks.md, verify:
 
 Implementation audit revealed critical gaps between marked tasks and actual functionality:
 
-### Critical Issues (P1 - Core functionality broken)
+### Classification Tasks - REJECTED BY DESIGN
+
+| Task | Status | Reason |
+|------|--------|--------|
+| **T046** | N/A | Classification requires 2 API calls (classify + improve) = 4-9s extra latency |
+| **T047** | N/A | Model selection is config-driven, not classification-driven |
+| **T049** | N/A | Single API call architecture is correct; classification rejected |
+
+**Decision**: `decision-prompt-improver-always-improve-no-classification` + `gotcha-classification-requires-2-api-calls-unacceptable-latency`
+
+### Actual Issues (P1 - Still needs fixing)
 
 | Task | Issue | Impact |
 |------|-------|--------|
-| **T046** | `classifier.ts` does NOT exist | No prompt classification - ALL prompts get improved |
-| **T047** | Improver ignores SIMPLE/COMPLEX | Single model for all, no NONE passthrough |
-| **T048** | `buildXmlPrompt()` not used | XML structuring never applied |
-| **T049** | Classification not integrated | Hook bypasses entire classification flow |
+| **T048** | `buildXmlPrompt()` not used | XML structuring never applied to improved prompts |
 
 ### Major Issues (P2 - Integrations not wired)
 
