@@ -782,6 +782,14 @@
     {
       "id": "gotcha-userpromptsubmit-hooks-trigger-recursively-when-spawning-claude-cli",
       "type": "gotcha"
+    },
+    {
+      "id": "decision-restore-nonesimplecomplex-classification-per-original-spec",
+      "type": "decision"
+    },
+    {
+      "id": "gotcha-classification-requires-2-api-calls-unacceptable-latency",
+      "type": "gotcha"
     }
   ],
   "edges": [
