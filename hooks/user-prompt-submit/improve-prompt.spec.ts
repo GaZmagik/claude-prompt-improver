@@ -291,7 +291,7 @@ describe('Hook Input/Output', () => {
       expect(result.type).toBe('passthrough');
     });
 
-    it('should passthrough on improvement error but with NONE fallback', async () => {
+    it('should passthrough on improvement error with improvement_failed reason', async () => {
       const result = await processPrompt({
         prompt: 'This is a vague prompt about something that needs to be fixed but without specifics',
         sessionId: 'session-error',
@@ -299,8 +299,11 @@ describe('Hook Input/Output', () => {
         _mockImprovement: null, // Simulates timeout/error
       });
 
-      // Falls back to original prompt
+      // Falls back to original prompt with visible reason
       expect(result.type).toBe('passthrough');
+      if (result.type === 'passthrough') {
+        expect(result.bypassReason).toBe('improvement_failed');
+      }
     });
 
     it('should bypass short prompts without classification', async () => {

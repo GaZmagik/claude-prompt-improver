@@ -44,6 +44,8 @@ export interface ImprovementResult {
   readonly latencyMs: number;
   readonly contextSources: readonly ContextSource[];
   readonly summary?: readonly string[];
+  /** Error message when improvement fails (for debugging) */
+  readonly error?: string;
 }
 
 /**
@@ -268,6 +270,7 @@ export async function improvePrompt(options: ImprovePromptOptions): Promise<Impr
       modelUsed: model,
       latencyMs,
       contextSources,
+      error: result.error ?? 'No output from Claude CLI',
     };
   }
 

@@ -6,6 +6,7 @@ import type {
   BypassReason,
   ClaudeModel,
   Configuration,
+  ContextSource,
   HookInput,
   HookOutput,
   IntegrationToggles,
@@ -199,7 +200,7 @@ export interface ProcessPromptOptions {
  * Result of processing a prompt
  */
 export type ProcessPromptResult =
-  | { type: 'passthrough'; bypassReason?: BypassReason }
+  | { type: 'passthrough'; bypassReason?: BypassReason; error?: string }
   | {
       type: 'improved';
       improvedPrompt: string;
@@ -208,6 +209,7 @@ export type ProcessPromptResult =
       summary?: readonly string[];
       latencyMs: number;
       modelUsed: ClaudeModel | null;
+      contextSources: readonly ContextSource[];
     };
 
 /**
@@ -431,13 +433,18 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
   try {
     improvement = await improvePrompt(improveOptions);
   } catch (err) {
-    // Unexpected error during improvement - fallback to passthrough
-    return { type: 'passthrough' };
+    // Unexpected error during improvement - fallback to passthrough with reason
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    return { type: 'passthrough', bypassReason: 'improvement_failed', error: errorMsg };
   }
 
-  // On improvement failure, fallback to passthrough
+  // On improvement failure, fallback to passthrough with reason
   if (!improvement.success || improvement.fallbackToOriginal) {
-    return { type: 'passthrough' };
+    const result: ProcessPromptResult = { type: 'passthrough', bypassReason: 'improvement_failed' };
+    if (improvement.error) {
+      (result as { error?: string }).error = improvement.error;
+    }
+    return result;
   }
 
   // Count tokens after improvement
@@ -450,6 +457,7 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
     tokensAfter,
     latencyMs: improvement.latencyMs,
     modelUsed: improvement.modelUsed,
+    contextSources: improvement.contextSources,
     ...(improvement.summary !== undefined && { summary: improvement.summary }),
   };
 }
@@ -531,7 +539,7 @@ async function main(): Promise<void> {
         modelUsed: result.modelUsed,
         totalLatency,
         improvementLatency: result.latencyMs,
-        contextSources: [],
+        contextSources: result.contextSources,
         conversationId: context.conversation_id,
         level: 'INFO',
         phase: 'complete',
@@ -546,8 +554,9 @@ async function main(): Promise<void> {
         totalLatency,
         contextSources: [],
         conversationId: context.conversation_id,
-        level: 'INFO',
+        level: result.bypassReason === 'improvement_failed' ? 'ERROR' : 'INFO',
         phase: result.bypassReason ? 'bypass' : 'complete',
+        ...(result.error && { error: result.error }),
       });
       writeLogEntry(logEntry, logFilePath, config.logging.logLevel);
     }
