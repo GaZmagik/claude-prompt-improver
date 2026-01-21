@@ -5,6 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-01-21
+
+### Added
+
+- **Dynamic Context Injection** - Runtime discovery of agents, commands, skills, and output styles
+  - Scans `~/.claude/` (global) and `.claude/` (local) directories automatically
+  - Parses YAML frontmatter from markdown definitions for metadata extraction
+  - Local scope takes precedence over global for same-named resources
+  - Injects matched suggestions into improved prompts based on keyword relevance
+
+- **Filesystem Discovery Infrastructure**
+  - `discoverAgents()` - Scans agents/ directories for .md files
+  - `discoverCommands()` - Scans commands/ directories for .md files
+  - `discoverSkills()` - Scans skills/ directories for SKILL.md files
+  - `discoverOutputStyles()` - Scans output-styles/ directories for .md files
+
+- **Performance Optimisations**
+  - LRU cache with mtime-based invalidation (MAX_CACHE_SIZE=50)
+  - 2-second timeout per directory scan with Promise.race
+  - Monotonic counter for reliable LRU ordering
+
+- **Security Hardening**
+  - Path validation rejecting `..`, null bytes, and shell metacharacters
+  - `isValidDiscoveryPath()` and `validateDiscoveryPath()` utilities
+
+- **Memory Think Special Handling**
+  - Detects `memory think create/add/counter/branch/conclude` patterns
+  - Injects enhanced suggestions for `--agent` and `--style` options
+  - Special formatting distinguishes deliberation context from regular discovery
+
+### Technical Details
+
+- 81 new tests across 4 test suites (path-validator, discovery-cache, directory-scanner, dynamic-discovery)
+- MockFileSystem pattern enables deterministic testing without real filesystem
+- Integrated into context-builder.ts via Promise.allSettled pattern
+- Full SDD workflow: spec.md, plan.md, tasks.md, research.md, quickstart.md
+- 694 total tests passing
+
 ## [1.1.2] - 2026-01-20
 
 ### Fixed
