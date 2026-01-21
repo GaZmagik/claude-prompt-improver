@@ -844,6 +844,42 @@
     {
       "id": "decision-integration-wiring-fixed-issues-before-shipping",
       "type": "decision"
+    },
+    {
+      "id": "learning-retro-systematic-issue-fixing-with-test-validation-prevents-regression",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-prompt-engineering-docs-showed-xml-should-be-mandatory-not-optional",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-async-file-ops-conversion-broke-tests-due-to-syncasync-boundary-confusion",
+      "type": "gotcha"
+    },
+    {
+      "id": "gotcha-retro-hook-testing-showed-silent-failures-on-api-timeouts-error-visibility-needed",
+      "type": "gotcha"
+    },
+    {
+      "id": "decision-integration-wiring-v120-fixed-8-review-issues-before-shipping",
+      "type": "decision"
+    },
+    {
+      "id": "learning-token-counting-optimization-o1-space-complexity",
+      "type": "learning"
+    },
+    {
+      "id": "learning-async-file-operations-migration-pattern",
+      "type": "learning"
+    },
+    {
+      "id": "artifact-lru-cache-eviction-pattern",
+      "type": "artifact"
+    },
+    {
+      "id": "gotcha-hook-xml-structure-consistency-optional-vs-mandatory",
+      "type": "gotcha"
     }
   ],
   "edges": [

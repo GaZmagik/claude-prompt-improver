@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-21T14:25:57.419Z",
+  "lastUpdated": "2026-01-21T18:51:28.392Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -2830,6 +2830,152 @@
       "updated": "2026-01-21T14:15:22.303Z",
       "scope": "project",
       "relativePath": "permanent/decision-integration-wiring-fixed-issues-before-shipping.md"
+    },
+    {
+      "id": "learning-retro-systematic-issue-fixing-with-test-validation-prevents-regression",
+      "type": "learning",
+      "title": "Retro - Systematic issue fixing with test validation prevents regression",
+      "tags": [
+        "retrospective",
+        "process",
+        "testing",
+        "project"
+      ],
+      "created": "2026-01-21T18:50:53.110Z",
+      "updated": "2026-01-21T18:50:53.110Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-systematic-issue-fixing-with-test-validation-prevents-regression.md",
+      "severity": "high"
+    },
+    {
+      "id": "learning-retro-prompt-engineering-docs-showed-xml-should-be-mandatory-not-optional",
+      "type": "learning",
+      "title": "Retro - Prompt engineering docs showed XML should be mandatory not optional",
+      "tags": [
+        "retrospective",
+        "process",
+        "prompt-engineering",
+        "project"
+      ],
+      "created": "2026-01-21T18:50:57.506Z",
+      "updated": "2026-01-21T18:50:57.506Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-prompt-engineering-docs-showed-xml-should-be-mandatory-not-optional.md",
+      "severity": "medium"
+    },
+    {
+      "id": "gotcha-retro-async-file-ops-conversion-broke-tests-due-to-syncasync-boundary-confusion",
+      "type": "gotcha",
+      "title": "Retro - Async file ops conversion broke tests due to sync/async boundary confusion",
+      "tags": [
+        "retrospective",
+        "testing",
+        "async-patterns",
+        "project"
+      ],
+      "created": "2026-01-21T18:51:03.729Z",
+      "updated": "2026-01-21T18:51:03.729Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-async-file-ops-conversion-broke-tests-due-to-syncasync-boundary-confusion.md",
+      "severity": "medium"
+    },
+    {
+      "id": "gotcha-retro-hook-testing-showed-silent-failures-on-api-timeouts-error-visibility-needed",
+      "type": "gotcha",
+      "title": "Retro - Hook testing showed silent failures on API timeouts - error visibility needed",
+      "tags": [
+        "retrospective",
+        "debugging",
+        "hook-testing",
+        "project"
+      ],
+      "created": "2026-01-21T18:51:09.412Z",
+      "updated": "2026-01-21T18:51:09.412Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-hook-testing-showed-silent-failures-on-api-timeouts-error-visibility-needed.md",
+      "severity": "medium"
+    },
+    {
+      "id": "decision-integration-wiring-v120-fixed-8-review-issues-before-shipping",
+      "type": "decision",
+      "title": "Integration Wiring v1.2.0 - Fixed 8 Review Issues Before Shipping",
+      "tags": [
+        "v1.2.0",
+        "integration",
+        "pre-shipping",
+        "quality-review",
+        "project"
+      ],
+      "created": "2026-01-21T18:51:11.134Z",
+      "updated": "2026-01-21T18:51:11.134Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-integration-wiring-v120-fixed-8-review-issues-before-shipping.md"
+    },
+    {
+      "id": "learning-token-counting-optimization-o1-space-complexity",
+      "type": "learning",
+      "title": "Token Counting Optimization - O(1) Space Complexity",
+      "tags": [
+        "optimization",
+        "performance",
+        "token-counting",
+        "algorithms",
+        "project"
+      ],
+      "created": "2026-01-21T18:51:15.501Z",
+      "updated": "2026-01-21T18:51:15.501Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-token-counting-optimization-o1-space-complexity.md"
+    },
+    {
+      "id": "learning-async-file-operations-migration-pattern",
+      "type": "learning",
+      "title": "Async File Operations Migration Pattern",
+      "tags": [
+        "async",
+        "file-io",
+        "performance",
+        "testing",
+        "event-loop",
+        "project"
+      ],
+      "created": "2026-01-21T18:51:19.659Z",
+      "updated": "2026-01-21T18:51:19.659Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-async-file-operations-migration-pattern.md"
+    },
+    {
+      "id": "artifact-lru-cache-eviction-pattern",
+      "type": "artifact",
+      "title": "LRU Cache Eviction Pattern",
+      "tags": [
+        "caching",
+        "lru",
+        "memory-management",
+        "patterns",
+        "project"
+      ],
+      "created": "2026-01-21T18:51:23.934Z",
+      "updated": "2026-01-21T18:51:23.934Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-lru-cache-eviction-pattern.md"
+    },
+    {
+      "id": "gotcha-hook-xml-structure-consistency-optional-vs-mandatory",
+      "type": "gotcha",
+      "title": "Hook XML Structure Consistency - Optional vs Mandatory",
+      "tags": [
+        "hooks",
+        "prompting",
+        "xml",
+        "consistency",
+        "debugging",
+        "project"
+      ],
+      "created": "2026-01-21T18:51:28.388Z",
+      "updated": "2026-01-21T18:51:28.388Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-hook-xml-structure-consistency-optional-vs-mandatory.md"
     }
   ]
 }
