@@ -29,6 +29,12 @@ import {
   gatherSpecContext,
 } from '../integrations/spec-awareness.ts';
 import {
+  type DynamicDiscoveryOptions,
+  type DynamicContext,
+  formatDynamicContext,
+  gatherDynamicContext,
+} from '../integrations/dynamic-discovery.ts';
+import {
   type AgentDefinition,
   type SuggestedAgent,
   formatAgentsContext,
@@ -93,7 +99,8 @@ export type ContextSource =
   | 'lsp'
   | 'spec'
   | 'memory'
-  | 'session';
+  | 'session'
+  | 'dynamicDiscovery';
 
 /**
  * Input for building context
