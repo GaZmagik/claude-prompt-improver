@@ -29,6 +29,12 @@ import {
   gatherSpecContext,
 } from '../integrations/spec-awareness.ts';
 import {
+  type DynamicDiscoveryOptions,
+  type DynamicContext,
+  formatDynamicContext,
+  gatherDynamicContext,
+} from '../integrations/dynamic-discovery.ts';
+import {
   type AgentDefinition,
   type SuggestedAgent,
   formatAgentsContext,
@@ -93,7 +99,8 @@ export type ContextSource =
   | 'lsp'
   | 'spec'
   | 'memory'
-  | 'session';
+  | 'session'
+  | 'dynamicDiscovery';
 
 /**
  * Input for building context
@@ -108,6 +115,7 @@ export interface ContextBuilderInput {
   readonly specOptions?: SpecAwarenessOptions;
   readonly memoryOptions?: MemoryPluginOptions;
   readonly sessionOptions?: SessionContextOptions;
+  readonly dynamicDiscoveryOptions?: DynamicDiscoveryOptions;
   readonly timeoutMs?: number;
 }
 
@@ -124,6 +132,7 @@ export interface BuiltContext {
   readonly spec?: SpecContext;
   readonly memory?: MemoryContext;
   readonly session?: SessionContext;
+  readonly dynamicDiscovery?: DynamicContext;
 }
 
 /**
@@ -138,6 +147,7 @@ export interface FormattedContext {
   readonly spec?: string;
   readonly memory?: string;
   readonly session?: string;
+  readonly dynamicDiscovery?: string;
 }
 
 /**
@@ -154,6 +164,7 @@ export async function buildContext(input: ContextBuilderInput): Promise<BuiltCon
     specOptions,
     memoryOptions,
     sessionOptions,
+    dynamicDiscoveryOptions,
   } = input;
   const sources: ContextSource[] = [];
 
@@ -167,6 +178,7 @@ export async function buildContext(input: ContextBuilderInput): Promise<BuiltCon
     spec?: SpecContext;
     memory?: MemoryContext;
     session?: SessionContext;
+    dynamicDiscovery?: DynamicContext;
   } = {};
 
   // Gather synchronous context
@@ -180,6 +192,7 @@ export async function buildContext(input: ContextBuilderInput): Promise<BuiltCon
     specOptions,
     memoryOptions,
     sessionOptions,
+    dynamicDiscoveryOptions,
     sources,
     results
   );
@@ -242,6 +255,7 @@ function buildAsyncTasks(
   specOptions: SpecAwarenessOptions | undefined,
   memoryOptions: MemoryPluginOptions | undefined,
   sessionOptions: SessionContextOptions | undefined,
+  dynamicDiscoveryOptions: DynamicDiscoveryOptions | undefined,
   sources: ContextSource[],
   results: {
     git?: GitContext;
@@ -249,6 +263,7 @@ function buildAsyncTasks(
     spec?: SpecContext;
     memory?: MemoryContext;
     session?: SessionContext;
+    dynamicDiscovery?: DynamicContext;
   }
 ): Promise<void>[] {
   const tasks: Promise<void>[] = [];
@@ -313,6 +328,18 @@ function buildAsyncTasks(
     );
   }
 
+  if (dynamicDiscoveryOptions && dynamicDiscoveryOptions.enabled !== false) {
+    tasks.push(
+      createAsyncTask(
+        () => gatherDynamicContext({ ...dynamicDiscoveryOptions, prompt }),
+        (ctx) => {
+          results.dynamicDiscovery = ctx;
+          sources.push('dynamicDiscovery');
+        }
+      )
+    );
+  }
+
   return tasks;
 }
 
@@ -331,6 +358,12 @@ export function formatContextForInjection(context: BuiltContext): FormattedConte
   const spec = formatField(context.spec, sources, 'spec', formatSpecContext);
   const memory = formatField(context.memory, sources, 'memory', formatMemoryContext);
   const session = formatField(context.session, sources, 'session', formatSessionContext);
+  const dynamicDiscovery = formatField(
+    context.dynamicDiscovery,
+    sources,
+    'dynamicDiscovery',
+    formatDynamicContext
+  );
 
   // Build result with conditional property inclusion (exactOptionalPropertyTypes)
   return {
@@ -342,5 +375,6 @@ export function formatContextForInjection(context: BuiltContext): FormattedConte
     ...(spec !== undefined && { spec }),
     ...(memory !== undefined && { memory }),
     ...(session !== undefined && { session }),
+    ...(dynamicDiscovery !== undefined && { dynamicDiscovery }),
   };
 }
