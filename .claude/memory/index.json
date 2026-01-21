@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-21T13:02:25.064Z",
+  "lastUpdated": "2026-01-21T13:10:22.569Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -2536,6 +2536,23 @@
       "updated": "2026-01-21T13:02:25.060Z",
       "scope": "project",
       "relativePath": "permanent/gotcha-project-scoped-plugin-hooks-dont-auto-load-despite-claude-pluginpluginjson.md"
+    },
+    {
+      "id": "gotcha-userpromptsubmit-hooks-trigger-recursively-when-spawning-claude-cli",
+      "type": "gotcha",
+      "title": "UserPromptSubmit hooks trigger recursively when spawning claude CLI",
+      "tags": [
+        "hooks",
+        "recursion",
+        "claude-cli",
+        "UserPromptSubmit",
+        "project"
+      ],
+      "created": "2026-01-21T13:10:22.563Z",
+      "updated": "2026-01-21T13:10:22.563Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-userpromptsubmit-hooks-trigger-recursively-when-spawning-claude-cli.md",
+      "severity": "critical"
     }
   ]
 }

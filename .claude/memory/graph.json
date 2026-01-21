@@ -778,6 +778,10 @@
     {
       "id": "gotcha-project-scoped-plugin-hooks-dont-auto-load-despite-claude-pluginpluginjson",
       "type": "gotcha"
+    },
+    {
+      "id": "gotcha-userpromptsubmit-hooks-trigger-recursively-when-spawning-claude-cli",
+      "type": "gotcha"
     }
   ],
   "edges": [
