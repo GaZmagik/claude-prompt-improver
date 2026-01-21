@@ -14,24 +14,14 @@ import {
 
 describe('Hook Input/Output', () => {
   describe('T018: parseHookInput - stdin parsing for prompt and context', () => {
+    // Note: Claude Code sends flat structure with session_id at root level
     it('should parse valid hook input with all fields', () => {
       const stdin = JSON.stringify({
         prompt: 'fix the bug',
-        context: {
-          conversation_id: 'conv-123',
-          message_index: 5,
-          available_tools: ['Read', 'Write', 'Edit'],
-          enabled_mcp_servers: ['ripgrep'],
-          context_usage: {
-            used: 12345,
-            max: 200000,
-            auto_compaction_enabled: true,
-          },
-          session_settings: {
-            model: 'claude-sonnet-4-5',
-            skills: ['memory', 'typescript-expert'],
-          },
-        },
+        session_id: 'conv-123',
+        cwd: '/home/user/project',
+        permission_mode: 'default',
+        hook_event_name: 'UserPromptSubmit',
       });
 
       const result = parseHookInput(stdin);
@@ -39,17 +29,13 @@ describe('Hook Input/Output', () => {
       expect(result.success).toBe(true);
       expect(result.input?.prompt).toBe('fix the bug');
       expect(result.input?.context.conversation_id).toBe('conv-123');
-      expect(result.input?.context.message_index).toBe(5);
-      expect(result.input?.context.available_tools).toContain('Read');
+      expect(result.input?.context.cwd).toBe('/home/user/project');
     });
 
     it('should parse minimal hook input with required fields only', () => {
       const stdin = JSON.stringify({
         prompt: 'simple prompt',
-        context: {
-          conversation_id: 'conv-456',
-          message_index: 0,
-        },
+        session_id: 'conv-456',
       });
 
       const result = parseHookInput(stdin);
@@ -62,11 +48,8 @@ describe('Hook Input/Output', () => {
     it('should detect forked session via permission_mode', () => {
       const stdin = JSON.stringify({
         prompt: 'internal prompt',
-        context: {
-          conversation_id: 'conv-789',
-          message_index: 1,
-          permission_mode: 'fork',
-        },
+        session_id: 'conv-789',
+        permission_mode: 'fork',
       });
 
       const result = parseHookInput(stdin);
@@ -75,25 +58,17 @@ describe('Hook Input/Output', () => {
       expect(result.input?.context.permission_mode).toBe('fork');
     });
 
-    it('should parse context_usage for compaction detection', () => {
+    it('should parse transcript_path when provided', () => {
       const stdin = JSON.stringify({
         prompt: 'test',
-        context: {
-          conversation_id: 'conv-abc',
-          message_index: 100,
-          context_usage: {
-            used: 190000,
-            max: 200000,
-            auto_compaction_enabled: true,
-          },
-        },
+        session_id: 'conv-abc',
+        transcript_path: '/home/user/.claude/transcripts/session.jsonl',
       });
 
       const result = parseHookInput(stdin);
 
       expect(result.success).toBe(true);
-      expect(result.input?.context.context_usage?.used).toBe(190000);
-      expect(result.input?.context.context_usage?.max).toBe(200000);
+      expect(result.input?.context.conversation_id).toBe('conv-abc');
     });
 
     it('should return error for invalid JSON', () => {
@@ -107,10 +82,7 @@ describe('Hook Input/Output', () => {
 
     it('should return error for missing prompt field', () => {
       const stdin = JSON.stringify({
-        context: {
-          conversation_id: 'conv-xyz',
-          message_index: 0,
-        },
+        session_id: 'conv-xyz',
       });
 
       const result = parseHookInput(stdin);
@@ -119,7 +91,7 @@ describe('Hook Input/Output', () => {
       expect(result.error).toContain('prompt');
     });
 
-    it('should return error for missing context field', () => {
+    it('should return error for missing session_id field', () => {
       const stdin = JSON.stringify({
         prompt: 'test prompt',
       });
@@ -127,16 +99,13 @@ describe('Hook Input/Output', () => {
       const result = parseHookInput(stdin);
 
       expect(result.success).toBe(false);
-      expect(result.error).toContain('context');
+      expect(result.error).toContain('session_id');
     });
 
     it('should handle empty string prompt', () => {
       const stdin = JSON.stringify({
         prompt: '',
-        context: {
-          conversation_id: 'conv-empty',
-          message_index: 0,
-        },
+        session_id: 'conv-empty',
       });
 
       const result = parseHookInput(stdin);

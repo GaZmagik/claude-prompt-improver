@@ -8,6 +8,7 @@ import type {
   Configuration,
   HookInput,
   HookOutput,
+  IntegrationToggles,
   VisibilityInfo,
 } from '../src/core/types.ts';
 import { detectBypass, type BypassCheckInput } from '../src/core/bypass-detector.ts';
@@ -15,7 +16,7 @@ import { improvePrompt, type ImprovementContext } from '../src/services/improver
 import { buildContext, formatContextForInjection } from '../src/context/context-builder.ts';
 import type { SkillRule } from '../src/context/skill-matcher.ts';
 import type { AgentDefinition } from '../src/context/agent-suggester.ts';
-import { loadConfigFromStandardPaths } from '../src/core/config-loader.ts';
+import { ensureConfigSetup, loadConfigFromStandardPaths } from '../src/core/config-loader.ts';
 import { formatSystemMessage } from '../src/utils/message-formatter.ts';
 import { countTokens } from '../src/utils/token-counter.ts';
 import { createLogEntry, writeLogEntry } from '../src/utils/logger.ts';
@@ -184,6 +185,10 @@ export interface ProcessPromptOptions {
   readonly skillRules?: SkillRule[];
   /** Agent definitions for matching */
   readonly agentDefinitions?: AgentDefinition[];
+  /** Integration toggles from config */
+  readonly integrations?: IntegrationToggles;
+  /** Current working directory for integrations */
+  readonly cwd?: string;
   /** For testing - mock the classification response */
   readonly _mockClassification?: string | null;
   /** For testing - mock the improvement response */
@@ -233,19 +238,41 @@ function buildBypassCheckInput(options: ProcessPromptOptions): BypassCheckInput 
 }
 
 /**
+ * Options for building improvement context
+ */
+interface BuildImprovementContextOptions {
+  readonly prompt: string;
+  readonly availableTools?: readonly string[];
+  readonly skillRules?: SkillRule[];
+  readonly agentDefinitions?: AgentDefinition[];
+  readonly integrations?: IntegrationToggles;
+  readonly cwd?: string;
+}
+
+/**
  * Builds improvement context from available sources
+ * Wires up all integration services (git, lsp, spec, memory, session)
  */
 async function buildImprovementContext(
-  prompt: string,
-  availableTools?: readonly string[],
-  skillRules?: SkillRule[],
-  agentDefinitions?: AgentDefinition[]
+  options: BuildImprovementContextOptions
 ): Promise<ImprovementContext | undefined> {
-  if (!availableTools && !skillRules && !agentDefinitions) {
+  const { prompt, availableTools, skillRules, agentDefinitions, integrations, cwd } = options;
+
+  // Check if we have any context sources to gather
+  const hasToolContext = availableTools || skillRules || agentDefinitions;
+  const hasIntegrations = integrations && (
+    integrations.git || integrations.lsp || integrations.spec ||
+    integrations.memory || integrations.session
+  );
+
+  if (!hasToolContext && !hasIntegrations) {
     return undefined;
   }
 
+  // Build context input with all sources
   const contextInput: Parameters<typeof buildContext>[0] = { prompt };
+
+  // Add tool/skill/agent context
   if (availableTools) {
     (contextInput as { availableTools?: readonly string[] }).availableTools = availableTools;
   }
@@ -256,14 +283,44 @@ async function buildImprovementContext(
     (contextInput as { agentDefinitions?: AgentDefinition[] }).agentDefinitions = agentDefinitions;
   }
 
+  // Add integration context options based on config toggles
+  if (integrations) {
+    if (integrations.git) {
+      (contextInput as { gitOptions?: { enabled: boolean; cwd?: string } }).gitOptions = {
+        enabled: true,
+        ...(cwd && { cwd }),
+      };
+    }
+    if (integrations.lsp) {
+      (contextInput as { lspOptions?: { enabled: boolean } }).lspOptions = { enabled: true };
+    }
+    if (integrations.spec) {
+      (contextInput as { specOptions?: { enabled: boolean; cwd?: string } }).specOptions = {
+        enabled: true,
+        ...(cwd && { cwd }),
+      };
+    }
+    if (integrations.memory) {
+      (contextInput as { memoryOptions?: { enabled: boolean } }).memoryOptions = { enabled: true };
+    }
+    if (integrations.session) {
+      (contextInput as { sessionOptions?: { enabled: boolean } }).sessionOptions = { enabled: true };
+    }
+  }
+
   const builtContext = await buildContext(contextInput);
   const formattedContext = formatContextForInjection(builtContext);
 
-  // Only return context if we have something
-  if (!formattedContext.tools && !formattedContext.skills && !formattedContext.agents) {
+  // Check if we have any context
+  const hasAnyContext = formattedContext.tools || formattedContext.skills || formattedContext.agents ||
+    formattedContext.git || formattedContext.lsp || formattedContext.spec ||
+    formattedContext.memory || formattedContext.session;
+
+  if (!hasAnyContext) {
     return undefined;
   }
 
+  // Build improvement context with all available fields
   const improvementContext: ImprovementContext = {};
   if (formattedContext.tools) {
     (improvementContext as { tools?: string }).tools = formattedContext.tools;
@@ -273,6 +330,21 @@ async function buildImprovementContext(
   }
   if (formattedContext.agents) {
     (improvementContext as { agents?: string }).agents = formattedContext.agents;
+  }
+  if (formattedContext.git) {
+    (improvementContext as { git?: string }).git = formattedContext.git;
+  }
+  if (formattedContext.lsp) {
+    (improvementContext as { lsp?: string }).lsp = formattedContext.lsp;
+  }
+  if (formattedContext.spec) {
+    (improvementContext as { spec?: string }).spec = formattedContext.spec;
+  }
+  if (formattedContext.memory) {
+    (improvementContext as { memory?: string }).memory = formattedContext.memory;
+  }
+  if (formattedContext.session) {
+    (improvementContext as { session?: string }).session = formattedContext.session;
   }
 
   return improvementContext;
@@ -315,7 +387,7 @@ function buildImproveOptions(
  * Returns passthrough on bypass conditions or errors
  */
 export async function processPrompt(options: ProcessPromptOptions): Promise<ProcessPromptResult> {
-  const { prompt, sessionId, availableTools, skillRules, agentDefinitions, _mockClassification, _mockImprovement } = options;
+  const { prompt, sessionId, availableTools, skillRules, agentDefinitions, integrations, cwd, _mockClassification, _mockImprovement } = options;
 
   // Check for bypass conditions (fast, synchronous check)
   const bypassInput = buildBypassCheckInput(options);
@@ -326,8 +398,24 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
       : { type: 'passthrough' };
   }
 
-  // Build context from available sources
-  const improvementContext = await buildImprovementContext(prompt, availableTools, skillRules, agentDefinitions);
+  // Build context from available sources (tools, skills, agents, git, lsp, spec, memory, session)
+  const contextOptions: BuildImprovementContextOptions = { prompt };
+  if (availableTools) {
+    (contextOptions as { availableTools?: readonly string[] }).availableTools = availableTools;
+  }
+  if (skillRules) {
+    (contextOptions as { skillRules?: SkillRule[] }).skillRules = skillRules;
+  }
+  if (agentDefinitions) {
+    (contextOptions as { agentDefinitions?: AgentDefinition[] }).agentDefinitions = agentDefinitions;
+  }
+  if (integrations) {
+    (contextOptions as { integrations?: IntegrationToggles }).integrations = integrations;
+  }
+  if (cwd) {
+    (contextOptions as { cwd?: string }).cwd = cwd;
+  }
+  const improvementContext = await buildImprovementContext(contextOptions);
 
   // Load config for model selection
   const config = await loadConfigFromStandardPaths();
@@ -373,6 +461,10 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
 async function main(): Promise<void> {
   const startTime = performance.now();
 
+  // Ensure config setup exists (creates example.md if needed)
+  const setupResult = await ensureConfigSetup();
+  const setupMessage = setupResult.message; // Will be included in output if present
+
   // Load configuration
   const config = await loadConfigFromStandardPaths();
 
@@ -411,7 +503,17 @@ async function main(): Promise<void> {
     };
   }
 
-  // Process the prompt through classification and improvement
+  // Add integration toggles from config
+  if (config.integrations) {
+    (processOptions as { integrations?: IntegrationToggles }).integrations = config.integrations;
+  }
+
+  // Add cwd for integrations that need it (git, spec)
+  if (context.cwd) {
+    (processOptions as { cwd?: string }).cwd = context.cwd;
+  }
+
+  // Process the prompt through improvement with all context sources
   const result = await processPrompt(processOptions);
 
   // Calculate total latency
@@ -468,6 +570,16 @@ async function main(): Promise<void> {
       type: 'passthrough',
       ...(result.bypassReason !== undefined && { bypassReason: result.bypassReason }),
     });
+  }
+
+  // Append setup message if config needs user attention
+  if (setupMessage) {
+    const existingSystemMessage = output.systemMessage ?? '';
+    const separator = existingSystemMessage ? '\n\n' : '';
+    output = {
+      ...output,
+      systemMessage: `${existingSystemMessage}${separator}📋 ${setupMessage}`,
+    };
   }
 
   console.log(serializeHookOutput(output));

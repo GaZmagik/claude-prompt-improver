@@ -174,6 +174,7 @@ export interface HookContext {
   readonly conversation_id: string;
   readonly message_index: number;
   readonly permission_mode?: string;
+  readonly cwd?: string;
   readonly available_tools?: readonly string[];
   readonly enabled_mcp_servers?: readonly string[];
   readonly context_usage?: ContextUsage;

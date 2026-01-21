@@ -57,14 +57,14 @@ describe('README.md Documentation', () => {
       expect(hasInstallation).toBe(true);
     });
 
-    it('should mention bun or npm for dependencies', () => {
+    it('should mention plugin installation method', () => {
       expect(readmeContent).toBeDefined();
-      const hasDeps =
+      // Claude Code plugins are installed via /plugin install, not npm/bun
+      const hasPluginInstall =
+        readmeContent.includes('/plugin install') ||
         readmeContent.includes('bun install') ||
-        readmeContent.includes('npm install') ||
-        readmeContent.includes('bun add') ||
-        readmeContent.includes('npm add');
-      expect(hasDeps).toBe(true);
+        readmeContent.includes('npm install');
+      expect(hasPluginInstall).toBe(true);
     });
 
     it('should mention plugin installation steps', () => {

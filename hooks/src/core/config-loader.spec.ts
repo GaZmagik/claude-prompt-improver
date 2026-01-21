@@ -12,7 +12,9 @@ import { join } from 'node:path';
 import {
   CONFIG_PATHS,
   DEFAULT_CONFIG,
+  EXAMPLE_CONFIG_PATH,
   clearConfigCache,
+  ensureConfigSetup,
   loadConfig,
   loadConfigFromStandardPaths,
   parseYamlFrontmatter,

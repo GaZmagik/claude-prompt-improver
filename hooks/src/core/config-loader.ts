@@ -3,8 +3,8 @@
  * Loads and validates user configuration from markdown files with YAML frontmatter
  * Similar to claude-memory-plugin's local.md pattern
  */
-import { access, readFile, stat } from 'node:fs/promises';
-import { join } from 'node:path';
+import { access, mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
 import type { Configuration, IntegrationToggles, LogLevel, LoggingConfig } from './types.ts';
 
 /**
@@ -67,6 +67,79 @@ export const CONFIG_PATHS = [
   '.claude/prompt-improver.local.md', // Primary: project-local config
   '.claude/prompt-improver-config.json', // Legacy: JSON format (backwards compat)
 ] as const;
+
+/** Path to example config file in project */
+export const EXAMPLE_CONFIG_PATH = '.claude/prompt-improver.example.md';
+
+/** Path to bundled example template (relative to hooks directory) */
+const BUNDLED_TEMPLATE_PATH = '../templates/prompt-improver.example.md';
+
+/** Result of config setup check */
+export interface ConfigSetupResult {
+  readonly status: 'local_exists' | 'example_exists' | 'example_created' | 'setup_failed';
+  readonly message?: string;
+}
+
+/**
+ * Gets the path to the bundled template file
+ * Resolves relative to the current module's location
+ */
+function getBundledTemplatePath(): string {
+  // import.meta.dir gives us the directory of this module
+  return join(import.meta.dir, BUNDLED_TEMPLATE_PATH);
+}
+
+/**
+ * Ensures config setup exists, creating example.md if neither config exists
+ * Returns status indicating what was found/created
+ */
+export async function ensureConfigSetup(baseDir = '.'): Promise<ConfigSetupResult> {
+  const localPath = join(baseDir, CONFIG_PATHS[0]);
+  const examplePath = join(baseDir, EXAMPLE_CONFIG_PATH);
+
+  // Check if local.md exists
+  try {
+    await access(localPath);
+    return { status: 'local_exists' };
+  } catch {
+    // local.md doesn't exist, continue
+  }
+
+  // Check if example.md exists
+  try {
+    await access(examplePath);
+    return {
+      status: 'example_exists',
+      message: 'Prompt improver config not found. Copy .claude/prompt-improver.example.md to .claude/prompt-improver.local.md to customise settings.',
+    };
+  } catch {
+    // example.md doesn't exist, create it
+  }
+
+  // Create example.md from bundled template
+  try {
+    // Read bundled template
+    const templatePath = getBundledTemplatePath();
+    const templateContent = await readFile(templatePath, 'utf-8');
+
+    // Ensure .claude directory exists
+    const claudeDir = dirname(examplePath);
+    await mkdir(claudeDir, { recursive: true });
+
+    // Write example config
+    await writeFile(examplePath, templateContent, 'utf-8');
+
+    return {
+      status: 'example_created',
+      message: 'Created .claude/prompt-improver.example.md. Copy to .claude/prompt-improver.local.md to customise plugin settings.',
+    };
+  } catch (err) {
+    return {
+      status: 'setup_failed',
+      message: `Failed to create config file: ${err instanceof Error ? err.message : String(err)}`,
+    };
+  }
+}
 
 /**
  * Cache entry for configuration

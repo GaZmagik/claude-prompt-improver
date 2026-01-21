@@ -82,7 +82,7 @@ describe('Claude Client', () => {
       expect(args).not.toContain('session-123');
     });
 
-    it('should set cwd to /tmp to avoid project hooks', () => {
+    it('should set cwd to /tmp/claude to avoid project hooks', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
         model: 'haiku',
@@ -91,7 +91,7 @@ describe('Claude Client', () => {
 
       const { cwd } = buildClaudeCommand(options);
 
-      expect(cwd).toBe('/tmp');
+      expect(cwd).toBe('/tmp/claude');
     });
   });
 
