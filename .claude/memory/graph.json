@@ -750,6 +750,34 @@
       "id": "learning-retro-user-domain-intuition-often-outweighs-initial-technical-assumptions",
       "type": "learning",
       "title": "Retro - User domain intuition often outweighs initial technical assumptions"
+    },
+    {
+      "id": "learning-retro-capture-actual-hook-input-format-before-implementing-parser",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-sandbox-stdin-is-devnull-making-local-testing-impossible",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-claude-code-hook-stdin-captures-with-shell-scripts-for-debugging",
+      "type": "learning"
+    },
+    {
+      "id": "learning-claude-code-userpromptsubmit-hook-input-format-is-flat-not-nested",
+      "type": "learning"
+    },
+    {
+      "id": "learning-sandbox-blocks-stdin-piping-to-bun-scripts",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-claude-cli-needs-no-session-persistence-to-run-in-sandbox",
+      "type": "gotcha"
+    },
+    {
+      "id": "gotcha-project-scoped-plugin-hooks-dont-auto-load-despite-claude-pluginpluginjson",
+      "type": "gotcha"
     }
   ],
   "edges": [
@@ -1511,6 +1539,36 @@
     {
       "source": "decision-prompt-improver-always-improve-no-classification",
       "target": "artifact-always-improve-production-restructuring-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-capture-actual-hook-input-format-before-implementing-parser",
+      "target": "learning-claude-code-userpromptsubmit-hook-input-format-is-flat-not-nested",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-capture-actual-hook-input-format-before-implementing-parser",
+      "target": "learning-retro-claude-code-hook-stdin-captures-with-shell-scripts-for-debugging",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-capture-actual-hook-input-format-before-implementing-parser",
+      "target": "gotcha-retro-sandbox-stdin-is-devnull-making-local-testing-impossible",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-sandbox-blocks-stdin-piping-to-bun-scripts",
+      "target": "gotcha-retro-sandbox-stdin-is-devnull-making-local-testing-impossible",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-claude-code-userpromptsubmit-hook-input-format-is-flat-not-nested",
+      "target": "gotcha-claude-cli-needs-no-session-persistence-to-run-in-sandbox",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-project-scoped-plugin-hooks-dont-auto-load-despite-claude-pluginpluginjson",
+      "target": "learning-claude-code-userpromptsubmit-hook-input-format-is-flat-not-nested",
       "label": "relates-to"
     }
   ]

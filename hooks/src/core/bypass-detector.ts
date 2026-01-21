@@ -48,6 +48,17 @@ function hasSkipTag(prompt: string): boolean {
 }
 
 /**
+ * Detects if prompt is an improvement request (recursion prevention)
+ * The hook spawns Claude CLI with an improvement prompt - if that triggers
+ * the hook again, we get infinite recursion with exponential XML escaping.
+ */
+function isImprovementPrompt(prompt: string): boolean {
+  // Check for the improvement prompt template signature
+  return prompt.startsWith('You are improving a user prompt') ||
+    prompt.includes('<original_prompt>');
+}
+
+/**
  * Calculates available context percentage
  */
 function getAvailableContextPercent(contextUsage: { used: number; max: number }): number {
@@ -63,6 +74,7 @@ function getAvailableContextPercent(contextUsage: { used: number; max: number })
  * 0. forceImprove - Override all checks except plugin_disabled
  * 1. plugin_disabled - Plugin is disabled in configuration (cannot be overridden)
  * 2. forked_session - Running in forked session (recursion prevention)
+ * 2b. improvement_prompt - Prompt is our own improvement template (recursion prevention)
  * 3. low_context - Less than 5% context remaining
  * 4. skip_tag - Prompt contains #skip tag
  * 5. short_prompt - Prompt is ≤10 tokens
@@ -90,6 +102,16 @@ export function detectBypass(input: BypassCheckInput): BypassCheckResult {
     return {
       shouldBypass: true,
       reason: 'forked_session',
+    };
+  }
+
+  // Priority 2b: Improvement prompt recursion prevention
+  // When the hook spawns `claude --print` to improve a prompt, that subprocess
+  // also triggers UserPromptSubmit hooks. Detect and skip our own improvement prompts.
+  if (isImprovementPrompt(prompt)) {
+    return {
+      shouldBypass: true,
+      reason: 'forked_session', // Reuse existing reason - semantically same concept
     };
   }
 

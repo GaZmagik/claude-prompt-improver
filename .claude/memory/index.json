@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-20T14:39:15.430Z",
+  "lastUpdated": "2026-01-21T13:02:25.064Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -2421,6 +2421,121 @@
       "updated": "2026-01-19T08:44:23.983Z",
       "scope": "global",
       "relativePath": "permanent/learning-test-coverage-strategy-systematic-gap-analysis-to-reach-100.md"
+    },
+    {
+      "id": "learning-retro-capture-actual-hook-input-format-before-implementing-parser",
+      "type": "learning",
+      "title": "Retro - Capture actual hook input format before implementing parser",
+      "tags": [
+        "retrospective",
+        "process",
+        "hooks",
+        "debugging",
+        "project"
+      ],
+      "created": "2026-01-21T13:01:36.493Z",
+      "updated": "2026-01-21T13:01:36.493Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-capture-actual-hook-input-format-before-implementing-parser.md",
+      "severity": "high"
+    },
+    {
+      "id": "gotcha-retro-sandbox-stdin-is-devnull-making-local-testing-impossible",
+      "type": "gotcha",
+      "title": "Retro - Sandbox stdin is /dev/null, making local testing impossible",
+      "tags": [
+        "retrospective",
+        "process",
+        "testing",
+        "sandbox",
+        "project"
+      ],
+      "created": "2026-01-21T13:01:44.152Z",
+      "updated": "2026-01-21T13:01:44.152Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-sandbox-stdin-is-devnull-making-local-testing-impossible.md",
+      "severity": "high"
+    },
+    {
+      "id": "learning-retro-claude-code-hook-stdin-captures-with-shell-scripts-for-debugging",
+      "type": "learning",
+      "title": "Retro - Claude Code hook stdin captures with shell scripts for debugging",
+      "tags": [
+        "retrospective",
+        "process",
+        "debugging",
+        "hooks",
+        "project"
+      ],
+      "created": "2026-01-21T13:01:49.530Z",
+      "updated": "2026-01-21T13:01:49.530Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-claude-code-hook-stdin-captures-with-shell-scripts-for-debugging.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-claude-code-userpromptsubmit-hook-input-format-is-flat-not-nested",
+      "type": "learning",
+      "title": "Claude Code UserPromptSubmit hook input format is flat, not nested",
+      "tags": [
+        "claude-code",
+        "hooks",
+        "userpromptsubmit",
+        "plugin-development",
+        "project"
+      ],
+      "created": "2026-01-21T13:02:21.530Z",
+      "updated": "2026-01-21T13:02:21.530Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-claude-code-userpromptsubmit-hook-input-format-is-flat-not-nested.md"
+    },
+    {
+      "id": "learning-sandbox-blocks-stdin-piping-to-bun-scripts",
+      "type": "learning",
+      "title": "Sandbox blocks stdin piping to Bun scripts",
+      "tags": [
+        "sandbox",
+        "bun",
+        "testing",
+        "stdin",
+        "project"
+      ],
+      "created": "2026-01-21T13:02:22.682Z",
+      "updated": "2026-01-21T13:02:22.682Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-sandbox-blocks-stdin-piping-to-bun-scripts.md"
+    },
+    {
+      "id": "gotcha-claude-cli-needs-no-session-persistence-to-run-in-sandbox",
+      "type": "gotcha",
+      "title": "Claude CLI needs --no-session-persistence to run in sandbox",
+      "tags": [
+        "sandbox",
+        "claude-cli",
+        "erofs",
+        "hooks",
+        "project"
+      ],
+      "created": "2026-01-21T13:02:23.882Z",
+      "updated": "2026-01-21T13:02:23.882Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-claude-cli-needs-no-session-persistence-to-run-in-sandbox.md"
+    },
+    {
+      "id": "gotcha-project-scoped-plugin-hooks-dont-auto-load-despite-claude-pluginpluginjson",
+      "type": "gotcha",
+      "title": "Project-scoped plugin hooks don't auto-load despite .claude-plugin/plugin.json",
+      "tags": [
+        "plugins",
+        "plugin-development",
+        "hooks",
+        "marketplace",
+        "project"
+      ],
+      "created": "2026-01-21T13:02:25.060Z",
+      "updated": "2026-01-21T13:02:25.060Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-project-scoped-plugin-hooks-dont-auto-load-despite-claude-pluginpluginjson.md"
     }
   ]
 }
