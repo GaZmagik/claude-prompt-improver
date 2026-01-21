@@ -880,6 +880,34 @@
     {
       "id": "gotcha-hook-xml-structure-consistency-optional-vs-mandatory",
       "type": "gotcha"
+    },
+    {
+      "id": "gotcha-retro-silent-error-handling-masks-integration-failures",
+      "type": "gotcha"
+    },
+    {
+      "id": "gotcha-retro-context-sources-were-hardcoded-empty-despite-gathering-logic",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-pre-compact-memory-capture-provided-immediate-debugging-context",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-hook-improvement-failures-silent-without-error-details",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-context-sources-hardcoded-to-empty-array-in-hook-output",
+      "type": "learning"
+    },
+    {
+      "id": "learning-integration-context-gathering-verified-working-with-git-and-memory-sources",
+      "type": "learning"
+    },
+    {
+      "id": "decision-dynamic-context-injection-v120-exploration-phase",
+      "type": "decision"
     }
   ],
   "edges": [

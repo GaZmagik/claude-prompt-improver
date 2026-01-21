@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-21T18:51:28.392Z",
+  "lastUpdated": "2026-01-21T19:56:47.939Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -2976,6 +2976,112 @@
       "updated": "2026-01-21T18:51:28.388Z",
       "scope": "project",
       "relativePath": "permanent/gotcha-hook-xml-structure-consistency-optional-vs-mandatory.md"
+    },
+    {
+      "id": "gotcha-retro-silent-error-handling-masks-integration-failures",
+      "type": "gotcha",
+      "title": "Retro - Silent error handling masks integration failures",
+      "tags": [
+        "retrospective",
+        "process",
+        "error-handling",
+        "project"
+      ],
+      "created": "2026-01-21T19:21:28.636Z",
+      "updated": "2026-01-21T19:21:28.636Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-silent-error-handling-masks-integration-failures.md",
+      "severity": "high"
+    },
+    {
+      "id": "gotcha-retro-context-sources-were-hardcoded-empty-despite-gathering-logic",
+      "type": "gotcha",
+      "title": "Retro - Context sources were hardcoded empty despite gathering logic",
+      "tags": [
+        "retrospective",
+        "process",
+        "data-flow",
+        "project"
+      ],
+      "created": "2026-01-21T19:21:28.710Z",
+      "updated": "2026-01-21T19:21:28.710Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-context-sources-were-hardcoded-empty-despite-gathering-logic.md",
+      "severity": "high"
+    },
+    {
+      "id": "learning-retro-pre-compact-memory-capture-provided-immediate-debugging-context",
+      "type": "learning",
+      "title": "Retro - Pre-compact memory capture provided immediate debugging context",
+      "tags": [
+        "retrospective",
+        "process",
+        "memory-system",
+        "project"
+      ],
+      "created": "2026-01-21T19:21:28.779Z",
+      "updated": "2026-01-21T19:21:28.779Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-pre-compact-memory-capture-provided-immediate-debugging-context.md",
+      "severity": "medium"
+    },
+    {
+      "id": "gotcha-hook-improvement-failures-silent-without-error-details",
+      "type": "gotcha",
+      "title": "Hook improvement failures silent without error details",
+      "tags": [
+        "hook-debugging",
+        "error-visibility",
+        "api-failures",
+        "project"
+      ],
+      "created": "2026-01-21T19:21:30.980Z",
+      "updated": "2026-01-21T19:21:30.980Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-hook-improvement-failures-silent-without-error-details.md"
+    },
+    {
+      "id": "learning-context-sources-hardcoded-to-empty-array-in-hook-output",
+      "type": "learning",
+      "title": "Context sources hardcoded to empty array in hook output",
+      "tags": [
+        "context-integration",
+        "prop-drilling",
+        "bug-fix",
+        "project"
+      ],
+      "created": "2026-01-21T19:21:31.088Z",
+      "updated": "2026-01-21T19:21:31.088Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-context-sources-hardcoded-to-empty-array-in-hook-output.md"
+    },
+    {
+      "id": "learning-integration-context-gathering-verified-working-with-git-and-memory-sources",
+      "type": "learning",
+      "title": "Integration context gathering verified working with git and memory sources",
+      "tags": [
+        "integration-testing",
+        "context-sources",
+        "verified",
+        "project"
+      ],
+      "created": "2026-01-21T19:21:31.188Z",
+      "updated": "2026-01-21T19:21:31.188Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-integration-context-gathering-verified-working-with-git-and-memory-sources.md"
+    },
+    {
+      "id": "decision-dynamic-context-injection-v120-exploration-phase",
+      "type": "decision",
+      "title": "Dynamic Context Injection v1.2.0 - Exploration Phase",
+      "tags": [
+        "promoted-from-think",
+        "project"
+      ],
+      "created": "2026-01-21T19:56:47.937Z",
+      "updated": "2026-01-21T19:56:47.937Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-dynamic-context-injection-v120-exploration-phase.md"
     }
   ]
 }
