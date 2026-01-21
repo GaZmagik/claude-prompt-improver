@@ -60,9 +60,11 @@ export function buildClaudeCommand(options: ClaudeClientOptions): ClaudeCommandA
   // Array-based arguments prevent shell injection
   // Arguments are passed directly to process, not through shell
   // Note: No --resume or --fork-session needed - prompt improvement doesn't require conversation history
+  // CRITICAL: --no-session-persistence required to avoid EROFS errors in Claude Code sandbox
   const args = [
     'claude',
     '--print',
+    '--no-session-persistence',
     '--model',
     modelId,
     prompt, // No escaping needed - passed directly to process
