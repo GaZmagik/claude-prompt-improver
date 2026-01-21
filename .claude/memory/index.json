@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-21T20:26:20.543Z",
+  "lastUpdated": "2026-01-21T20:47:54.199Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -2437,6 +2437,150 @@
       "updated": "2026-01-21T20:26:20.538Z",
       "scope": "project",
       "relativePath": "permanent/decision-dynamic-context-injection-v130-spec.md"
+    },
+    {
+      "id": "learning-retro-full-sdd-workflow-in-single-session-accelerates-feature-delivery",
+      "type": "learning",
+      "title": "Retro - Full SDD workflow in single session accelerates feature delivery",
+      "tags": [
+        "retrospective",
+        "process",
+        "sdd-workflow",
+        "planning",
+        "project"
+      ],
+      "created": "2026-01-21T20:47:12.666Z",
+      "updated": "2026-01-21T20:47:12.666Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-full-sdd-workflow-in-single-session-accelerates-feature-delivery.md",
+      "severity": "high"
+    },
+    {
+      "id": "learning-retro-post-compact-context-restoration-with-multiple-agents-works-well",
+      "type": "learning",
+      "title": "Retro - Post-compact context restoration with multiple agents works well",
+      "tags": [
+        "retrospective",
+        "process",
+        "context-restoration",
+        "agents",
+        "project"
+      ],
+      "created": "2026-01-21T20:47:18.304Z",
+      "updated": "2026-01-21T20:47:18.304Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-post-compact-context-restoration-with-multiple-agents-works-well.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-retro-codebase-exploration-agent-is-essential-before-specking-new-features",
+      "type": "learning",
+      "title": "Retro - Codebase exploration agent is essential before specking new features",
+      "tags": [
+        "retrospective",
+        "process",
+        "exploration",
+        "architecture-reuse",
+        "project"
+      ],
+      "created": "2026-01-21T20:47:24.494Z",
+      "updated": "2026-01-21T20:47:24.494Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-codebase-exploration-agent-is-essential-before-specking-new-features.md",
+      "severity": "high"
+    },
+    {
+      "id": "learning-retro-asking-user-questions-keeps-session-focused-vs-open-ended",
+      "type": "learning",
+      "title": "Retro - Asking user questions keeps session focused vs open-ended",
+      "tags": [
+        "retrospective",
+        "process",
+        "user-engagement",
+        "project"
+      ],
+      "created": "2026-01-21T20:47:30.621Z",
+      "updated": "2026-01-21T20:47:30.621Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-asking-user-questions-keeps-session-focused-vs-open-ended.md",
+      "severity": "medium"
+    },
+    {
+      "id": "decision-filesystem-first-discovery-over-config-driven",
+      "type": "decision",
+      "title": "Filesystem-first discovery over config-driven",
+      "tags": [
+        "architecture",
+        "discovery",
+        "configuration",
+        "project"
+      ],
+      "created": "2026-01-21T20:47:31.753Z",
+      "updated": "2026-01-21T20:47:31.753Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-filesystem-first-discovery-over-config-driven.md"
+    },
+    {
+      "id": "learning-multi-tier-filesystem-scanning-pattern-for-plugin-discovery",
+      "type": "learning",
+      "title": "Multi-tier filesystem scanning pattern for plugin discovery",
+      "tags": [
+        "architecture",
+        "pattern",
+        "discovery",
+        "filesystem",
+        "project"
+      ],
+      "created": "2026-01-21T20:47:38.093Z",
+      "updated": "2026-01-21T20:47:38.093Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-multi-tier-filesystem-scanning-pattern-for-plugin-discovery.md"
+    },
+    {
+      "id": "learning-lru-cache-with-mtime-invalidation-for-discovery-performance",
+      "type": "learning",
+      "title": "LRU cache with mtime invalidation for discovery performance",
+      "tags": [
+        "performance",
+        "caching",
+        "optimization",
+        "pattern",
+        "project"
+      ],
+      "created": "2026-01-21T20:47:43.075Z",
+      "updated": "2026-01-21T20:47:43.075Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-lru-cache-with-mtime-invalidation-for-discovery-performance.md"
+    },
+    {
+      "id": "decision-special-pattern-detection-for-memory-think-deliberation",
+      "type": "decision",
+      "title": "Special pattern detection for memory think deliberation",
+      "tags": [
+        "architecture",
+        "memory-integration",
+        "deliberation",
+        "project"
+      ],
+      "created": "2026-01-21T20:47:48.321Z",
+      "updated": "2026-01-21T20:47:48.321Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-special-pattern-detection-for-memory-think-deliberation.md"
+    },
+    {
+      "id": "learning-consistent-yaml-frontmatter-across-plugin-definition-types",
+      "type": "learning",
+      "title": "Consistent YAML frontmatter across plugin definition types",
+      "tags": [
+        "architecture",
+        "consistency",
+        "design-pattern",
+        "project"
+      ],
+      "created": "2026-01-21T20:47:54.185Z",
+      "updated": "2026-01-21T20:47:54.185Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-consistent-yaml-frontmatter-across-plugin-definition-types.md"
     }
   ]
 }

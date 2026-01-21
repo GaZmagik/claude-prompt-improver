@@ -754,6 +754,42 @@
     {
       "id": "decision-dynamic-context-injection-v130-spec",
       "type": "decision"
+    },
+    {
+      "id": "learning-retro-full-sdd-workflow-in-single-session-accelerates-feature-delivery",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-post-compact-context-restoration-with-multiple-agents-works-well",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-codebase-exploration-agent-is-essential-before-specking-new-features",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-asking-user-questions-keeps-session-focused-vs-open-ended",
+      "type": "learning"
+    },
+    {
+      "id": "decision-filesystem-first-discovery-over-config-driven",
+      "type": "decision"
+    },
+    {
+      "id": "learning-multi-tier-filesystem-scanning-pattern-for-plugin-discovery",
+      "type": "learning"
+    },
+    {
+      "id": "learning-lru-cache-with-mtime-invalidation-for-discovery-performance",
+      "type": "learning"
+    },
+    {
+      "id": "decision-special-pattern-detection-for-memory-think-deliberation",
+      "type": "decision"
+    },
+    {
+      "id": "learning-consistent-yaml-frontmatter-across-plugin-definition-types",
+      "type": "learning"
     }
   ],
   "edges": [
@@ -1515,6 +1551,36 @@
     {
       "source": "decision-prompt-improver-always-improve-no-classification",
       "target": "artifact-always-improve-production-restructuring-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-dynamic-context-injection-v130-spec",
+      "target": "decision-filesystem-first-discovery-over-config-driven",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-dynamic-context-injection-v130-spec",
+      "target": "decision-special-pattern-detection-for-memory-think-deliberation",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-filesystem-first-discovery-over-config-driven",
+      "target": "learning-multi-tier-filesystem-scanning-pattern-for-plugin-discovery",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-dynamic-context-injection-v130-spec",
+      "target": "learning-lru-cache-with-mtime-invalidation-for-discovery-performance",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-special-pattern-detection-for-memory-think-deliberation",
+      "target": "learning-consistent-yaml-frontmatter-across-plugin-definition-types",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-filesystem-first-discovery-over-config-driven",
+      "target": "learning-consistent-yaml-frontmatter-across-plugin-definition-types",
       "label": "relates-to"
     }
   ]
