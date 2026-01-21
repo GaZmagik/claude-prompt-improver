@@ -6,8 +6,10 @@ import type {
   BypassReason,
   ClaudeModel,
   Configuration,
+  ContextSource,
   HookInput,
   HookOutput,
+  IntegrationToggles,
   VisibilityInfo,
 } from '../src/core/types.ts';
 import { detectBypass, type BypassCheckInput } from '../src/core/bypass-detector.ts';
@@ -15,7 +17,7 @@ import { improvePrompt, type ImprovementContext } from '../src/services/improver
 import { buildContext, formatContextForInjection } from '../src/context/context-builder.ts';
 import type { SkillRule } from '../src/context/skill-matcher.ts';
 import type { AgentDefinition } from '../src/context/agent-suggester.ts';
-import { loadConfigFromStandardPaths } from '../src/core/config-loader.ts';
+import { ensureConfigSetup, loadConfigFromStandardPaths } from '../src/core/config-loader.ts';
 import { formatSystemMessage } from '../src/utils/message-formatter.ts';
 import { countTokens } from '../src/utils/token-counter.ts';
 import { createLogEntry, writeLogEntry } from '../src/utils/logger.ts';
@@ -60,50 +62,33 @@ export function parseHookInput(stdin: string): ParseResult {
       };
     }
 
-    if (!parsed.context || typeof parsed.context !== 'object') {
+    // Claude Code sends a flat structure, not nested context
+    // Expected format: { session_id, cwd, permission_mode, hook_event_name, prompt }
+    const sessionId = parsed.session_id;
+    if (typeof sessionId !== 'string') {
       return {
         success: false,
-        error: 'Missing or invalid "context" field',
+        error: 'Missing or invalid "session_id" field',
       };
     }
 
-    const context = parsed.context as Record<string, unknown>;
-
-    // Validate required context fields
-    if (typeof context.conversation_id !== 'string') {
-      return {
-        success: false,
-        error: 'Missing or invalid "context.conversation_id" field',
-      };
-    }
-
-    if (typeof context.message_index !== 'number') {
-      return {
-        success: false,
-        error: 'Missing or invalid "context.message_index" field',
-      };
-    }
-
-    // Build context object, adding optional fields only when present
+    // Build context object from flat input structure
     const contextObj: Record<string, unknown> = {
-      conversation_id: context.conversation_id,
-      message_index: context.message_index,
+      conversation_id: sessionId,
+      message_index: 0, // Not provided by Claude Code, use default
     };
 
-    if (typeof context.permission_mode === 'string') {
-      contextObj.permission_mode = context.permission_mode;
+    if (typeof parsed.permission_mode === 'string') {
+      contextObj.permission_mode = parsed.permission_mode;
     }
-    if (Array.isArray(context.available_tools)) {
-      contextObj.available_tools = context.available_tools;
+    if (typeof parsed.cwd === 'string') {
+      contextObj.cwd = parsed.cwd;
     }
-    if (Array.isArray(context.enabled_mcp_servers)) {
-      contextObj.enabled_mcp_servers = context.enabled_mcp_servers;
+    if (typeof parsed.hook_event_name === 'string') {
+      contextObj.hook_event_name = parsed.hook_event_name;
     }
-    if (context.context_usage && typeof context.context_usage === 'object') {
-      contextObj.context_usage = context.context_usage;
-    }
-    if (context.session_settings && typeof context.session_settings === 'object') {
-      contextObj.session_settings = context.session_settings;
+    if (typeof parsed.transcript_path === 'string') {
+      contextObj.transcript_path = parsed.transcript_path;
     }
 
     const input: HookInput = {
@@ -201,6 +186,10 @@ export interface ProcessPromptOptions {
   readonly skillRules?: SkillRule[];
   /** Agent definitions for matching */
   readonly agentDefinitions?: AgentDefinition[];
+  /** Integration toggles from config */
+  readonly integrations?: IntegrationToggles;
+  /** Current working directory for integrations */
+  readonly cwd?: string;
   /** For testing - mock the classification response */
   readonly _mockClassification?: string | null;
   /** For testing - mock the improvement response */
@@ -211,7 +200,7 @@ export interface ProcessPromptOptions {
  * Result of processing a prompt
  */
 export type ProcessPromptResult =
-  | { type: 'passthrough'; bypassReason?: BypassReason }
+  | { type: 'passthrough'; bypassReason?: BypassReason; error?: string }
   | {
       type: 'improved';
       improvedPrompt: string;
@@ -220,6 +209,7 @@ export type ProcessPromptResult =
       summary?: readonly string[];
       latencyMs: number;
       modelUsed: ClaudeModel | null;
+      contextSources: readonly ContextSource[];
     };
 
 /**
@@ -250,19 +240,41 @@ function buildBypassCheckInput(options: ProcessPromptOptions): BypassCheckInput 
 }
 
 /**
+ * Options for building improvement context
+ */
+interface BuildImprovementContextOptions {
+  readonly prompt: string;
+  readonly availableTools?: readonly string[];
+  readonly skillRules?: SkillRule[];
+  readonly agentDefinitions?: AgentDefinition[];
+  readonly integrations?: IntegrationToggles;
+  readonly cwd?: string;
+}
+
+/**
  * Builds improvement context from available sources
+ * Wires up all integration services (git, lsp, spec, memory, session)
  */
 async function buildImprovementContext(
-  prompt: string,
-  availableTools?: readonly string[],
-  skillRules?: SkillRule[],
-  agentDefinitions?: AgentDefinition[]
+  options: BuildImprovementContextOptions
 ): Promise<ImprovementContext | undefined> {
-  if (!availableTools && !skillRules && !agentDefinitions) {
+  const { prompt, availableTools, skillRules, agentDefinitions, integrations, cwd } = options;
+
+  // Check if we have any context sources to gather
+  const hasToolContext = availableTools || skillRules || agentDefinitions;
+  const hasIntegrations = integrations && (
+    integrations.git || integrations.lsp || integrations.spec ||
+    integrations.memory || integrations.session
+  );
+
+  if (!hasToolContext && !hasIntegrations) {
     return undefined;
   }
 
+  // Build context input with all sources
   const contextInput: Parameters<typeof buildContext>[0] = { prompt };
+
+  // Add tool/skill/agent context
   if (availableTools) {
     (contextInput as { availableTools?: readonly string[] }).availableTools = availableTools;
   }
@@ -273,14 +285,44 @@ async function buildImprovementContext(
     (contextInput as { agentDefinitions?: AgentDefinition[] }).agentDefinitions = agentDefinitions;
   }
 
+  // Add integration context options based on config toggles
+  if (integrations) {
+    if (integrations.git) {
+      (contextInput as { gitOptions?: { enabled: boolean; cwd?: string } }).gitOptions = {
+        enabled: true,
+        ...(cwd && { cwd }),
+      };
+    }
+    if (integrations.lsp) {
+      (contextInput as { lspOptions?: { enabled: boolean } }).lspOptions = { enabled: true };
+    }
+    if (integrations.spec) {
+      (contextInput as { specOptions?: { enabled: boolean; cwd?: string } }).specOptions = {
+        enabled: true,
+        ...(cwd && { cwd }),
+      };
+    }
+    if (integrations.memory) {
+      (contextInput as { memoryOptions?: { enabled: boolean } }).memoryOptions = { enabled: true };
+    }
+    if (integrations.session) {
+      (contextInput as { sessionOptions?: { enabled: boolean } }).sessionOptions = { enabled: true };
+    }
+  }
+
   const builtContext = await buildContext(contextInput);
   const formattedContext = formatContextForInjection(builtContext);
 
-  // Only return context if we have something
-  if (!formattedContext.tools && !formattedContext.skills && !formattedContext.agents) {
+  // Check if we have any context
+  const hasAnyContext = formattedContext.tools || formattedContext.skills || formattedContext.agents ||
+    formattedContext.git || formattedContext.lsp || formattedContext.spec ||
+    formattedContext.memory || formattedContext.session;
+
+  if (!hasAnyContext) {
     return undefined;
   }
 
+  // Build improvement context with all available fields
   const improvementContext: ImprovementContext = {};
   if (formattedContext.tools) {
     (improvementContext as { tools?: string }).tools = formattedContext.tools;
@@ -290,6 +332,21 @@ async function buildImprovementContext(
   }
   if (formattedContext.agents) {
     (improvementContext as { agents?: string }).agents = formattedContext.agents;
+  }
+  if (formattedContext.git) {
+    (improvementContext as { git?: string }).git = formattedContext.git;
+  }
+  if (formattedContext.lsp) {
+    (improvementContext as { lsp?: string }).lsp = formattedContext.lsp;
+  }
+  if (formattedContext.spec) {
+    (improvementContext as { spec?: string }).spec = formattedContext.spec;
+  }
+  if (formattedContext.memory) {
+    (improvementContext as { memory?: string }).memory = formattedContext.memory;
+  }
+  if (formattedContext.session) {
+    (improvementContext as { session?: string }).session = formattedContext.session;
   }
 
   return improvementContext;
@@ -332,7 +389,7 @@ function buildImproveOptions(
  * Returns passthrough on bypass conditions or errors
  */
 export async function processPrompt(options: ProcessPromptOptions): Promise<ProcessPromptResult> {
-  const { prompt, sessionId, availableTools, skillRules, agentDefinitions, _mockClassification, _mockImprovement } = options;
+  const { prompt, sessionId, availableTools, skillRules, agentDefinitions, integrations, cwd, _mockClassification, _mockImprovement } = options;
 
   // Check for bypass conditions (fast, synchronous check)
   const bypassInput = buildBypassCheckInput(options);
@@ -343,8 +400,24 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
       : { type: 'passthrough' };
   }
 
-  // Build context from available sources
-  const improvementContext = await buildImprovementContext(prompt, availableTools, skillRules, agentDefinitions);
+  // Build context from available sources (tools, skills, agents, git, lsp, spec, memory, session)
+  const contextOptions: BuildImprovementContextOptions = { prompt };
+  if (availableTools) {
+    (contextOptions as { availableTools?: readonly string[] }).availableTools = availableTools;
+  }
+  if (skillRules) {
+    (contextOptions as { skillRules?: SkillRule[] }).skillRules = skillRules;
+  }
+  if (agentDefinitions) {
+    (contextOptions as { agentDefinitions?: AgentDefinition[] }).agentDefinitions = agentDefinitions;
+  }
+  if (integrations) {
+    (contextOptions as { integrations?: IntegrationToggles }).integrations = integrations;
+  }
+  if (cwd) {
+    (contextOptions as { cwd?: string }).cwd = cwd;
+  }
+  const improvementContext = await buildImprovementContext(contextOptions);
 
   // Load config for model selection
   const config = await loadConfigFromStandardPaths();
@@ -360,13 +433,18 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
   try {
     improvement = await improvePrompt(improveOptions);
   } catch (err) {
-    // Unexpected error during improvement - fallback to passthrough
-    return { type: 'passthrough' };
+    // Unexpected error during improvement - fallback to passthrough with reason
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    return { type: 'passthrough', bypassReason: 'improvement_failed', error: errorMsg };
   }
 
-  // On improvement failure, fallback to passthrough
+  // On improvement failure, fallback to passthrough with reason
   if (!improvement.success || improvement.fallbackToOriginal) {
-    return { type: 'passthrough' };
+    const result: ProcessPromptResult = { type: 'passthrough', bypassReason: 'improvement_failed' };
+    if (improvement.error) {
+      (result as { error?: string }).error = improvement.error;
+    }
+    return result;
   }
 
   // Count tokens after improvement
@@ -379,6 +457,7 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
     tokensAfter,
     latencyMs: improvement.latencyMs,
     modelUsed: improvement.modelUsed,
+    contextSources: improvement.contextSources,
     ...(improvement.summary !== undefined && { summary: improvement.summary }),
   };
 }
@@ -389,6 +468,10 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
  */
 async function main(): Promise<void> {
   const startTime = performance.now();
+
+  // Ensure config setup exists (creates example.md if needed)
+  const setupResult = await ensureConfigSetup();
+  const setupMessage = setupResult.message; // Will be included in output if present
 
   // Load configuration
   const config = await loadConfigFromStandardPaths();
@@ -428,7 +511,17 @@ async function main(): Promise<void> {
     };
   }
 
-  // Process the prompt through classification and improvement
+  // Add integration toggles from config
+  if (config.integrations) {
+    (processOptions as { integrations?: IntegrationToggles }).integrations = config.integrations;
+  }
+
+  // Add cwd for integrations that need it (git, spec)
+  if (context.cwd) {
+    (processOptions as { cwd?: string }).cwd = context.cwd;
+  }
+
+  // Process the prompt through improvement with all context sources
   const result = await processPrompt(processOptions);
 
   // Calculate total latency
@@ -446,7 +539,7 @@ async function main(): Promise<void> {
         modelUsed: result.modelUsed,
         totalLatency,
         improvementLatency: result.latencyMs,
-        contextSources: [],
+        contextSources: result.contextSources,
         conversationId: context.conversation_id,
         level: 'INFO',
         phase: 'complete',
@@ -461,8 +554,9 @@ async function main(): Promise<void> {
         totalLatency,
         contextSources: [],
         conversationId: context.conversation_id,
-        level: 'INFO',
+        level: result.bypassReason === 'improvement_failed' ? 'ERROR' : 'INFO',
         phase: result.bypassReason ? 'bypass' : 'complete',
+        ...(result.error && { error: result.error }),
       });
       writeLogEntry(logEntry, logFilePath, config.logging.logLevel);
     }
@@ -485,6 +579,16 @@ async function main(): Promise<void> {
       type: 'passthrough',
       ...(result.bypassReason !== undefined && { bypassReason: result.bypassReason }),
     });
+  }
+
+  // Append setup message if config needs user attention
+  if (setupMessage) {
+    const existingSystemMessage = output.systemMessage ?? '';
+    const separator = existingSystemMessage ? '\n\n' : '';
+    output = {
+      ...output,
+      systemMessage: `${existingSystemMessage}${separator}📋 ${setupMessage}`,
+    };
   }
 
   console.log(serializeHookOutput(output));

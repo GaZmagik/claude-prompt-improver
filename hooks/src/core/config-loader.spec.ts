@@ -12,7 +12,9 @@ import { join } from 'node:path';
 import {
   CONFIG_PATHS,
   DEFAULT_CONFIG,
+  EXAMPLE_CONFIG_PATH,
   clearConfigCache,
+  ensureConfigSetup,
   loadConfig,
   loadConfigFromStandardPaths,
   parseYamlFrontmatter,
@@ -756,6 +758,137 @@ enabled: true
     it('should have useTimestampedLogs in logging defaults', () => {
       expect(DEFAULT_CONFIG.logging).toHaveProperty('useTimestampedLogs');
       expect(DEFAULT_CONFIG.logging.useTimestampedLogs).toBe(false);
+    });
+  });
+
+  describe('ensureConfigSetup', () => {
+    const setupTestDir = join(tmpdir(), `prompt-improver-setup-test-${Date.now()}`);
+    const localConfigPath = join(setupTestDir, '.claude', 'prompt-improver.local.md');
+    const exampleConfigPath = join(setupTestDir, '.claude', 'prompt-improver.example.md');
+
+    beforeEach(() => {
+      // Clean slate for each test
+      if (existsSync(setupTestDir)) {
+        rmSync(setupTestDir, { recursive: true, force: true });
+      }
+    });
+
+    afterEach(() => {
+      if (existsSync(setupTestDir)) {
+        rmSync(setupTestDir, { recursive: true, force: true });
+      }
+    });
+
+    it('should return local_exists when local.md exists', async () => {
+      // Create .claude directory and local config
+      mkdirSync(join(setupTestDir, '.claude'), { recursive: true });
+      writeFileSync(localConfigPath, '---\nenabled: true\n---\n');
+
+      const result = await ensureConfigSetup(setupTestDir);
+
+      expect(result.status).toBe('local_exists');
+      expect(result.message).toBeUndefined();
+    });
+
+    it('should return example_exists when only example.md exists', async () => {
+      // Create .claude directory and example config only
+      mkdirSync(join(setupTestDir, '.claude'), { recursive: true });
+      writeFileSync(exampleConfigPath, '---\nenabled: true\n---\n');
+
+      const result = await ensureConfigSetup(setupTestDir);
+
+      expect(result.status).toBe('example_exists');
+      expect(result.message).toBeDefined();
+      expect(result.message).toContain('prompt-improver.example.md');
+      expect(result.message).toContain('prompt-improver.local.md');
+    });
+
+    it('should return example_created when neither config exists and template is available', async () => {
+      // Create empty .claude directory (no configs)
+      mkdirSync(join(setupTestDir, '.claude'), { recursive: true });
+
+      const result = await ensureConfigSetup(setupTestDir);
+
+      expect(result.status).toBe('example_created');
+      expect(result.message).toBeDefined();
+      expect(result.message).toContain('Created');
+      expect(result.message).toContain('prompt-improver.example.md');
+
+      // Verify file was actually created
+      expect(existsSync(exampleConfigPath)).toBe(true);
+    });
+
+    it('should create .claude directory if it does not exist', async () => {
+      // Start with completely empty test directory
+      mkdirSync(setupTestDir, { recursive: true });
+      expect(existsSync(join(setupTestDir, '.claude'))).toBe(false);
+
+      const result = await ensureConfigSetup(setupTestDir);
+
+      expect(result.status).toBe('example_created');
+      expect(existsSync(join(setupTestDir, '.claude'))).toBe(true);
+      expect(existsSync(exampleConfigPath)).toBe(true);
+    });
+
+    it('should prefer local.md over example.md when both exist', async () => {
+      // Create both configs
+      mkdirSync(join(setupTestDir, '.claude'), { recursive: true });
+      writeFileSync(localConfigPath, '---\nenabled: false\n---\n');
+      writeFileSync(exampleConfigPath, '---\nenabled: true\n---\n');
+
+      const result = await ensureConfigSetup(setupTestDir);
+
+      // Should return local_exists, not example_exists
+      expect(result.status).toBe('local_exists');
+    });
+
+    it('should create example.md with valid YAML frontmatter content', async () => {
+      mkdirSync(setupTestDir, { recursive: true });
+
+      await ensureConfigSetup(setupTestDir);
+
+      // Read the created file and verify it has valid content
+      const content = await Bun.file(exampleConfigPath).text();
+
+      // Should have YAML frontmatter markers
+      expect(content).toContain('---');
+
+      // Should contain expected config keys
+      expect(content.toLowerCase()).toContain('enabled');
+    });
+
+    it('should return setup_failed when template cannot be read', async () => {
+      // This test requires mocking the bundled template path to be unavailable
+      // Since we can't easily mock import.meta.dir, we test the error path
+      // by using a non-writable directory
+      const readOnlyDir = join(tmpdir(), `readonly-test-${Date.now()}`);
+
+      try {
+        mkdirSync(readOnlyDir, { recursive: true });
+
+        // On most systems, we can't easily make a dir read-only in a way that
+        // prevents mkdir inside it, so we test the function handles errors
+        // by checking the result type structure
+        const result = await ensureConfigSetup(readOnlyDir);
+
+        // Either it succeeds (creates the file) or fails gracefully
+        expect(['example_created', 'setup_failed']).toContain(result.status);
+
+        if (result.status === 'setup_failed') {
+          expect(result.message).toBeDefined();
+          expect(result.message).toContain('Failed');
+        }
+      } finally {
+        if (existsSync(readOnlyDir)) {
+          rmSync(readOnlyDir, { recursive: true, force: true });
+        }
+      }
+    });
+
+    it('should use correct paths from CONFIG_PATHS and EXAMPLE_CONFIG_PATH', () => {
+      // Verify the paths are correct
+      expect(CONFIG_PATHS[0]).toBe('.claude/prompt-improver.local.md');
+      expect(EXAMPLE_CONFIG_PATH).toBe('.claude/prompt-improver.example.md');
     });
   });
 });

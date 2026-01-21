@@ -10,15 +10,13 @@ import type { HookInput } from '../../src/core/types.ts';
 
 describe('Integration Tests - Full Flow', () => {
   describe('Hook Input Parsing', () => {
+    // Note: Claude Code sends flat structure with session_id at root level
     it('should parse valid hook input successfully', () => {
       const stdin = JSON.stringify({
         prompt: 'Help me fix this bug',
-        context: {
-          conversation_id: 'test-123',
-          message_index: 1,
-          available_tools: ['Read', 'Write'],
-          context_usage: { max: 200000, used: 10000 },
-        },
+        session_id: 'test-123',
+        cwd: '/home/user/project',
+        permission_mode: 'default',
       });
 
       const result = parseHookInput(stdin);
@@ -31,10 +29,7 @@ describe('Integration Tests - Full Flow', () => {
 
     it('should reject input with missing prompt field', () => {
       const stdin = JSON.stringify({
-        context: {
-          conversation_id: 'test-123',
-          message_index: 1,
-        },
+        session_id: 'test-123',
       });
 
       const result = parseHookInput(stdin);
@@ -43,7 +38,7 @@ describe('Integration Tests - Full Flow', () => {
       expect(result.error).toContain('prompt');
     });
 
-    it('should reject input with missing context field', () => {
+    it('should reject input with missing session_id field', () => {
       const stdin = JSON.stringify({
         prompt: 'Test prompt',
       });
@@ -51,7 +46,7 @@ describe('Integration Tests - Full Flow', () => {
       const result = parseHookInput(stdin);
 
       expect(result.success).toBe(false);
-      expect(result.error).toContain('context');
+      expect(result.error).toContain('session_id');
     });
 
     it('should reject input with invalid JSON', () => {
@@ -251,16 +246,13 @@ describe('Integration Tests - Full Flow', () => {
   });
 
   describe('End-to-End Pipeline Integration', () => {
-    it('should process a complete flow: parse → bypass → classify → context', async () => {
-      // 1. Parse input
+    it('should process a complete flow: parse → bypass → context → improve', async () => {
+      // 1. Parse input (flat format as sent by Claude Code)
       const stdin = JSON.stringify({
         prompt: 'Help me refactor the authentication module to use JWT tokens',
-        context: {
-          conversation_id: 'integration-test',
-          message_index: 5,
-          available_tools: ['Read', 'Write', 'Edit'],
-          context_usage: { max: 200000, used: 50000, auto_compaction_enabled: false },
-        },
+        session_id: 'integration-test',
+        cwd: '/home/user/project',
+        permission_mode: 'default',
       });
 
       const parseResult = parseHookInput(stdin);
@@ -273,14 +265,13 @@ describe('Integration Tests - Full Flow', () => {
       const bypassResult = detectBypass({
         prompt: parseResult.input.prompt,
         sessionId: parseResult.input.context.conversation_id,
-        ...(parseResult.input.context.context_usage && { contextUsage: parseResult.input.context.context_usage }),
       });
 
       // Bypass detector may return true for various reasons - just verify it runs
       expect(bypassResult).toBeDefined();
       expect(bypassResult.shouldBypass).toBeDefined();
 
-      // If not bypassed, continue with classification
+      // If not bypassed, continue with context building
       if (bypassResult.shouldBypass) {
         // Test passes - bypass was detected (which is valid behavior)
         expect(bypassResult.reason).toBeDefined();
@@ -290,7 +281,6 @@ describe('Integration Tests - Full Flow', () => {
       // 3. Build context (classification removed - we now always improve)
       const contextResult = await buildContext({
         prompt: parseResult.input.prompt,
-        ...(parseResult.input.context.available_tools && { availableTools: parseResult.input.context.available_tools }),
       });
       expect(contextResult).toBeDefined();
       expect(contextResult.sources).toBeDefined();
@@ -299,11 +289,7 @@ describe('Integration Tests - Full Flow', () => {
     it('should handle complete flow with bypass', async () => {
       const stdin = JSON.stringify({
         prompt: '#skip quick test',
-        context: {
-          conversation_id: 'bypass-test',
-          message_index: 1,
-          context_usage: { max: 200000, used: 10000 },
-        },
+        session_id: 'bypass-test',
       });
 
       const parseResult = parseHookInput(stdin);
@@ -314,7 +300,6 @@ describe('Integration Tests - Full Flow', () => {
       const bypassResult = detectBypass({
         prompt: parseResult.input.prompt,
         sessionId: parseResult.input.context.conversation_id,
-        ...(parseResult.input.context.context_usage && { contextUsage: parseResult.input.context.context_usage }),
       });
 
       expect(bypassResult.shouldBypass).toBe(true);
