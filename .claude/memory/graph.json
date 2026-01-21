@@ -790,6 +790,26 @@
     {
       "id": "gotcha-classification-requires-2-api-calls-unacceptable-latency",
       "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-audit-driven-task-reconciliation-exposed-15-20-false-completion-rate",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-conflicting-architectural-decisions-led-to-wasted-implementation",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-recursion-prevention-discovered-via-runaway-logs-not-testing",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-classification-adds-unacceptable-latency-and-cost",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-spec-vs-implementation-audit-revealed-major-feature-gaps",
+      "type": "learning"
     }
   ],
   "edges": [

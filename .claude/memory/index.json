@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-21T13:28:08.889Z",
+  "lastUpdated": "2026-01-21T13:31:52.665Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -2538,23 +2538,6 @@
       "relativePath": "permanent/gotcha-project-scoped-plugin-hooks-dont-auto-load-despite-claude-pluginpluginjson.md"
     },
     {
-      "id": "gotcha-userpromptsubmit-hooks-trigger-recursively-when-spawning-claude-cli",
-      "type": "gotcha",
-      "title": "UserPromptSubmit hooks trigger recursively when spawning claude CLI",
-      "tags": [
-        "hooks",
-        "recursion",
-        "claude-cli",
-        "UserPromptSubmit",
-        "project"
-      ],
-      "created": "2026-01-21T13:10:22.563Z",
-      "updated": "2026-01-21T13:10:22.563Z",
-      "scope": "project",
-      "relativePath": "permanent/gotcha-userpromptsubmit-hooks-trigger-recursively-when-spawning-claude-cli.md",
-      "severity": "critical"
-    },
-    {
       "id": "decision-restore-nonesimplecomplex-classification-per-original-spec",
       "type": "decision",
       "title": "Restore NONE/SIMPLE/COMPLEX classification per original spec",
@@ -2586,6 +2569,104 @@
       "scope": "project",
       "relativePath": "permanent/gotcha-classification-requires-2-api-calls-unacceptable-latency.md",
       "severity": "high"
+    },
+    {
+      "id": "learning-retro-audit-driven-task-reconciliation-exposed-15-20-false-completion-rate",
+      "type": "learning",
+      "title": "Retro - Audit-driven task reconciliation exposed 15-20% false-completion rate",
+      "tags": [
+        "retrospective",
+        "process",
+        "quality",
+        "project"
+      ],
+      "created": "2026-01-21T13:31:34.205Z",
+      "updated": "2026-01-21T13:31:34.205Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-audit-driven-task-reconciliation-exposed-15-20-false-completion-rate.md",
+      "severity": "high"
+    },
+    {
+      "id": "gotcha-retro-conflicting-architectural-decisions-led-to-wasted-implementation",
+      "type": "gotcha",
+      "title": "Retro - Conflicting architectural decisions led to wasted implementation",
+      "tags": [
+        "retrospective",
+        "process",
+        "architecture",
+        "sync",
+        "project"
+      ],
+      "created": "2026-01-21T13:31:39.024Z",
+      "updated": "2026-01-21T13:31:39.024Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-conflicting-architectural-decisions-led-to-wasted-implementation.md",
+      "severity": "high"
+    },
+    {
+      "id": "gotcha-userpromptsubmit-hooks-trigger-recursively-when-spawning-claude-cli",
+      "type": "gotcha",
+      "title": "UserPromptSubmit hooks trigger recursively when spawning Claude CLI",
+      "tags": [
+        "hooks",
+        "recursion",
+        "claude-cli",
+        "prompt-improver",
+        "project"
+      ],
+      "created": "2026-01-21T13:31:43.003Z",
+      "updated": "2026-01-21T13:31:43.003Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-userpromptsubmit-hooks-trigger-recursively-when-spawning-claude-cli.md"
+    },
+    {
+      "id": "learning-retro-recursion-prevention-discovered-via-runaway-logs-not-testing",
+      "type": "learning",
+      "title": "Retro - Recursion prevention discovered via runaway logs, not testing",
+      "tags": [
+        "retrospective",
+        "process",
+        "debugging",
+        "hooks",
+        "project"
+      ],
+      "created": "2026-01-21T13:31:43.979Z",
+      "updated": "2026-01-21T13:31:43.979Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-recursion-prevention-discovered-via-runaway-logs-not-testing.md",
+      "severity": "medium"
+    },
+    {
+      "id": "gotcha-classification-adds-unacceptable-latency-and-cost",
+      "type": "gotcha",
+      "title": "Classification adds unacceptable latency and cost",
+      "tags": [
+        "architecture",
+        "prompt-improver",
+        "performance",
+        "cost",
+        "project"
+      ],
+      "created": "2026-01-21T13:31:47.941Z",
+      "updated": "2026-01-21T13:31:47.941Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-classification-adds-unacceptable-latency-and-cost.md"
+    },
+    {
+      "id": "learning-spec-vs-implementation-audit-revealed-major-feature-gaps",
+      "type": "learning",
+      "title": "Spec-vs-implementation audit revealed major feature gaps",
+      "tags": [
+        "audit",
+        "testing",
+        "integration",
+        "prompt-improver",
+        "project"
+      ],
+      "created": "2026-01-21T13:31:52.661Z",
+      "updated": "2026-01-21T13:31:52.661Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-spec-vs-implementation-audit-revealed-major-feature-gaps.md"
     }
   ]
 }
