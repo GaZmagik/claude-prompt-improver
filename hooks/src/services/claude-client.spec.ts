@@ -1,20 +1,20 @@
 /**
  * T028-T030: Claude Client tests
  * T028: Test Claude client executes `claude --fork-session --print`
- * T029: Test Claude client timeout enforcement (5s classification, 30s/60s improvement)
+ * T029: Test Claude client timeout enforcement (model-based: haiku 30s, sonnet 60s, opus 90s)
  * T030: Test Claude client model selection (haiku vs sonnet)
  */
 import { describe, expect, it } from 'bun:test';
-import {
-  CLASSIFICATION_TIMEOUT_MS,
-  COMPLEX_IMPROVEMENT_TIMEOUT_MS,
-  SIMPLE_IMPROVEMENT_TIMEOUT_MS,
-} from '../core/constants.ts';
 import {
   type ClaudeClientOptions,
   buildClaudeCommand,
   executeClaudeCommand,
 } from './claude-client.ts';
+
+// Model-based timeouts (matches improver.ts getTimeoutForModel)
+const HAIKU_TIMEOUT_MS = 30_000;
+const SONNET_TIMEOUT_MS = 60_000;
+const OPUS_TIMEOUT_MS = 90_000;
 
 describe('Claude Client', () => {
   describe('T028: buildClaudeCommand - executes claude --fork-session --print', () => {
@@ -96,37 +96,37 @@ describe('Claude Client', () => {
   });
 
   describe('T029: executeClaudeCommand - timeout enforcement', () => {
-    it('should use 5s timeout for classification', () => {
-      const options: ClaudeClientOptions = {
-        prompt: 'Classify',
-        model: 'haiku',
-        sessionId: 'session-123',
-        timeoutMs: CLASSIFICATION_TIMEOUT_MS,
-      };
-
-      expect(options.timeoutMs).toBe(5_000);
-    });
-
-    it('should use 30s timeout for simple improvement', () => {
+    it('should use 30s timeout for haiku model', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Improve',
         model: 'haiku',
         sessionId: 'session-123',
-        timeoutMs: SIMPLE_IMPROVEMENT_TIMEOUT_MS,
+        timeoutMs: HAIKU_TIMEOUT_MS,
       };
 
       expect(options.timeoutMs).toBe(30_000);
     });
 
-    it('should use 60s timeout for complex improvement', () => {
+    it('should use 60s timeout for sonnet model', () => {
       const options: ClaudeClientOptions = {
-        prompt: 'Improve complex',
+        prompt: 'Improve',
         model: 'sonnet',
         sessionId: 'session-123',
-        timeoutMs: COMPLEX_IMPROVEMENT_TIMEOUT_MS,
+        timeoutMs: SONNET_TIMEOUT_MS,
       };
 
       expect(options.timeoutMs).toBe(60_000);
+    });
+
+    it('should use 90s timeout for opus model', () => {
+      const options: ClaudeClientOptions = {
+        prompt: 'Improve complex',
+        model: 'opus',
+        sessionId: 'session-123',
+        timeoutMs: OPUS_TIMEOUT_MS,
+      };
+
+      expect(options.timeoutMs).toBe(90_000);
     });
 
     it('should return timeout error when command exceeds timeout', async () => {

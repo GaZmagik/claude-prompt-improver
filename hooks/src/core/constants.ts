@@ -11,15 +11,6 @@ import type { XmlTag } from './types.ts';
 /** Total hook timeout - must complete within this time (90 seconds) */
 export const HOOK_TIMEOUT_MS = 90_000;
 
-/** Classification API call timeout (5 seconds) */
-export const CLASSIFICATION_TIMEOUT_MS = 5_000;
-
-/** Simple prompt improvement timeout using Haiku (30 seconds) */
-export const SIMPLE_IMPROVEMENT_TIMEOUT_MS = 30_000;
-
-/** Complex prompt improvement timeout using Sonnet (60 seconds) */
-export const COMPLEX_IMPROVEMENT_TIMEOUT_MS = 60_000;
-
 /** Session fork timeout for gathering context from forked session (10 seconds) */
 export const SESSION_FORK_TIMEOUT_MS = 10_000;
 

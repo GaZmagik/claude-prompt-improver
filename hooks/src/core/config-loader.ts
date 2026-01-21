@@ -71,8 +71,8 @@ export const CONFIG_PATHS = [
 /** Path to example config file in project */
 export const EXAMPLE_CONFIG_PATH = '.claude/prompt-improver.example.md';
 
-/** Path to bundled example template (relative to hooks directory) */
-const BUNDLED_TEMPLATE_PATH = '../templates/prompt-improver.example.md';
+/** Path to bundled example template (relative to src/core directory) */
+const BUNDLED_TEMPLATE_PATH = '../../templates/prompt-improver.example.md';
 
 /** Result of config setup check */
 export interface ConfigSetupResult {
