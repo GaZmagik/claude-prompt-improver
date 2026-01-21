@@ -1,16 +1,16 @@
 ---
 id: learning-lru-cache-with-mtime-invalidation-for-discovery-performance
-title: LRU cache with mtime invalidation for discovery performance
+title: LRU Cache with mtime Invalidation for Discovery Performance
 type: learning
 scope: project
-created: "2026-01-21T20:47:43.075Z"
-updated: "2026-01-21T20:47:43.075Z"
+created: "2026-01-21T21:19:42.753Z"
+updated: "2026-01-21T21:19:42.753Z"
 tags:
-  - performance
   - caching
-  - optimization
-  - pattern
+  - performance
+  - filesystem
+  - discovery
   - project
 ---
 
-Adopted LRU cache pattern with mtime-based invalidation (borrowed from spec-awareness.ts). Cache limit 50 entries prevents repeated filesystem scans during prompt improvement. Uses Node.js fs.readdir with { recursive: true, withFileTypes: true } for efficient directory traversal.
+Implement cache with automatic invalidation: store mtime alongside cached items, compare on access. Evicts oldest entry when capacity reached. Note: Date.now() granularity can cause timing issues in rapid test operations.

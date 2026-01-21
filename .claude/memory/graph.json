@@ -790,6 +790,34 @@
     {
       "id": "learning-consistent-yaml-frontmatter-across-plugin-definition-types",
       "type": "learning"
+    },
+    {
+      "id": "learning-retro-tdd-stub-first-hook-catches-implementation-mistakes-early",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-mock-filesystem-pattern-with-mockfilesystem-enables-deterministic-testing",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-large-test-files-500-lines-should-be-split-by-resource-type-for-maintainability",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-phase-based-task-organization-012345-scales-well-for-multi-phase-features",
+      "type": "learning"
+    },
+    {
+      "id": "learning-tdd-hook-enforcement-requires-stub-first-approach",
+      "type": "learning"
+    },
+    {
+      "id": "learning-exactoptionalpropertytypes-requires-conditional-object-spreads",
+      "type": "learning"
+    },
+    {
+      "id": "artifact-filesystem-first-discovery-pattern",
+      "type": "artifact"
     }
   ],
   "edges": [
@@ -1581,6 +1609,111 @@
     {
       "source": "decision-filesystem-first-discovery-over-config-driven",
       "target": "learning-consistent-yaml-frontmatter-across-plugin-definition-types",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-tdd-hook-enforcement-requires-stub-first-approach",
+      "target": "decision-filesystem-first-discovery-over-config-driven",
+      "label": "relates-to"
+    },
+    {
+      "source": "artifact-filesystem-first-discovery-pattern",
+      "target": "decision-filesystem-first-discovery-over-config-driven",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-postinstall-script-path-calculation-caused-catastrophic-deletion",
+      "target": "gotcha-retro-postinstall-scripts-need-environment-detection-guards",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-postinstall-script-path-calculation-caused-catastrophic-deletion",
+      "target": "gotcha-postinstall-script-path-calculation-destroyed-23-projects",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-postinstall-script-path-calculation-caused-catastrophic-deletion",
+      "target": "learning-postinstall-scripts-must-validate-paths-before-destructive-operations",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-postinstall-script-path-calculation-caused-catastrophic-deletion",
+      "target": "decision-claude-code-sandboxing",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-photorec-recovery-succeeded-but-required-correct-syntax",
+      "target": "gotcha-retro-validate-complex-cli-commands-before-execution",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-retro-validate-complex-cli-commands-before-execution",
+      "target": "learning-retro-systematic-file-type-enumeration-accelerates-recovery",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-test-quality-improvements-were-derailed-by-infrastructure-disaster",
+      "target": "gotcha-postinstall-script-path-calculation-caused-catastrophic-deletion",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-user-accountability-and-recovery-mindset-made-difference",
+      "target": "learning-retro-photorec-recovery-succeeded-but-required-correct-syntax",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-user-accountability-and-recovery-mindset-made-difference",
+      "target": "learning-retro-user-domain-intuition-often-outweighs-initial-technical-assumptions",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-claude-code-sandboxing",
+      "target": "learning-retro-test-quality-improvements-were-derailed-by-infrastructure-disaster",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-full-sdd-workflow-in-single-session-accelerates-feature-delivery",
+      "target": "learning-retro-agent-first-sdd-workflow-reduces-iteration",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-post-compact-context-restoration-with-multiple-agents-works-well",
+      "target": "learning-retro-parallel-multi-agent-restoration-after-compaction-accelerates-context-recovery",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-codebase-exploration-agent-is-essential-before-specking-new-features",
+      "target": "learning-agent-first-specification-analysis-prevents-rework-before-implementation",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-asking-user-questions-keeps-session-focused-vs-open-ended",
+      "target": "learning-retro-analysis-driven-fixes-prevent-rework-before-implementation",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-tdd-stub-first-hook-catches-implementation-mistakes-early",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-mock-filesystem-pattern-with-mockfilesystem-enables-deterministic-testing",
+      "target": "artifact-sdd-tdd-phase-completion-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-retro-large-test-files-500-lines-should-be-split-by-resource-type-for-maintainability",
+      "target": "learning-retro-run-tests-after-each-file-type-change-to-measure-progress",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-phase-based-task-organization-012345-scales-well-for-multi-phase-features",
+      "target": "learning-retro-phase-based-task-organization-enables-parallel-mental-planning",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-exactoptionalpropertytypes-requires-conditional-object-spreads",
+      "target": "learning-typescript-exactoptionalpropertytypes-in-strict-mode",
       "label": "relates-to"
     }
   ]

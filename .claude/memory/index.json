@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-21T20:47:54.199Z",
+  "lastUpdated": "2026-01-21T21:19:54.479Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -2537,22 +2537,6 @@
       "relativePath": "permanent/learning-multi-tier-filesystem-scanning-pattern-for-plugin-discovery.md"
     },
     {
-      "id": "learning-lru-cache-with-mtime-invalidation-for-discovery-performance",
-      "type": "learning",
-      "title": "LRU cache with mtime invalidation for discovery performance",
-      "tags": [
-        "performance",
-        "caching",
-        "optimization",
-        "pattern",
-        "project"
-      ],
-      "created": "2026-01-21T20:47:43.075Z",
-      "updated": "2026-01-21T20:47:43.075Z",
-      "scope": "project",
-      "relativePath": "permanent/learning-lru-cache-with-mtime-invalidation-for-discovery-performance.md"
-    },
-    {
       "id": "decision-special-pattern-detection-for-memory-think-deliberation",
       "type": "decision",
       "title": "Special pattern detection for memory think deliberation",
@@ -2581,6 +2565,133 @@
       "updated": "2026-01-21T20:47:54.185Z",
       "scope": "project",
       "relativePath": "permanent/learning-consistent-yaml-frontmatter-across-plugin-definition-types.md"
+    },
+    {
+      "id": "learning-retro-tdd-stub-first-hook-catches-implementation-mistakes-early",
+      "type": "learning",
+      "title": "Retro - TDD stub-first hook catches implementation mistakes early",
+      "tags": [
+        "retrospective",
+        "process",
+        "tdd",
+        "project"
+      ],
+      "created": "2026-01-21T21:19:13.898Z",
+      "updated": "2026-01-21T21:19:13.898Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-tdd-stub-first-hook-catches-implementation-mistakes-early.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-retro-mock-filesystem-pattern-with-mockfilesystem-enables-deterministic-testing",
+      "type": "learning",
+      "title": "Retro - Mock filesystem pattern with _mockFileSystem enables deterministic testing",
+      "tags": [
+        "retrospective",
+        "process",
+        "testing",
+        "project"
+      ],
+      "created": "2026-01-21T21:19:18.409Z",
+      "updated": "2026-01-21T21:19:18.409Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-mock-filesystem-pattern-with-mockfilesystem-enables-deterministic-testing.md",
+      "severity": "medium"
+    },
+    {
+      "id": "gotcha-retro-large-test-files-500-lines-should-be-split-by-resource-type-for-maintainability",
+      "type": "gotcha",
+      "title": "Retro - Large test files (500+ lines) should be split by resource type for maintainability",
+      "tags": [
+        "retrospective",
+        "process",
+        "testing",
+        "project"
+      ],
+      "created": "2026-01-21T21:19:22.029Z",
+      "updated": "2026-01-21T21:19:22.029Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-large-test-files-500-lines-should-be-split-by-resource-type-for-maintainability.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-retro-phase-based-task-organization-012345-scales-well-for-multi-phase-features",
+      "type": "learning",
+      "title": "Retro - Phase-based task organization (0→1→2→3→4→5) scales well for multi-phase features",
+      "tags": [
+        "retrospective",
+        "process",
+        "planning",
+        "project"
+      ],
+      "created": "2026-01-21T21:19:26.059Z",
+      "updated": "2026-01-21T21:19:26.059Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-phase-based-task-organization-012345-scales-well-for-multi-phase-features.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-tdd-hook-enforcement-requires-stub-first-approach",
+      "type": "learning",
+      "title": "TDD Hook Enforcement Requires Stub-First Approach",
+      "tags": [
+        "tdd",
+        "bun",
+        "typescript",
+        "hooks",
+        "project"
+      ],
+      "created": "2026-01-21T21:19:39.293Z",
+      "updated": "2026-01-21T21:19:39.293Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-tdd-hook-enforcement-requires-stub-first-approach.md"
+    },
+    {
+      "id": "learning-lru-cache-with-mtime-invalidation-for-discovery-performance",
+      "type": "learning",
+      "title": "LRU Cache with mtime Invalidation for Discovery Performance",
+      "tags": [
+        "caching",
+        "performance",
+        "filesystem",
+        "discovery",
+        "project"
+      ],
+      "created": "2026-01-21T21:19:42.753Z",
+      "updated": "2026-01-21T21:19:42.753Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-lru-cache-with-mtime-invalidation-for-discovery-performance.md"
+    },
+    {
+      "id": "learning-exactoptionalpropertytypes-requires-conditional-object-spreads",
+      "type": "learning",
+      "title": "exactOptionalPropertyTypes Requires Conditional Object Spreads",
+      "tags": [
+        "typescript",
+        "exactOptionalPropertyTypes",
+        "gotcha",
+        "project"
+      ],
+      "created": "2026-01-21T21:19:46.731Z",
+      "updated": "2026-01-21T21:19:46.731Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-exactoptionalpropertytypes-requires-conditional-object-spreads.md"
+    },
+    {
+      "id": "artifact-filesystem-first-discovery-pattern",
+      "type": "artifact",
+      "title": "Filesystem-First Discovery Pattern for CLI Plugins",
+      "tags": [
+        "discovery",
+        "filesystem",
+        "pattern",
+        "reusable",
+        "project"
+      ],
+      "created": "2026-01-21T21:19:54.475Z",
+      "updated": "2026-01-21T21:19:54.475Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-filesystem-first-discovery-pattern.md"
     }
   ]
 }
