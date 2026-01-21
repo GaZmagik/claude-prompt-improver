@@ -2,8 +2,7 @@
  * Memory plugin integration for enriching prompts with relevant memories
  * Detects claude-memory-plugin and retrieves matching memories from index.json
  */
-import { existsSync } from 'node:fs';
-import { readFileSyncSafe } from '../utils/file-reader.ts';
+import { pathExistsAsync, readFileAsync } from '../utils/file-reader.ts';
 
 /** Maximum number of memories to include */
 const MAX_MEMORIES = 5;
@@ -75,7 +74,9 @@ const PLUGIN_PATHS = [
 /**
  * Checks if memory plugin is installed at known paths
  */
-export function checkMemoryPluginInstalled(options: MemoryPluginOptions): PluginCheckResult {
+export async function checkMemoryPluginInstalled(
+  options: MemoryPluginOptions
+): Promise<PluginCheckResult> {
   const { _mockFileSystem } = options;
 
   if (_mockFileSystem) {
@@ -88,11 +89,11 @@ export function checkMemoryPluginInstalled(options: MemoryPluginOptions): Plugin
     return { found: false };
   }
 
-  // Real implementation - check filesystem for known paths
+  // Real implementation - check filesystem for known paths (async)
   for (const path of PLUGIN_PATHS) {
     // Expand ~ to home directory
     const expandedPath = path.startsWith('~/') ? path.replace('~', process.env.HOME ?? '') : path;
-    if (existsSync(expandedPath)) {
+    if (await pathExistsAsync(expandedPath)) {
       return { found: true, path: expandedPath };
     }
   }
@@ -214,7 +215,7 @@ export async function gatherMemoryContext(
   }
 
   // Check if plugin is installed
-  const pluginCheck = checkMemoryPluginInstalled(options);
+  const pluginCheck = await checkMemoryPluginInstalled(options);
   if (!pluginCheck.found) {
     return {
       success: false,
@@ -223,9 +224,9 @@ export async function gatherMemoryContext(
     };
   }
 
-  // Read index.json
+  // Read index.json (async)
   const indexPath = `${pluginCheck.path}index.json`;
-  const indexContent = readFileSyncSafe(indexPath, _mockFileSystem);
+  const indexContent = await readFileAsync(indexPath, _mockFileSystem);
 
   if (!indexContent) {
     return {

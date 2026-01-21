@@ -96,9 +96,9 @@ This is a test user story.
   });
 
   describe('Memory Plugin - Real FS', () => {
-    it('should detect memory plugin when .claude/memory exists via mock', () => {
+    it('should detect memory plugin when .claude/memory exists via mock', async () => {
       // Mock must use exact paths from PLUGIN_PATHS (.claude/memory/)
-      const result = checkMemoryPluginInstalled({
+      const result = await checkMemoryPluginInstalled({
         _mockFileSystem: { '.claude/memory/': '' },
       });
 
@@ -106,18 +106,18 @@ This is a test user story.
       expect(result.path).toBe('.claude/memory/');
     });
 
-    it('should return found:false when memory plugin not installed', () => {
+    it('should return found:false when memory plugin not installed', async () => {
       // Empty mock - no plugin paths exist
-      const result = checkMemoryPluginInstalled({
+      const result = await checkMemoryPluginInstalled({
         _mockFileSystem: {},
       });
 
       expect(result.found).toBe(false);
     });
 
-    it('should check real filesystem paths when no mock provided', () => {
+    it('should check real filesystem paths when no mock provided', async () => {
       // This tests the real fs code path (may find plugin if installed)
-      const result = checkMemoryPluginInstalled({});
+      const result = await checkMemoryPluginInstalled({});
 
       // Just verify it runs without error and returns valid structure
       expect(result).toHaveProperty('found');

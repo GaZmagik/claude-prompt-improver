@@ -13,8 +13,42 @@ interface SpecFileCacheEntry {
   readonly mtimeMs: number;
 }
 
-/** Cache for spec file contents keyed by path */
+/** Maximum number of spec files to cache (LRU eviction when exceeded) */
+const MAX_CACHE_SIZE = 50;
+
+/** Cache for spec file contents keyed by path (Map maintains insertion order for LRU) */
 const specFileCache = new Map<string, SpecFileCacheEntry>();
+
+/**
+ * Adds entry to cache with LRU eviction
+ * Re-inserts on access to maintain LRU order (Map iteration order = insertion order)
+ */
+function setCacheEntry(path: string, entry: SpecFileCacheEntry): void {
+  // Delete first to reset insertion order (for LRU tracking)
+  specFileCache.delete(path);
+  specFileCache.set(path, entry);
+
+  // Evict oldest entries if cache exceeds limit
+  while (specFileCache.size > MAX_CACHE_SIZE) {
+    const oldestKey = specFileCache.keys().next().value;
+    if (oldestKey) {
+      specFileCache.delete(oldestKey);
+    }
+  }
+}
+
+/**
+ * Gets cache entry and refreshes LRU order
+ */
+function getCacheEntry(path: string): SpecFileCacheEntry | undefined {
+  const entry = specFileCache.get(path);
+  if (entry) {
+    // Refresh LRU order by re-inserting
+    specFileCache.delete(path);
+    specFileCache.set(path, entry);
+  }
+  return entry;
+}
 
 /**
  * Gets file modification time, returns -1 if file doesn't exist
@@ -349,15 +383,15 @@ function readFile(path: string, mockFs?: Record<string, string | null>): string 
     return null;
   }
 
-  const cached = specFileCache.get(path);
+  const cached = getCacheEntry(path);
   if (cached && cached.mtimeMs === currentMtime) {
     return cached.content;
   }
 
-  // Read fresh content using shared utility and update cache
+  // Read fresh content using shared utility and update cache (LRU)
   const content = readFileSyncSafe(path);
   if (content) {
-    specFileCache.set(path, { content, mtimeMs: currentMtime });
+    setCacheEntry(path, { content, mtimeMs: currentMtime });
   }
   return content;
 }

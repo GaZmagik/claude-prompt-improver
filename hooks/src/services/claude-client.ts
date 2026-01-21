@@ -78,6 +78,7 @@ export function buildClaudeCommand(options: ClaudeClientOptions): ClaudeCommandA
 
 /**
  * Executes a Claude command with timeout enforcement
+ * Uses try/finally to guarantee timeout cleanup and prevent race conditions
  */
 export async function executeClaudeCommand(
   options: ClaudeClientOptions
@@ -85,21 +86,15 @@ export async function executeClaudeCommand(
   const { timeoutMs = 30_000, _mockExecution } = options;
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
-  try {
-    // Use mock execution for testing
-    if (_mockExecution) {
+  // Use mock execution for testing
+  if (_mockExecution) {
+    try {
       const timeoutPromise = new Promise<never>((_, reject) => {
         timeoutId = setTimeout(() => reject(new Error('Command timeout')), timeoutMs);
       });
 
       const executionPromise = _mockExecution();
-
       const result = await Promise.race([executionPromise, timeoutPromise]);
-
-      // Clean up timeout if execution completed first
-      if (timeoutId !== undefined) {
-        clearTimeout(timeoutId);
-      }
 
       if (result.exitCode !== 0) {
         return {
@@ -112,18 +107,35 @@ export async function executeClaudeCommand(
         success: true,
         output: result.output,
       };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (message.includes('timeout')) {
+        return {
+          success: false,
+          error: `Command timeout after ${timeoutMs}ms`,
+        };
+      }
+      return {
+        success: false,
+        error: message,
+      };
+    } finally {
+      // Guaranteed cleanup - no race condition possible
+      if (timeoutId !== undefined) {
+        clearTimeout(timeoutId);
+      }
     }
+  }
 
-    // Real execution using Bun.spawn with array-based args (no shell interpretation)
-    const { args, cwd } = buildClaudeCommand(options);
+  // Real execution using Bun.spawn with array-based args (no shell interpretation)
+  const { args, cwd } = buildClaudeCommand(options);
+  const proc = Bun.spawn(args, {
+    stdout: 'pipe',
+    stderr: 'pipe',
+    cwd,
+  });
 
-    const proc = Bun.spawn(args, {
-      stdout: 'pipe',
-      stderr: 'pipe',
-      cwd,
-    });
-
-    // Create timeout promise
+  try {
     const timeoutPromise = new Promise<never>((_, reject) => {
       timeoutId = setTimeout(() => {
         proc.kill();
@@ -131,13 +143,7 @@ export async function executeClaudeCommand(
       }, timeoutMs);
     });
 
-    // Wait for process completion or timeout
     const exitCode = await Promise.race([proc.exited, timeoutPromise]);
-
-    // Clean up timeout if process completed first
-    if (timeoutId !== undefined) {
-      clearTimeout(timeoutId);
-    }
 
     const stdout = await new Response(proc.stdout).text();
     const stderr = await new Response(proc.stderr).text();
@@ -154,23 +160,21 @@ export async function executeClaudeCommand(
       output: stdout.trim(),
     };
   } catch (err) {
-    // Clean up timeout on error
-    if (timeoutId !== undefined) {
-      clearTimeout(timeoutId);
-    }
-
     const message = err instanceof Error ? err.message : String(err);
-
     if (message.includes('timeout')) {
       return {
         success: false,
         error: `Command timeout after ${timeoutMs}ms`,
       };
     }
-
     return {
       success: false,
       error: message,
     };
+  } finally {
+    // Guaranteed cleanup - no race condition possible
+    if (timeoutId !== undefined) {
+      clearTimeout(timeoutId);
+    }
   }
 }
