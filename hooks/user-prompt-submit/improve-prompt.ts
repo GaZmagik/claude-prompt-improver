@@ -60,50 +60,33 @@ export function parseHookInput(stdin: string): ParseResult {
       };
     }
 
-    if (!parsed.context || typeof parsed.context !== 'object') {
+    // Claude Code sends a flat structure, not nested context
+    // Expected format: { session_id, cwd, permission_mode, hook_event_name, prompt }
+    const sessionId = parsed.session_id;
+    if (typeof sessionId !== 'string') {
       return {
         success: false,
-        error: 'Missing or invalid "context" field',
+        error: 'Missing or invalid "session_id" field',
       };
     }
 
-    const context = parsed.context as Record<string, unknown>;
-
-    // Validate required context fields
-    if (typeof context.conversation_id !== 'string') {
-      return {
-        success: false,
-        error: 'Missing or invalid "context.conversation_id" field',
-      };
-    }
-
-    if (typeof context.message_index !== 'number') {
-      return {
-        success: false,
-        error: 'Missing or invalid "context.message_index" field',
-      };
-    }
-
-    // Build context object, adding optional fields only when present
+    // Build context object from flat input structure
     const contextObj: Record<string, unknown> = {
-      conversation_id: context.conversation_id,
-      message_index: context.message_index,
+      conversation_id: sessionId,
+      message_index: 0, // Not provided by Claude Code, use default
     };
 
-    if (typeof context.permission_mode === 'string') {
-      contextObj.permission_mode = context.permission_mode;
+    if (typeof parsed.permission_mode === 'string') {
+      contextObj.permission_mode = parsed.permission_mode;
     }
-    if (Array.isArray(context.available_tools)) {
-      contextObj.available_tools = context.available_tools;
+    if (typeof parsed.cwd === 'string') {
+      contextObj.cwd = parsed.cwd;
     }
-    if (Array.isArray(context.enabled_mcp_servers)) {
-      contextObj.enabled_mcp_servers = context.enabled_mcp_servers;
+    if (typeof parsed.hook_event_name === 'string') {
+      contextObj.hook_event_name = parsed.hook_event_name;
     }
-    if (context.context_usage && typeof context.context_usage === 'object') {
-      contextObj.context_usage = context.context_usage;
-    }
-    if (context.session_settings && typeof context.session_settings === 'object') {
-      contextObj.session_settings = context.session_settings;
+    if (typeof parsed.transcript_path === 'string') {
+      contextObj.transcript_path = parsed.transcript_path;
     }
 
     const input: HookInput = {
