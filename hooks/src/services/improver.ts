@@ -44,6 +44,8 @@ export interface ImprovementResult {
   readonly latencyMs: number;
   readonly contextSources: readonly ContextSource[];
   readonly summary?: readonly string[];
+  /** Error message when improvement fails (for debugging) */
+  readonly error?: string;
 }
 
 /**
@@ -181,11 +183,11 @@ Instructions:
 1. PRESERVE the original intent - the user's goal must remain unchanged
 2. PRESERVE the original tone - formal/informal, concise/detailed
 3. ADD clarity by specifying what's ambiguous
-4. ADD structure using XML tags if helpful for complex prompts
+4. ALWAYS structure the output using XML tags (e.g., <task>, <context>, <constraints>, <requirements>)
 5. SUGGEST clarifying questions if the prompt is very vague
 6. REFERENCE the provided context where relevant
 
-Output ONLY the improved prompt, nothing else.`;
+Output ONLY the improved prompt wrapped in XML tags, nothing else.`;
 
 /**
  * Builds the improvement prompt with context
@@ -268,6 +270,7 @@ export async function improvePrompt(options: ImprovePromptOptions): Promise<Impr
       modelUsed: model,
       latencyMs,
       contextSources,
+      error: result.error ?? 'No output from Claude CLI',
     };
   }
 

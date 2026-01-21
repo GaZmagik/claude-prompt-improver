@@ -153,10 +153,14 @@ TDD: test first? ✅/❌ | seen failing? ✅/❌ | now passing? ✅/❌
 ### Implementation for Classification & Improvement
 
 - [X] T045 [P] [US1] Implement Claude client with `claude --fork-session` execution in /home/gareth/.vs/claude-prompt-improver/hooks/src/services/claude-client.ts
-- [X] T046 [P] [US1] Implement classifier with classification prompt template in /home/gareth/.vs/claude-prompt-improver/hooks/src/services/classifier.ts
-- [X] T047 [US1] Implement improver with SIMPLE/COMPLEX strategies in /home/gareth/.vs/claude-prompt-improver/hooks/src/services/improver.ts (depends on T045, T046)
-- [X] T048 [P] [US9] Implement XML tag builder with tag selection logic in /home/gareth/.vs/claude-prompt-improver/hooks/src/utils/xml-builder.ts
-- [X] T049 [US1] [US9] Integrate classification and improvement into hook entry point in /home/gareth/.vs/claude-prompt-improver/hooks/user-prompt-submit/improve-prompt.ts
+- [ ] T046 [P] [US1] Implement classifier with classification prompt template in /home/gareth/.vs/claude-prompt-improver/hooks/src/services/classifier.ts
+  - **AUDIT 2026-01-21**: File does NOT exist. Classifier never implemented.
+- [ ] T047 [US1] Implement improver with SIMPLE/COMPLEX strategies in /home/gareth/.vs/claude-prompt-improver/hooks/src/services/improver.ts (depends on T045, T046)
+  - **AUDIT 2026-01-21**: Improver exists but does NOT use classification. Uses single `config.improverModel` for all prompts. No NONE passthrough, no SIMPLE/COMPLEX differentiation.
+- [ ] T048 [P] [US9] Implement XML tag builder with tag selection logic in /home/gareth/.vs/claude-prompt-improver/hooks/src/utils/xml-builder.ts
+  - **AUDIT 2026-01-21**: File exists but `buildXmlPrompt()` is NOT used in improver. Only `escapeXmlContent()` imported. XML structuring not applied to improved prompts.
+- [ ] T049 [US1] [US9] Integrate classification and improvement into hook entry point in /home/gareth/.vs/claude-prompt-improver/hooks/user-prompt-submit/improve-prompt.ts
+  - **AUDIT 2026-01-21**: Classification NOT integrated. Hook calls improver directly without classification step. All non-bypassed prompts get improved regardless of whether they need it.
 
 **Checkpoint**: Prompts classified and improved based on complexity level
 
@@ -250,7 +254,8 @@ TDD: test first? ✅/❌ | seen failing? ✅/❌ | now passing? ✅/❌
 ### Implementation for Git Integration
 
 - [X] T088 [US4] Implement git context gatherer with command execution and parsing in /home/gareth/.vs/claude-prompt-improver/hooks/src/integrations/git-context.ts
-- [X] T089 [US4] Integrate git context into context builder in /home/gareth/.vs/claude-prompt-improver/hooks/src/context/context-builder.ts
+- [ ] T089 [US4] Integrate git context into context builder in /home/gareth/.vs/claude-prompt-improver/hooks/src/context/context-builder.ts
+  - **AUDIT 2026-01-21**: context-builder.ts imports git-context but improve-prompt.ts does NOT pass git data to buildContext(). Integration is imported but never invoked.
 
 **Checkpoint**: Git context gathered and injected into prompts when available
 
@@ -278,7 +283,8 @@ TDD: test first? ✅/❌ | seen failing? ✅/❌ | now passing? ✅/❌
 ### Implementation for LSP Integration
 
 - [X] T098 [US5] Implement LSP diagnostics collector with MCP invocation in /home/gareth/.vs/claude-prompt-improver/hooks/src/integrations/lsp-diagnostics.ts
-- [X] T099 [US5] Integrate LSP diagnostics into context builder in /home/gareth/.vs/claude-prompt-improver/hooks/src/context/context-builder.ts
+- [ ] T099 [US5] Integrate LSP diagnostics into context builder in /home/gareth/.vs/claude-prompt-improver/hooks/src/context/context-builder.ts
+  - **AUDIT 2026-01-21**: context-builder.ts imports lsp-diagnostics but improve-prompt.ts does NOT pass LSP data to buildContext(). Integration is imported but never invoked.
 
 **Checkpoint**: LSP diagnostics gathered and injected into debugging prompts when available
 
@@ -306,7 +312,8 @@ TDD: test first? ✅/❌ | seen failing? ✅/❌ | now passing? ✅/❌
 ### Implementation for Specification Integration
 
 - [X] T108 [US6] Implement spec awareness parser with YAML frontmatter parsing in /home/gareth/.vs/claude-prompt-improver/hooks/src/integrations/spec-awareness.ts
-- [X] T109 [US6] Integrate spec awareness into context builder in /home/gareth/.vs/claude-prompt-improver/hooks/src/context/context-builder.ts
+- [ ] T109 [US6] Integrate spec awareness into context builder in /home/gareth/.vs/claude-prompt-improver/hooks/src/context/context-builder.ts
+  - **AUDIT 2026-01-21**: context-builder.ts imports spec-awareness but improve-prompt.ts does NOT pass spec data to buildContext(). Integration is imported but never invoked.
 
 **Checkpoint**: Specification context gathered and injected into prompts when available
 
@@ -334,7 +341,8 @@ TDD: test first? ✅/❌ | seen failing? ✅/❌ | now passing? ✅/❌
 ### Implementation for Memory Integration
 
 - [X] T118 [US7] Implement memory plugin integration with index.json parsing in /home/gareth/.vs/claude-prompt-improver/hooks/src/integrations/memory-plugin.ts
-- [X] T119 [US7] Integrate memory plugin into context builder in /home/gareth/.vs/claude-prompt-improver/hooks/src/context/context-builder.ts
+- [ ] T119 [US7] Integrate memory plugin into context builder in /home/gareth/.vs/claude-prompt-improver/hooks/src/context/context-builder.ts
+  - **AUDIT 2026-01-21**: context-builder.ts imports memory-plugin but improve-prompt.ts does NOT pass memory data to buildContext(). Integration is imported but never invoked.
 
 **Checkpoint**: Memory plugin detected and memories injected into prompts when available
 
@@ -363,7 +371,8 @@ TDD: test first? ✅/❌ | seen failing? ✅/❌ | now passing? ✅/❌
 
 - [X] T128 [P] [US8] Implement compaction detector with context usage parsing in /home/gareth/.vs/claude-prompt-improver/hooks/src/integrations/compaction-detector.ts
 - [X] T129 [US8] Implement session context with session forking in /home/gareth/.vs/claude-prompt-improver/hooks/src/integrations/session-context.ts (depends on T128)
-- [X] T130 [US8] Integrate session context into context builder in /home/gareth/.vs/claude-prompt-improver/hooks/src/context/context-builder.ts
+- [ ] T130 [US8] Integrate session context into context builder in /home/gareth/.vs/claude-prompt-improver/hooks/src/context/context-builder.ts
+  - **AUDIT 2026-01-21**: context-builder.ts imports session-context but improve-prompt.ts does NOT pass session data to buildContext(). Integration is imported but never invoked.
 - [X] T131 [US8] Integrate compaction detection into bypass logic in /home/gareth/.vs/claude-prompt-improver/hooks/src/core/bypass-detector.ts
 
 **Checkpoint**: Session context used when appropriate, compaction detection prevents resource exhaustion
@@ -511,4 +520,48 @@ Before finalising tasks.md, verify:
 
 ---
 
-**Tasks Version**: 1.0.0 | **Status**: Ready | **Created**: 2026-01-18
+**Tasks Version**: 1.1.0 | **Status**: Audit Required | **Created**: 2026-01-18 | **Audited**: 2026-01-21
+
+---
+
+## 🚨 AUDIT FINDINGS (2026-01-21)
+
+Implementation audit revealed critical gaps between marked tasks and actual functionality:
+
+### Classification Tasks - REJECTED BY DESIGN
+
+| Task | Status | Reason |
+|------|--------|--------|
+| **T046** | N/A | Classification requires 2 API calls (classify + improve) = 4-9s extra latency |
+| **T047** | N/A | Model selection is config-driven, not classification-driven |
+| **T049** | N/A | Single API call architecture is correct; classification rejected |
+
+**Decision**: `decision-prompt-improver-always-improve-no-classification` + `gotcha-classification-requires-2-api-calls-unacceptable-latency`
+
+### Actual Issues (P1 - Still needs fixing)
+
+| Task | Issue | Impact |
+|------|-------|--------|
+| **T048** | `buildXmlPrompt()` not used | XML structuring never applied to improved prompts |
+
+### Major Issues (P2 - Integrations not wired)
+
+| Task | Issue | Impact |
+|------|-------|--------|
+| **T089** | Git context not passed to builder | Git enrichment never happens |
+| **T099** | LSP diagnostics not passed | Debug context never injected |
+| **T109** | Spec awareness not passed | SDD context never injected |
+| **T119** | Memory plugin not passed | Past decisions never surfaced |
+| **T130** | Session context not passed | Conversation awareness missing |
+
+### Root Cause
+
+The integration files exist and context-builder.ts imports them, but `improve-prompt.ts:buildImprovementContext()` only passes tools/skills/agents - NOT the advanced integration sources.
+
+### Recommended Fix Order
+
+1. **T046** - Create classifier.ts with NONE/SIMPLE/COMPLEX classification
+2. **T049** - Wire classification into hook flow
+3. **T047** - Update improver to use classification results for model selection
+4. **T048** - Wire `buildXmlPrompt()` into improver for COMPLEX prompts
+5. **T089-T130** - Update `buildImprovementContext()` to pass integration sources

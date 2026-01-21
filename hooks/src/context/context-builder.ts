@@ -183,7 +183,15 @@ export async function buildContext(input: ContextBuilderInput): Promise<BuiltCon
     sources,
     results
   );
-  await Promise.allSettled(asyncTasks);
+
+  // Capture results to log any failures
+  const settledResults = await Promise.allSettled(asyncTasks);
+  for (const result of settledResults) {
+    if (result.status === 'rejected') {
+      // Log to stderr for debugging - context failures are non-fatal but should be visible
+      console.warn('[context-builder] Async context gathering failed:', result.reason);
+    }
+  }
 
   return { sources, ...results };
 }

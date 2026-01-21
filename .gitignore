@@ -42,6 +42,20 @@ yarn-error.log*
 .claude/*.local.md
 .claude/*.local.json
 
+# Claude Code sandbox stub files (security isolation)
+.bash_profile
+.bashrc
+.profile
+.zshrc
+.zprofile
+.gitconfig
+.gitmodules
+.ripgreprc
+.mcp.json
+.claude/settings.json
+.claude/agents
+.claude/commands
+
 # Testing
 .coverage
 htmlcov/

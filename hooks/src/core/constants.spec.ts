@@ -3,14 +3,13 @@
  */
 import { describe, expect, it } from 'bun:test';
 import {
-  CLASSIFICATION_TIMEOUT_MS,
   COMPACTION_THRESHOLD_PERCENT,
-  COMPLEX_IMPROVEMENT_TIMEOUT_MS,
   CONTEXT_GATHERING_TIMEOUT_MS,
   DEFAULT_LOG_FILE_PATH,
+  GIT_COMMAND_TIMEOUT_MS,
   HOOK_TIMEOUT_MS,
+  SESSION_FORK_TIMEOUT_MS,
   SHORT_PROMPT_THRESHOLD_TOKENS,
-  SIMPLE_IMPROVEMENT_TIMEOUT_MS,
   SKIP_TAG,
   XML_TAGS,
 } from './constants.ts';
@@ -21,20 +20,16 @@ describe('Constants', () => {
       expect(HOOK_TIMEOUT_MS).toBe(90_000);
     });
 
-    it('should define classification timeout of 5 seconds', () => {
-      expect(CLASSIFICATION_TIMEOUT_MS).toBe(5_000);
-    });
-
-    it('should define simple improvement timeout of 30 seconds', () => {
-      expect(SIMPLE_IMPROVEMENT_TIMEOUT_MS).toBe(30_000);
-    });
-
-    it('should define complex improvement timeout of 60 seconds', () => {
-      expect(COMPLEX_IMPROVEMENT_TIMEOUT_MS).toBe(60_000);
+    it('should define session fork timeout of 10 seconds', () => {
+      expect(SESSION_FORK_TIMEOUT_MS).toBe(10_000);
     });
 
     it('should define context gathering timeout of 2 seconds', () => {
       expect(CONTEXT_GATHERING_TIMEOUT_MS).toBe(2_000);
+    });
+
+    it('should define git command timeout of 2 seconds', () => {
+      expect(GIT_COMMAND_TIMEOUT_MS).toBe(2_000);
     });
   });
 

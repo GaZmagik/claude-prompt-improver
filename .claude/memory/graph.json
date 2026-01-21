@@ -67,11 +67,6 @@
       "title": "Bun TypeScript requires allowImportingTsExtensions for .ts imports"
     },
     {
-      "id": "decision-classification-three-tier-cost-optimised",
-      "type": "decision",
-      "title": "Three-tier classification with cost optimisation"
-    },
-    {
       "id": "artifact-sdd-tdd-phase-completion-pattern",
       "type": "artifact",
       "title": "SDD + TDD phase completion pattern"
@@ -567,19 +562,9 @@
       "title": "Post-MVP remediation PR successfully merged to main"
     },
     {
-      "id": "gotcha-plugin-logger-utility-exists-but-not-integrated",
-      "type": "gotcha",
-      "title": "plugin-logger-utility-now-integrated-with-active-logging"
-    },
-    {
       "id": "learning-prompt-improver-classifier-conservative-by-design",
       "type": "learning",
       "title": "prompt-improver-classifier-conservative-by-design"
-    },
-    {
-      "id": "decision-prompt-improver-always-improve-no-classification",
-      "type": "decision",
-      "title": "prompt-improver-always-improve-no-classification"
     },
     {
       "id": "artifact-prompt-improver-single-api-call-pattern",
@@ -632,11 +617,6 @@
       "title": "Prompt improver end-to-end validation successful"
     },
     {
-      "id": "artifact-always-improve-without-classification-pattern",
-      "type": "artifact",
-      "title": "Always-improve without classification pattern"
-    },
-    {
       "id": "learning-session-restore-with-parallel-agents-improves-memory-graph-health-efficiently",
       "type": "learning",
       "title": "Session-restore with parallel agents improves memory graph health efficiently"
@@ -672,11 +652,6 @@
       "title": "Retro - Pre-identify all code locations before refactoring to avoid incremental discovery"
     },
     {
-      "id": "gotcha-security-vulnerabilities-v100-merged-with-2-critical-issues-indicate-need-for-mandatory-pre-merge-security-audit-gate",
-      "type": "gotcha",
-      "title": "Security vulnerabilities (v1.0.0 merged with 2 critical issues) indicate need for mandatory pre-merge security audit gate"
-    },
-    {
       "id": "learning-retro-parallel-agent-launches-for-complex-reviews-8-agents-dramatically-more-efficient-than-sequential",
       "type": "learning",
       "title": "Retro - Parallel agent launches for complex reviews (8 agents) dramatically more efficient than sequential"
@@ -705,11 +680,6 @@
       "id": "gotcha-retro-postinstall-scripts-need-environment-detection-guards",
       "type": "gotcha",
       "title": "Retro - Postinstall scripts need environment detection guards"
-    },
-    {
-      "id": "gotcha-postinstall-script-path-calculation-destroyed-23-projects",
-      "type": "gotcha",
-      "title": "Postinstall script path calculation destroyed 23 projects"
     },
     {
       "id": "learning-retro-photorec-recovery-succeeded-but-required-correct-syntax",
@@ -750,6 +720,194 @@
       "id": "learning-retro-user-domain-intuition-often-outweighs-initial-technical-assumptions",
       "type": "learning",
       "title": "Retro - User domain intuition often outweighs initial technical assumptions"
+    },
+    {
+      "id": "learning-retro-capture-actual-hook-input-format-before-implementing-parser",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-sandbox-stdin-is-devnull-making-local-testing-impossible",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-claude-code-hook-stdin-captures-with-shell-scripts-for-debugging",
+      "type": "learning"
+    },
+    {
+      "id": "learning-claude-code-userpromptsubmit-hook-input-format-is-flat-not-nested",
+      "type": "learning"
+    },
+    {
+      "id": "learning-sandbox-blocks-stdin-piping-to-bun-scripts",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-claude-cli-needs-no-session-persistence-to-run-in-sandbox",
+      "type": "gotcha"
+    },
+    {
+      "id": "gotcha-project-scoped-plugin-hooks-dont-auto-load-despite-claude-pluginpluginjson",
+      "type": "gotcha"
+    },
+    {
+      "id": "gotcha-userpromptsubmit-hooks-trigger-recursively-when-spawning-claude-cli",
+      "type": "gotcha"
+    },
+    {
+      "id": "decision-restore-nonesimplecomplex-classification-per-original-spec",
+      "type": "decision"
+    },
+    {
+      "id": "gotcha-classification-requires-2-api-calls-unacceptable-latency",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-audit-driven-task-reconciliation-exposed-15-20-false-completion-rate",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-conflicting-architectural-decisions-led-to-wasted-implementation",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-recursion-prevention-discovered-via-runaway-logs-not-testing",
+      "type": "learning"
+    },
+    {
+      "id": "learning-spec-vs-implementation-audit-revealed-major-feature-gaps",
+      "type": "learning"
+    },
+    {
+      "id": "decision-integration-wiring-single-pass",
+      "type": "decision"
+    },
+    {
+      "id": "learning-retro-test-spec-mismatch-revealed-via-systematic-failures-across-multiple-test-suites",
+      "type": "learning"
+    },
+    {
+      "id": "learning-classification-rejected-due-to-latency-and-cost",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-config-driven-integration-wiring-eliminated-need-for-classification-layer",
+      "type": "learning"
+    },
+    {
+      "id": "artifact-hook-auto-setup-pattern",
+      "type": "artifact"
+    },
+    {
+      "id": "learning-hook-test-format-flat-sessionid-vs-nested-context",
+      "type": "learning"
+    },
+    {
+      "id": "learning-prompt-improver-test-coverage-at-v120",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-bundled-template-files-enable-seamless-auto-setup-without-embedding-strings",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-parallel-expert-agents-dramatically-improved-review-efficiency",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-memory-curator-proactively-surfaces-decision-conflicts-for-cleanup",
+      "type": "learning"
+    },
+    {
+      "id": "learning-bundled-template-path-resolution-requires-relative-traversal-from-srccore",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-gotcha-specify-symlinks-not-auto-created-in-project-clone",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-ensureconfigsetup-test-coverage-required-8-tests-for-4-status-outcomes",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-gotcha-dead-code-unused-constants-only-discovered-during-comprehensive-review",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-pre-shipping-review-identified-5-major-issues-and-12-minor-issues-across-7-expert-reviews",
+      "type": "learning"
+    },
+    {
+      "id": "artifact-config-default-sync-validation",
+      "type": "artifact"
+    },
+    {
+      "id": "decision-integration-wiring-fixed-issues-before-shipping",
+      "type": "decision"
+    },
+    {
+      "id": "learning-retro-systematic-issue-fixing-with-test-validation-prevents-regression",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-prompt-engineering-docs-showed-xml-should-be-mandatory-not-optional",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-async-file-ops-conversion-broke-tests-due-to-syncasync-boundary-confusion",
+      "type": "gotcha"
+    },
+    {
+      "id": "gotcha-retro-hook-testing-showed-silent-failures-on-api-timeouts-error-visibility-needed",
+      "type": "gotcha"
+    },
+    {
+      "id": "decision-integration-wiring-v120-fixed-8-review-issues-before-shipping",
+      "type": "decision"
+    },
+    {
+      "id": "learning-token-counting-optimization-o1-space-complexity",
+      "type": "learning"
+    },
+    {
+      "id": "learning-async-file-operations-migration-pattern",
+      "type": "learning"
+    },
+    {
+      "id": "artifact-lru-cache-eviction-pattern",
+      "type": "artifact"
+    },
+    {
+      "id": "gotcha-hook-xml-structure-consistency-optional-vs-mandatory",
+      "type": "gotcha"
+    },
+    {
+      "id": "gotcha-retro-silent-error-handling-masks-integration-failures",
+      "type": "gotcha"
+    },
+    {
+      "id": "gotcha-retro-context-sources-were-hardcoded-empty-despite-gathering-logic",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-pre-compact-memory-capture-provided-immediate-debugging-context",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-hook-improvement-failures-silent-without-error-details",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-context-sources-hardcoded-to-empty-array-in-hook-output",
+      "type": "learning"
+    },
+    {
+      "id": "learning-integration-context-gathering-verified-working-with-git-and-memory-sources",
+      "type": "learning"
+    },
+    {
+      "id": "decision-dynamic-context-injection-v120-exploration-phase",
+      "type": "decision"
     }
   ],
   "edges": [
@@ -814,11 +972,6 @@
       "label": "relates-to"
     },
     {
-      "source": "decision-classification-three-tier-cost-optimised",
-      "target": "artifact-spec-analysis-issue-resolution",
-      "label": "relates-to"
-    },
-    {
       "source": "learning-retro-agent-first-sdd-workflow-reduces-iteration",
       "target": "artifact-sdd-tdd-phase-completion-pattern",
       "label": "relates-to"
@@ -859,11 +1012,6 @@
       "label": "relates-to"
     },
     {
-      "source": "learning-modular-context-sources-enable-extensible-prompt-enrichment-without-tight-coupling",
-      "target": "decision-classification-three-tier-cost-optimised",
-      "label": "relates-to"
-    },
-    {
       "source": "learning-phase-based-task-organization-enables-parallel-mental-planning",
       "target": "learning-retro-tdd-phase-based-organization-with-parallel-test-writing-accelerates-implementation",
       "label": "relates-to"
@@ -876,11 +1024,6 @@
     {
       "source": "gotcha-retro-memory-graph-deduplication-complexity-increased-post-hoc",
       "target": "learning-retro-modular-context-builder-design-enabled-6-incremental-integrations-without-conflicts",
-      "label": "relates-to"
-    },
-    {
-      "source": "learning-retro-clear-bypass-priority-ordering-prevents-edge-case-ambiguity",
-      "target": "decision-classification-three-tier-cost-optimised",
       "label": "relates-to"
     },
     {
@@ -1021,11 +1164,6 @@
     {
       "source": "learning-timer-cleanup-prevents-resource-leaks-in-timeout-patterns",
       "target": "learning-retro-tdd-stub-first-pattern-scales-to-404-tests-with-zero-rework",
-      "label": "relates-to"
-    },
-    {
-      "source": "artifact-keyword-matcher-shared-utility",
-      "target": "decision-classification-three-tier-cost-optimised",
       "label": "relates-to"
     },
     {
@@ -1349,26 +1487,6 @@
       "label": "relates-to"
     },
     {
-      "source": "gotcha-plugin-logger-utility-exists-but-not-integrated",
-      "target": "decision-visibility-mvp-for-prompt-improver-structured-logging-improvement-reports-over-feature-expansion",
-      "label": "relates-to"
-    },
-    {
-      "source": "decision-prompt-improver-always-improve-no-classification",
-      "target": "decision-visibility-mvp-for-prompt-improver-structured-logging-improvement-reports-over-feature-expansion",
-      "label": "relates-to"
-    },
-    {
-      "source": "learning-prompt-improver-classifier-conservative-by-design",
-      "target": "decision-prompt-improver-always-improve-no-classification",
-      "label": "relates-to"
-    },
-    {
-      "source": "artifact-prompt-improver-single-api-call-pattern",
-      "target": "decision-prompt-improver-always-improve-no-classification",
-      "label": "relates-to"
-    },
-    {
       "source": "learning-retro-typescript-errors-as-a-feature-removal-guide",
       "target": "artifact-sdd-tdd-phase-completion-pattern",
       "label": "relates-to"
@@ -1381,21 +1499,6 @@
     {
       "source": "learning-retro-run-tests-after-each-file-type-change-to-measure-progress",
       "target": "artifact-sdd-tdd-phase-completion-pattern",
-      "label": "relates-to"
-    },
-    {
-      "source": "decision-prompt-improver-always-improve-no-classification",
-      "target": "artifact-always-improve-without-classification-pattern",
-      "label": "relates-to"
-    },
-    {
-      "source": "learning-prompt-improver-end-to-end-validation-successful",
-      "target": "decision-prompt-improver-always-improve-no-classification",
-      "label": "relates-to"
-    },
-    {
-      "source": "artifact-always-improve-without-classification-pattern",
-      "target": "decision-classification-three-tier-cost-optimised",
       "label": "relates-to"
     },
     {
@@ -1444,11 +1547,6 @@
       "label": "relates-to"
     },
     {
-      "source": "decision-always-improve-comprehensive-expert-review-before-pr",
-      "target": "decision-prompt-improver-always-improve-no-classification",
-      "label": "relates-to"
-    },
-    {
       "source": "learning-session-restoration-with-parallel-agents-improves-memory-curation",
       "target": "decision-always-improve-comprehensive-expert-review-before-pr",
       "label": "relates-to"
@@ -1460,11 +1558,6 @@
     },
     {
       "source": "decision-featurepath-traversal-validation",
-      "target": "decision-always-improve-comprehensive-expert-review-before-pr",
-      "label": "relates-to"
-    },
-    {
-      "source": "gotcha-security-vulnerabilities-v100-merged-with-2-critical-issues-indicate-need-for-mandatory-pre-merge-security-audit-gate",
       "target": "decision-always-improve-comprehensive-expert-review-before-pr",
       "label": "relates-to"
     },
@@ -1499,18 +1592,38 @@
       "label": "relates-to"
     },
     {
-      "source": "decision-classification-three-tier-cost-optimised",
-      "target": "learning-prompt-improver-classifier-conservative-by-design",
-      "label": "relates-to"
-    },
-    {
       "source": "gotcha-retro-userpromptsubmit-hooks-should-not-use-fork-session",
       "target": "decision-remove-fork-session-from-userpromptsubmit-hooks",
       "label": "relates-to"
     },
     {
-      "source": "decision-prompt-improver-always-improve-no-classification",
-      "target": "artifact-always-improve-production-restructuring-pattern",
+      "source": "learning-retro-capture-actual-hook-input-format-before-implementing-parser",
+      "target": "learning-claude-code-userpromptsubmit-hook-input-format-is-flat-not-nested",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-capture-actual-hook-input-format-before-implementing-parser",
+      "target": "learning-retro-claude-code-hook-stdin-captures-with-shell-scripts-for-debugging",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-capture-actual-hook-input-format-before-implementing-parser",
+      "target": "gotcha-retro-sandbox-stdin-is-devnull-making-local-testing-impossible",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-sandbox-blocks-stdin-piping-to-bun-scripts",
+      "target": "gotcha-retro-sandbox-stdin-is-devnull-making-local-testing-impossible",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-claude-code-userpromptsubmit-hook-input-format-is-flat-not-nested",
+      "target": "gotcha-claude-cli-needs-no-session-persistence-to-run-in-sandbox",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-project-scoped-plugin-hooks-dont-auto-load-despite-claude-pluginpluginjson",
+      "target": "learning-claude-code-userpromptsubmit-hook-input-format-is-flat-not-nested",
       "label": "relates-to"
     }
   ]

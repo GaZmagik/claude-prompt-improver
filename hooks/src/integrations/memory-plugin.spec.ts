@@ -23,8 +23,8 @@ import {
 
 describe('Memory Plugin Integration', () => {
   describe('T110: checkMemoryPluginInstalled - detects plugin at known paths', () => {
-    it('should detect plugin at ~/.claude/plugins/cache/enhance/claude-memory-plugin/', () => {
-      const result = checkMemoryPluginInstalled({
+    it('should detect plugin at ~/.claude/plugins/cache/enhance/claude-memory-plugin/', async () => {
+      const result = await checkMemoryPluginInstalled({
         _mockFileSystem: {
           '~/.claude/plugins/cache/enhance/claude-memory-plugin/': 'directory',
         },
@@ -34,8 +34,8 @@ describe('Memory Plugin Integration', () => {
       expect(result.path).toContain('claude-memory-plugin');
     });
 
-    it('should detect plugin at project .claude/plugins/', () => {
-      const result = checkMemoryPluginInstalled({
+    it('should detect plugin at project .claude/plugins/', async () => {
+      const result = await checkMemoryPluginInstalled({
         _mockFileSystem: {
           '.claude/plugins/claude-memory-plugin/': 'directory',
         },
@@ -44,8 +44,8 @@ describe('Memory Plugin Integration', () => {
       expect(result.found).toBe(true);
     });
 
-    it('should detect plugin via .claude/memory/ directory', () => {
-      const result = checkMemoryPluginInstalled({
+    it('should detect plugin via .claude/memory/ directory', async () => {
+      const result = await checkMemoryPluginInstalled({
         _mockFileSystem: {
           '.claude/memory/': 'directory',
           '.claude/memory/index.json': '{}',
@@ -55,8 +55,8 @@ describe('Memory Plugin Integration', () => {
       expect(result.found).toBe(true);
     });
 
-    it('should return false when plugin not found', () => {
-      const result = checkMemoryPluginInstalled({
+    it('should return false when plugin not found', async () => {
+      const result = await checkMemoryPluginInstalled({
         _mockFileSystem: {},
       });
 

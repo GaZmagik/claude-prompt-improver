@@ -6,8 +6,7 @@ enabled: true
 forceImprove: false
 shortPromptThreshold: 10
 compactionThreshold: 5
-defaultSimpleModel: haiku
-defaultComplexModel: sonnet
+improverModel: haiku
 
 integrations:
   git: true
@@ -23,7 +22,7 @@ logging:
   maxLogSizeMB: 10
   maxLogAgeDays: 7
   displayImprovedPrompt: true
-  useTimestampedLogs: false
+  useTimestampedLogs: true
 ---
 
 # Claude Prompt Improver Plugin
@@ -50,8 +49,7 @@ Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settin
 | `forceImprove` | boolean | `false` | Bypass all heuristic checks (for testing) |
 | `shortPromptThreshold` | number | `10` | Prompts with fewer tokens bypass improvement |
 | `compactionThreshold` | number | `5` | Skip when context availability is below this % |
-| `defaultSimpleModel` | string | `haiku` | Model for simple improvements |
-| `defaultComplexModel` | string | `sonnet` | Model for complex improvements |
+| `improverModel` | string | `haiku` | Model for improvements (haiku, sonnet, or opus) |
 
 ### Integration Toggles
 
