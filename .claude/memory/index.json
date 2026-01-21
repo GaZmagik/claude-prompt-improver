@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-21T13:31:52.665Z",
+  "lastUpdated": "2026-01-21T13:58:28.444Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -932,21 +932,6 @@
       "relativePath": "permanent/learning-post-compaction-context-restoration-via-memory-system-effective.md"
     },
     {
-      "id": "decision-prompt-improver-always-improve-no-classification",
-      "type": "decision",
-      "title": "prompt-improver-always-improve-no-classification",
-      "tags": [
-        "prompt-improver",
-        "architecture",
-        "decision",
-        "project"
-      ],
-      "created": "2026-01-19T20:44:17.018Z",
-      "updated": "2026-01-19T20:44:17.018Z",
-      "scope": "global",
-      "relativePath": "permanent/decision-prompt-improver-always-improve-no-classification.md"
-    },
-    {
       "id": "learning-prompt-improver-classifier-conservative-by-design",
       "type": "learning",
       "title": "prompt-improver-classifier-conservative-by-design",
@@ -1058,22 +1043,6 @@
       "updated": "2026-01-19T11:02:42.591Z",
       "scope": "global",
       "relativePath": "permanent/gotcha-real-integration-tests-require-accurate-interface-property-names.md"
-    },
-    {
-      "id": "artifact-always-improve-without-classification-pattern",
-      "type": "artifact",
-      "title": "Always-improve without classification pattern",
-      "tags": [
-        "architecture",
-        "pattern",
-        "prompt-improver",
-        "refactoring",
-        "project"
-      ],
-      "created": "2026-01-19T22:08:37.857Z",
-      "updated": "2026-01-19T22:08:37.857Z",
-      "scope": "global",
-      "relativePath": "permanent/artifact-always-improve-without-classification-pattern.md"
     },
     {
       "id": "learning-tdd-stub-first-pattern-enables-290-tests-across-6-phases",
@@ -1348,22 +1317,6 @@
       "updated": "2026-01-19T10:04:52.001Z",
       "scope": "global",
       "relativePath": "permanent/learning-nouncheckedindexedaccess-requires-non-null-assertion-after-length-verification-in-tests.md"
-    },
-    {
-      "id": "decision-classification-three-tier-cost-optimised",
-      "type": "decision",
-      "title": "Three-tier classification with cost optimisation",
-      "tags": [
-        "architecture",
-        "classification",
-        "cost-optimisation",
-        "prompt-improver",
-        "project"
-      ],
-      "created": "2026-01-19T07:39:33.390Z",
-      "updated": "2026-01-19T07:39:33.390Z",
-      "scope": "global",
-      "relativePath": "permanent/decision-classification-three-tier-cost-optimised.md"
     },
     {
       "id": "learning-security-pattern-50-char-prompt-preview-for-logging",
@@ -2667,6 +2620,133 @@
       "updated": "2026-01-21T13:31:52.661Z",
       "scope": "project",
       "relativePath": "permanent/learning-spec-vs-implementation-audit-revealed-major-feature-gaps.md"
+    },
+    {
+      "id": "decision-integration-wiring-single-pass",
+      "type": "decision",
+      "title": "Single-pass integration wiring for hook flow",
+      "tags": [
+        "integration",
+        "architecture",
+        "hook-design",
+        "project"
+      ],
+      "created": "2026-01-21T13:52:27.151Z",
+      "updated": "2026-01-21T13:52:27.151Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-integration-wiring-single-pass.md"
+    },
+    {
+      "id": "learning-retro-test-spec-mismatch-revealed-via-systematic-failures-across-multiple-test-suites",
+      "type": "learning",
+      "title": "Retro - Test-spec mismatch revealed via systematic failures across multiple test suites",
+      "tags": [
+        "retrospective",
+        "testing",
+        "patterns",
+        "project"
+      ],
+      "created": "2026-01-21T13:52:31.785Z",
+      "updated": "2026-01-21T13:52:31.785Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-test-spec-mismatch-revealed-via-systematic-failures-across-multiple-test-suites.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-classification-rejected-due-to-latency-and-cost",
+      "type": "learning",
+      "title": "Classification rejected due to latency and cost",
+      "tags": [
+        "classification",
+        "latency",
+        "performance",
+        "decision-rationale",
+        "project"
+      ],
+      "created": "2026-01-21T13:52:36.885Z",
+      "updated": "2026-01-21T13:52:36.885Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-classification-rejected-due-to-latency-and-cost.md"
+    },
+    {
+      "id": "learning-retro-config-driven-integration-wiring-eliminated-need-for-classification-layer",
+      "type": "learning",
+      "title": "Retro - Config-driven integration wiring eliminated need for classification layer",
+      "tags": [
+        "retrospective",
+        "architecture",
+        "config",
+        "project"
+      ],
+      "created": "2026-01-21T13:52:37.015Z",
+      "updated": "2026-01-21T13:52:37.015Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-config-driven-integration-wiring-eliminated-need-for-classification-layer.md",
+      "severity": "medium"
+    },
+    {
+      "id": "artifact-hook-auto-setup-pattern",
+      "type": "artifact",
+      "title": "Hook auto-setup from bundled template",
+      "tags": [
+        "hook-design",
+        "user-experience",
+        "configuration",
+        "pattern",
+        "project"
+      ],
+      "created": "2026-01-21T13:52:37.473Z",
+      "updated": "2026-01-21T13:52:37.473Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-hook-auto-setup-pattern.md"
+    },
+    {
+      "id": "learning-hook-test-format-flat-sessionid-vs-nested-context",
+      "type": "learning",
+      "title": "Hook test format: flat session_id vs nested context",
+      "tags": [
+        "testing",
+        "hooks",
+        "json-format",
+        "bug-fix",
+        "project"
+      ],
+      "created": "2026-01-21T13:52:38.064Z",
+      "updated": "2026-01-21T13:52:38.064Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-hook-test-format-flat-sessionid-vs-nested-context.md"
+    },
+    {
+      "id": "learning-prompt-improver-test-coverage-at-v120",
+      "type": "learning",
+      "title": "Prompt improver test coverage at v1.2.0",
+      "tags": [
+        "testing",
+        "coverage",
+        "metrics",
+        "quality",
+        "project"
+      ],
+      "created": "2026-01-21T13:52:38.652Z",
+      "updated": "2026-01-21T13:52:38.652Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-prompt-improver-test-coverage-at-v120.md"
+    },
+    {
+      "id": "learning-retro-bundled-template-files-enable-seamless-auto-setup-without-embedding-strings",
+      "type": "learning",
+      "title": "Retro - Bundled template files enable seamless auto-setup without embedding strings",
+      "tags": [
+        "retrospective",
+        "configuration",
+        "pattern",
+        "project"
+      ],
+      "created": "2026-01-21T13:52:41.429Z",
+      "updated": "2026-01-21T13:52:41.429Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-bundled-template-files-enable-seamless-auto-setup-without-embedding-strings.md",
+      "severity": "low"
     }
   ]
 }
