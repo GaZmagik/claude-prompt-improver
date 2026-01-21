@@ -750,6 +750,10 @@
       "id": "learning-retro-user-domain-intuition-often-outweighs-initial-technical-assumptions",
       "type": "learning",
       "title": "Retro - User domain intuition often outweighs initial technical assumptions"
+    },
+    {
+      "id": "decision-dynamic-context-injection-v130-spec",
+      "type": "decision"
     }
   ],
   "edges": [

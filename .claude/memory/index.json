@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-20T14:39:15.430Z",
+  "lastUpdated": "2026-01-21T20:26:20.543Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -2421,6 +2421,22 @@
       "updated": "2026-01-19T08:44:23.983Z",
       "scope": "global",
       "relativePath": "permanent/learning-test-coverage-strategy-systematic-gap-analysis-to-reach-100.md"
+    },
+    {
+      "id": "decision-dynamic-context-injection-v130-spec",
+      "type": "decision",
+      "title": "Dynamic Context Injection v1.3.0 Specification",
+      "tags": [
+        "ready-for-planning",
+        "dynamic-discovery",
+        "filesystem-scanning",
+        "integration",
+        "project"
+      ],
+      "created": "2026-01-21T20:26:20.538Z",
+      "updated": "2026-01-21T20:26:20.538Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-dynamic-context-injection-v130-spec.md"
     }
   ]
 }
