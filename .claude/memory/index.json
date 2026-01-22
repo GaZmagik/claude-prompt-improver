@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-22T01:01:24.145Z",
+  "lastUpdated": "2026-01-22T13:42:31.163Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -3156,6 +3156,185 @@
       "updated": "2026-01-22T01:01:24.140Z",
       "scope": "project",
       "relativePath": "permanent/gotcha-userpromptsubmit-fork-session-confirmed-broken.md"
+    },
+    {
+      "id": "learning-retro-cross-reference-working-implementations-before-redesigning",
+      "type": "learning",
+      "title": "Retro - Cross-reference working implementations before redesigning",
+      "tags": [
+        "retrospective",
+        "process",
+        "debugging",
+        "project"
+      ],
+      "created": "2026-01-22T13:39:16.326Z",
+      "updated": "2026-01-22T13:39:16.326Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-cross-reference-working-implementations-before-redesigning.md",
+      "severity": "medium"
+    },
+    {
+      "id": "gotcha-retro-multiple-independent-failures-masked-by-single-symptom",
+      "type": "gotcha",
+      "title": "Retro - Multiple independent failures masked by single symptom",
+      "tags": [
+        "retrospective",
+        "process",
+        "debugging",
+        "project"
+      ],
+      "created": "2026-01-22T13:39:22.028Z",
+      "updated": "2026-01-22T13:39:22.028Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-multiple-independent-failures-masked-by-single-symptom.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-retro-cli-debug-flag-was-critical-discovery-not-in-docs",
+      "type": "learning",
+      "title": "Retro - CLI --debug flag was critical discovery not in docs",
+      "tags": [
+        "retrospective",
+        "process",
+        "cli",
+        "debugging",
+        "project"
+      ],
+      "created": "2026-01-22T13:41:52.874Z",
+      "updated": "2026-01-22T13:41:52.874Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-cli-debug-flag-was-critical-discovery-not-in-docs.md",
+      "severity": "high"
+    },
+    {
+      "id": "learning-fork-session-requires-project-cwd-not-tmp-directory",
+      "type": "learning",
+      "title": "fork-session requires project cwd not tmp directory",
+      "tags": [
+        "fork-session",
+        "session-context",
+        "working-directory",
+        "project"
+      ],
+      "created": "2026-01-22T13:41:55.963Z",
+      "updated": "2026-01-22T13:41:55.963Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-fork-session-requires-project-cwd-not-tmp-directory.md"
+    },
+    {
+      "id": "learning-retro-comparing-working-vs-broken-implementations-accelerated-debugging",
+      "type": "learning",
+      "title": "Retro - Comparing working vs broken implementations accelerated debugging",
+      "tags": [
+        "retrospective",
+        "process",
+        "debugging",
+        "comparison",
+        "project"
+      ],
+      "created": "2026-01-22T13:42:01.059Z",
+      "updated": "2026-01-22T13:42:01.059Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-comparing-working-vs-broken-implementations-accelerated-debugging.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-claude-cli-debug-flag-workaround-enables-fork-session",
+      "type": "learning",
+      "title": "claude cli --debug flag workaround enables fork-session",
+      "tags": [
+        "fork-session",
+        "claude-cli",
+        "workaround",
+        "debugging",
+        "project"
+      ],
+      "created": "2026-01-22T13:42:02.059Z",
+      "updated": "2026-01-22T13:42:02.059Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-claude-cli-debug-flag-workaround-enables-fork-session.md"
+    },
+    {
+      "id": "gotcha-retro-hook-output-format-documentation-required-external-lookup",
+      "type": "gotcha",
+      "title": "Retro - Hook output format documentation required external lookup",
+      "tags": [
+        "retrospective",
+        "process",
+        "documentation",
+        "hooks",
+        "project"
+      ],
+      "created": "2026-01-22T13:42:05.678Z",
+      "updated": "2026-01-22T13:42:05.678Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-hook-output-format-documentation-required-external-lookup.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-userpromptsubmit-hook-additionalcontext-must-be-wrapped-in-hookspecificoutput",
+      "type": "learning",
+      "title": "userpromptsubmit hook additionalcontext must be wrapped in hookspecificoutput",
+      "tags": [
+        "hooks",
+        "additionalContext",
+        "hookSpecificOutput",
+        "output-format",
+        "project"
+      ],
+      "created": "2026-01-22T13:42:07.034Z",
+      "updated": "2026-01-22T13:42:07.034Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-userpromptsubmit-hook-additionalcontext-must-be-wrapped-in-hookspecificoutput.md"
+    },
+    {
+      "id": "learning-opus-timeout-on-large-sessions-requires-hook-timeout-increase",
+      "type": "learning",
+      "title": "opus timeout on large sessions requires hook timeout increase",
+      "tags": [
+        "opus",
+        "timeout",
+        "hook-timeout",
+        "large-sessions",
+        "performance",
+        "project"
+      ],
+      "created": "2026-01-22T13:42:12.294Z",
+      "updated": "2026-01-22T13:42:12.294Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-opus-timeout-on-large-sessions-requires-hook-timeout-increase.md"
+    },
+    {
+      "id": "gotcha-output-format-json-causes-fork-session-hangs",
+      "type": "gotcha",
+      "title": "output-format json causes fork-session hangs",
+      "tags": [
+        "fork-session",
+        "output-format",
+        "json",
+        "gotcha",
+        "project"
+      ],
+      "created": "2026-01-22T13:42:18.117Z",
+      "updated": "2026-01-22T13:42:18.117Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-output-format-json-causes-fork-session-hangs.md"
+    },
+    {
+      "id": "decision-hook-timeout-120-seconds-opus-support",
+      "type": "decision",
+      "title": "hook timeout set to 120 seconds for opus support",
+      "tags": [
+        "hook-timeout",
+        "opus",
+        "performance",
+        "configuration",
+        "project"
+      ],
+      "created": "2026-01-22T13:42:31.157Z",
+      "updated": "2026-01-22T13:42:31.157Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-hook-timeout-120-seconds-opus-support.md"
     }
   ]
 }

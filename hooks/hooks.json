@@ -8,7 +8,7 @@
           {
             "type": "command",
             "command": "bun ${CLAUDE_PLUGIN_ROOT}/hooks/user-prompt-submit/improve-prompt.ts",
-            "timeout": 90
+            "timeout": 120
           }
         ]
       }

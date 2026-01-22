@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-01-22
+
+### Added
+
+- **Transcript-based context detection** - The `low_context` bypass now actually works
+  - Claude Code doesn't provide `context_usage` to UserPromptSubmit hooks
+  - Now parses the session transcript (`.jsonl`) to calculate context usage
+  - Uses last assistant message's token counts (input + output + cache tokens)
+  - Accounts for autocompact buffer (22.5% reserved = 155K usable of 200K)
+  - Bypasses prompt improvement when <5% context remaining
+
+### Changed
+
+- **Hook timeout increased to 120s** - Supports Opus model on large sessions
+  - Opus can take ~87s on 193MB transcripts
+  - Previous 90s timeout was insufficient
+
+### Technical Details
+
+- Added `calculateContextFromTranscript()` to compaction-detector.ts
+- Added `getUsableContextWindow()` accounting for autocompact buffer
+- Added `transcript_path` to HookContext type
+- Falls back gracefully if transcript unavailable
+
 ## [1.3.3] - 2026-01-22
 
 ### Fixed
