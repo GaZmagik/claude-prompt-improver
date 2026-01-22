@@ -337,6 +337,7 @@ function yamlToConfig(yaml: Record<string, unknown>): Partial<Configuration> {
       spec: typeof src.spec === 'boolean' ? src.spec : undefined,
       memory: typeof src.memory === 'boolean' ? src.memory : undefined,
       session: typeof src.session === 'boolean' ? src.session : undefined,
+      dynamicDiscovery: typeof src.dynamicDiscovery === 'boolean' ? src.dynamicDiscovery : undefined,
     };
   }
 
