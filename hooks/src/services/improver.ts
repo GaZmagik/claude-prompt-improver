@@ -176,25 +176,40 @@ function buildContextSection(context?: ImprovementContext): string {
 
 /**
  * Improvement prompt template
+ *
+ * CRITICAL: This prompt runs in a FORKED SESSION with full conversation history visible.
+ * The framing must clearly distinguish this as a one-shot improvement task, NOT a
+ * continuation of the previous conversation. Without explicit boundaries, the model
+ * may respond to prior conversation context instead of performing the improvement.
  */
-const IMPROVEMENT_PROMPT_TEMPLATE = `You are improving a user prompt for Claude Code.
+const IMPROVEMENT_PROMPT_TEMPLATE = `[FORKED SESSION - PROMPT IMPROVEMENT AGENT]
 
-Original prompt:
+You are running in a FORKED SESSION as a specialised prompt improvement agent.
+You are NOT the assistant from the previous conversation.
+Your ONLY task is to output an improved version of the user's prompt.
+
+CRITICAL BOUNDARIES:
+- DO NOT continue or respond to the previous conversation
+- DO NOT ask questions or request clarification
+- DO NOT explain your reasoning or add commentary
+- DO NOT reference what was previously discussed
+- Output ONLY the improved prompt, nothing else
+
+Original prompt to improve:
 <original_prompt>
 {ORIGINAL_PROMPT}
 </original_prompt>
 
 {CONTEXT_SECTION}
 
-Instructions:
+Improvement guidelines:
 1. PRESERVE the original intent - the user's goal must remain unchanged
 2. PRESERVE the original tone - formal/informal, concise/detailed
 3. ADD clarity by specifying what's ambiguous
-4. ALWAYS structure the output using XML tags (e.g., <task>, <context>, <constraints>, <requirements>)
-5. NEVER ask clarifying questions - make reasonable assumptions based on available context
-6. REFERENCE the provided context where relevant
+4. Structure the output using XML tags (e.g., <task>, <context>, <constraints>)
+5. Make reasonable assumptions based on available context
 
-Output ONLY the improved prompt wrapped in XML tags, nothing else.`;
+Output ONLY the improved prompt wrapped in XML tags. No preamble. No explanation.`;
 
 /**
  * Builds the improvement prompt with context
