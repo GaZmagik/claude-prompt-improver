@@ -27,6 +27,7 @@ const mockConfig: Configuration = {
     spec: false,
     memory: false,
     session: false,
+    dynamicDiscovery: false,
   },
   logging: {
     enabled: false,

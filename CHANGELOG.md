@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-01-22
+
+### Added
+
+- **Tools context from Claude Code** - Now parses `available_tools` from stdin
+  - Extracts tools provided by Claude Code (Read, Write, Edit, MCP tools, etc.)
+  - Injects into improved prompts as `<available_tools>` section
+
+- **Dynamic discovery integration** - Discovers skills and agents at runtime
+  - Scans `.claude/` directories for available resources
+  - Matches skills and agents to prompt keywords
+  - Injects as `<available_skills>`, `<suggested_agents>`, `<discovered_resources>` sections
+  - New `dynamicDiscovery` config toggle (default: `true`)
+
+### Fixed
+
+- **Context sources now actually wired** - Previously, tools/skills/agents infrastructure existed but was never connected
+  - `available_tools` was sent by Claude Code but never extracted from stdin
+  - Dynamic discovery was fully implemented but never invoked from entry point
+
+### Technical Details
+
+- Added `available_tools` extraction in `parseHookInput()`
+- Added `dynamicDiscovery` to `IntegrationToggles` type
+- Wired `dynamicDiscoveryOptions` in `buildImprovementContext()`
+- Added `dynamicDiscovery` to `ContextSource` type and `ImprovementContext`
+
 ## [1.4.0] - 2026-01-22
 
 ### Added

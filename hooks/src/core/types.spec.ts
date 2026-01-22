@@ -173,6 +173,7 @@ describe('Core Types', () => {
           spec: true,
           memory: true,
           session: false,
+          dynamicDiscovery: true,
         },
         logging: {
           enabled: true,

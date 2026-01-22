@@ -32,6 +32,7 @@ const DEFAULT_INTEGRATIONS: IntegrationToggles = {
   spec: true,
   memory: true,
   session: true,
+  dynamicDiscovery: true,
 };
 
 /**
@@ -336,6 +337,7 @@ function yamlToConfig(yaml: Record<string, unknown>): Partial<Configuration> {
       spec: typeof src.spec === 'boolean' ? src.spec : undefined,
       memory: typeof src.memory === 'boolean' ? src.memory : undefined,
       session: typeof src.session === 'boolean' ? src.session : undefined,
+      dynamicDiscovery: typeof src.dynamicDiscovery === 'boolean' ? src.dynamicDiscovery : undefined,
     };
   }
 
@@ -404,6 +406,7 @@ function mergeConfig(defaults: Configuration, partial: Partial<Configuration>): 
       spec: partial.integrations?.spec ?? defaults.integrations.spec,
       memory: partial.integrations?.memory ?? defaults.integrations.memory,
       session: partial.integrations?.session ?? defaults.integrations.session,
+      dynamicDiscovery: partial.integrations?.dynamicDiscovery ?? defaults.integrations.dynamicDiscovery,
     },
     logging: {
       enabled: partial.logging?.enabled ?? defaults.logging.enabled,

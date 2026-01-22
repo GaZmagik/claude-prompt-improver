@@ -91,6 +91,9 @@ export function parseHookInput(stdin: string): ParseResult {
     if (typeof parsed.transcript_path === 'string') {
       contextObj.transcript_path = parsed.transcript_path;
     }
+    if (Array.isArray(parsed.available_tools)) {
+      contextObj.available_tools = parsed.available_tools;
+    }
 
     const input: HookInput = {
       prompt: parsed.prompt,
@@ -314,6 +317,12 @@ async function buildImprovementContext(
     if (integrations.session) {
       (contextInput as { sessionOptions?: { enabled: boolean } }).sessionOptions = { enabled: true };
     }
+    if (integrations.dynamicDiscovery) {
+      (contextInput as { dynamicDiscoveryOptions?: { enabled: boolean; cwd?: string } }).dynamicDiscoveryOptions = {
+        enabled: true,
+        ...(cwd && { cwd }),
+      };
+    }
   }
 
   const builtContext = await buildContext(contextInput);
@@ -322,7 +331,7 @@ async function buildImprovementContext(
   // Check if we have any context
   const hasAnyContext = formattedContext.tools || formattedContext.skills || formattedContext.agents ||
     formattedContext.git || formattedContext.lsp || formattedContext.spec ||
-    formattedContext.memory || formattedContext.session;
+    formattedContext.memory || formattedContext.session || formattedContext.dynamicDiscovery;
 
   if (!hasAnyContext) {
     return undefined;
@@ -353,6 +362,9 @@ async function buildImprovementContext(
   }
   if (formattedContext.session) {
     (improvementContext as { session?: string }).session = formattedContext.session;
+  }
+  if (formattedContext.dynamicDiscovery) {
+    (improvementContext as { dynamicDiscovery?: string }).dynamicDiscovery = formattedContext.dynamicDiscovery;
   }
 
   return improvementContext;
@@ -538,6 +550,11 @@ async function main(): Promise<void> {
   // Add cwd for integrations that need it (git, spec)
   if (context.cwd) {
     (processOptions as { cwd?: string }).cwd = context.cwd;
+  }
+
+  // Add available tools from stdin (Claude Code provides this)
+  if (context.available_tools && context.available_tools.length > 0) {
+    (processOptions as { availableTools?: readonly string[] }).availableTools = context.available_tools;
   }
 
   // Process the prompt through improvement with all context sources
