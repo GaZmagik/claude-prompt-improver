@@ -928,6 +928,50 @@
     {
       "id": "gotcha-userpromptsubmit-fork-session-confirmed-broken",
       "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-cross-reference-working-implementations-before-redesigning",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-multiple-independent-failures-masked-by-single-symptom",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-cli-debug-flag-was-critical-discovery-not-in-docs",
+      "type": "learning"
+    },
+    {
+      "id": "learning-fork-session-requires-project-cwd-not-tmp-directory",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-comparing-working-vs-broken-implementations-accelerated-debugging",
+      "type": "learning"
+    },
+    {
+      "id": "learning-claude-cli-debug-flag-workaround-enables-fork-session",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-hook-output-format-documentation-required-external-lookup",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-userpromptsubmit-hook-additionalcontext-must-be-wrapped-in-hookspecificoutput",
+      "type": "learning"
+    },
+    {
+      "id": "learning-opus-timeout-on-large-sessions-requires-hook-timeout-increase",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-output-format-json-causes-fork-session-hangs",
+      "type": "gotcha"
+    },
+    {
+      "id": "decision-hook-timeout-120-seconds-opus-support",
+      "type": "decision"
     }
   ],
   "edges": [
@@ -1654,6 +1698,41 @@
     {
       "source": "gotcha-userpromptsubmit-fork-session-confirmed-broken",
       "target": "decision-decision-point-index-over-session-summaries",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-opus-timeout-on-large-sessions-requires-hook-timeout-increase",
+      "target": "decision-hook-timeout-120-seconds-opus-support",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-output-format-json-causes-fork-session-hangs",
+      "target": "learning-fork-session-requires-project-cwd-not-tmp-directory",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-output-format-json-causes-fork-session-hangs",
+      "target": "learning-claude-cli-debug-flag-workaround-enables-fork-session",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-postinstall-script-path-calculation-caused-catastrophic-deletion",
+      "target": "learning-postinstall-scripts-must-validate-paths-before-destructive-operations",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-postinstall-script-path-calculation-caused-catastrophic-deletion",
+      "target": "learning-retro-photorec-recovery-succeeded-but-required-correct-syntax",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-postinstall-script-path-calculation-caused-catastrophic-deletion",
+      "target": "gotcha-retro-postinstall-scripts-need-environment-detection-guards",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-userpromptsubmit-hook-additionalcontext-must-be-wrapped-in-hookspecificoutput",
+      "target": "decision-remove-fork-session-from-userpromptsubmit-hooks",
       "label": "relates-to"
     }
   ]
