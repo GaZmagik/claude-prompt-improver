@@ -51,27 +51,29 @@ jobs:
           fromJSON(steps.detect.outputs.structured_output).confidence >= 0.7
         env:
           GH_TOKEN: ${{ github.token }}
+          STRUCTURED_OUTPUT: ${{ steps.detect.outputs.structured_output }}
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
         run: |
-          OUTPUT='${{ steps.detect.outputs.structured_output }}'
-          CONFIDENCE=$(echo "$OUTPUT" | jq -r '.confidence')
-          SUMMARY=$(echo "$OUTPUT" | jq -r '.summary')
+          CONFIDENCE=$(echo "$STRUCTURED_OUTPUT" | jq -r '.confidence')
+          SUMMARY=$(echo "$STRUCTURED_OUTPUT" | jq -r '.summary')
 
           echo "Flaky test detected (confidence: $CONFIDENCE)"
           echo "Summary: $SUMMARY"
           echo ""
           echo "Triggering automatic retry..."
 
-          gh workflow run "${{ github.event.workflow_run.name }}" \
-            --ref "${{ github.event.workflow_run.head_branch }}"
+          gh workflow run "$WORKFLOW_NAME" --ref "$HEAD_BRANCH"
 
       # Low confidence flaky detection - skip retry
       - name: Low confidence detection
         if: |
           fromJSON(steps.detect.outputs.structured_output).is_flaky == true &&
           fromJSON(steps.detect.outputs.structured_output).confidence < 0.7
+        env:
+          STRUCTURED_OUTPUT: ${{ steps.detect.outputs.structured_output }}
         run: |
-          OUTPUT='${{ steps.detect.outputs.structured_output }}'
-          CONFIDENCE=$(echo "$OUTPUT" | jq -r '.confidence')
+          CONFIDENCE=$(echo "$STRUCTURED_OUTPUT" | jq -r '.confidence')
 
           echo "Possible flaky test but confidence too low ($CONFIDENCE)"
           echo "Not retrying automatically - manual review recommended"
@@ -94,7 +96,12 @@ jobs:
           if [ -n "$pr_number" ]; then
             if [ "$IS_FLAKY" = "true" ]; then
               TITLE="Flaky Test Detected"
-              ACTION="Automatically retrying the workflow"
+              # Only claim retry if confidence threshold was met
+              if awk "BEGIN {exit !($CONFIDENCE >= 0.7)}"; then
+                ACTION="Automatically retrying the workflow"
+              else
+                ACTION="Confidence too low ($CONFIDENCE) - manual review recommended"
+              fi
             else
               TITLE="Test Failure"
               ACTION="This appears to be a real bug - manual intervention needed"
