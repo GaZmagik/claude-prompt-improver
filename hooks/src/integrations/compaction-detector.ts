@@ -156,15 +156,28 @@ export function extractTokenUsageFromLine(line: string): MessageTokenUsage | und
       cacheCreationTokens,
       cacheReadTokens,
     };
-  } catch {
-    // Invalid JSON line - skip silently
+  } catch (error) {
+    // Invalid JSON line - skip and continue parsing
+    // Debug logging available via DEBUG env var for troubleshooting
+    if (process.env.DEBUG) {
+      console.error(`[compaction-detector] Failed to parse transcript line: ${error}`);
+    }
     return undefined;
   }
 }
 
 /**
  * Autocompact buffer percentage (22.5% of context window)
- * When autocompact is enabled, Claude reserves this buffer for compaction
+ *
+ * When autocompact is enabled, Claude Code reserves this portion of the context
+ * window for automatic compaction operations. This ensures there's always room
+ * for the compaction summary without hitting hard token limits.
+ *
+ * Calculation: 200K total × (1 - 0.225) = 155K usable tokens
+ *
+ * Source: Observed from Claude Code statusline behaviour and ~/.claude.json
+ * autoCompactEnabled setting. The 22.5% value matches the statusline's
+ * context percentage calculation in ~/.claude/statusline/lib/context-window.ts
  */
 export const AUTOCOMPACT_BUFFER_PERCENT = 0.225;
 
@@ -231,9 +244,15 @@ export async function calculateContextFromTranscript(
       return undefined;
     }
 
-    // The last message's input_tokens + output_tokens represents current context size
-    // Input tokens = full conversation history sent to API
-    // Output tokens = assistant's response (also in context for next turn)
+    // The last message's token counts represent current context size:
+    // - inputTokens: Fresh tokens sent to API (not from cache)
+    // - outputTokens: Assistant's response (will be in context for next turn)
+    // - cacheCreationTokens: Tokens written to cache (new context)
+    // - cacheReadTokens: Tokens served from cache (still part of context window)
+    //
+    // Note: cacheReadTokens ARE included because they represent context that exists
+    // in the conversation - they're just served from cache rather than reprocessed.
+    // The total represents what Claude "sees" as context, regardless of cache source.
     const currentContextSize =
       lastUsage.inputTokens +
       lastUsage.outputTokens +
