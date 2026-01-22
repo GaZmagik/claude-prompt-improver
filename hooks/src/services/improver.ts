@@ -184,7 +184,7 @@ Instructions:
 2. PRESERVE the original tone - formal/informal, concise/detailed
 3. ADD clarity by specifying what's ambiguous
 4. ALWAYS structure the output using XML tags (e.g., <task>, <context>, <constraints>, <requirements>)
-5. SUGGEST clarifying questions if the prompt is very vague
+5. NEVER ask clarifying questions - make reasonable assumptions based on available context
 6. REFERENCE the provided context where relevant
 
 Output ONLY the improved prompt wrapped in XML tags, nothing else.`;

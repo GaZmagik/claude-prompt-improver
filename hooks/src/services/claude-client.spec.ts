@@ -30,7 +30,7 @@ describe('Claude Client', () => {
       expect(args).toContain('--print');
     });
 
-    it('should build command without --fork-session (not needed for prompt improvement)', () => {
+    it('should build command with --fork-session when sessionId is available', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
         model: 'haiku',
@@ -39,9 +39,10 @@ describe('Claude Client', () => {
 
       const { args } = buildClaudeCommand(options);
 
-      // No fork-session or resume needed - prompt improvement doesn't require conversation history
-      expect(args).not.toContain('--fork-session');
-      expect(args).not.toContain('--resume');
+      // Fork-session allows improver to access conversation context
+      expect(args).toContain('--fork-session');
+      expect(args).toContain('--resume');
+      expect(args).toContain('session-123');
     });
 
     it('should include the prompt in the command args', () => {
@@ -69,17 +70,18 @@ describe('Claude Client', () => {
       expect(args).toContain('Test "quotes" and $variables');
     });
 
-    it('should not include sessionId in command (not used without --resume)', () => {
+    it('should not include --fork-session when sessionId is empty', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
         model: 'haiku',
-        sessionId: 'session-123',
+        sessionId: '',
       };
 
       const { args } = buildClaudeCommand(options);
 
-      // sessionId not included in command since we don't use --resume
-      expect(args).not.toContain('session-123');
+      // No fork-session when sessionId is not available
+      expect(args).not.toContain('--fork-session');
+      expect(args).not.toContain('--resume');
     });
 
     it('should set cwd to /tmp/claude to avoid project hooks', () => {

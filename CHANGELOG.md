@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2026-01-22
+
+### Fixed
+
+- **Conversation context now available to prompt improver** - Added `--resume ${sessionId} --fork-session` to Claude CLI invocation, allowing the improver to access conversation history and understand terms/acronyms defined earlier in the session
+- **Removed clarifying questions behaviour** - Changed system prompt instruction from "SUGGEST clarifying questions if the prompt is very vague" to "NEVER ask clarifying questions - make reasonable assumptions based on available context"
+
+### Technical Details
+
+- Updated `buildClaudeCommand()` in claude-client.ts to conditionally add fork-session args when sessionId is available
+- The fork-session pattern was restored from the original ~/.claude/hooks implementation
+
 ## [1.3.0] - 2026-01-21
 
 ### Added

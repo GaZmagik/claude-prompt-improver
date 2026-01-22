@@ -54,12 +54,11 @@ export interface ClaudeCommandArgs {
  * Uses array-based approach to prevent shell injection
  */
 export function buildClaudeCommand(options: ClaudeClientOptions): ClaudeCommandArgs {
-  const { prompt, model } = options;
+  const { prompt, model, sessionId } = options;
   const modelId = getModelIdentifier(model);
 
   // Array-based arguments prevent shell injection
   // Arguments are passed directly to process, not through shell
-  // Note: No --resume or --fork-session needed - prompt improvement doesn't require conversation history
   // CRITICAL: --no-session-persistence required to avoid EROFS errors in Claude Code sandbox
   const args = [
     'claude',
@@ -67,8 +66,16 @@ export function buildClaudeCommand(options: ClaudeClientOptions): ClaudeCommandA
     '--no-session-persistence',
     '--model',
     modelId,
-    prompt, // No escaping needed - passed directly to process
   ];
+
+  // When sessionId is available, fork the session to access conversation context
+  // This allows the improver to understand terms/acronyms defined earlier in the conversation
+  if (sessionId) {
+    args.push('--resume', sessionId, '--fork-session');
+  }
+
+  // Prompt must be last argument
+  args.push(prompt);
 
   return {
     args,
