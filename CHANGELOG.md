@@ -9,16 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **Fork-session now works correctly** - Added `--output-format json` flag which is required for fork-session to function properly
-  - v1.3.1 fork-session was hanging/timing out because it was missing this critical flag
-  - The working pattern was discovered in the original ~/.claude/hooks/archive/user-prompt-quality-check.sh implementation
-- **JSON output parsing** - Added proper extraction of `.result` field from Claude CLI JSON output
+- **Fork-session now works correctly** - Three critical fixes discovered through debugging:
+  1. **Added `--debug` flag** - CLI bug causes commands to hang without it
+  2. **Removed `--output-format json`** - Causes fork-session to hang indefinitely
+  3. **Run from project directory** - Fork-session can only find session files from the project cwd, not /tmp
 
 ### Technical Details
 
-- Added `--output-format json` to buildClaudeCommand() args
-- Added JSON parsing with fallback to extract `.result` or `.output` field from CLI response
-- Added test for --output-format json flag presence
+- Added `--debug` flag to buildClaudeCommand() args (CLI bug workaround)
+- Removed `--output-format json` which caused hangs with fork-session
+- Added `cwd` parameter to ClaudeClientOptions, passed through from hook input
+- Changed default cwd from tmpdir() to project directory when available
+- Updated improver.ts and improve-prompt.ts to pass cwd through the call chain
 
 ## [1.3.1] - 2026-01-22
 
