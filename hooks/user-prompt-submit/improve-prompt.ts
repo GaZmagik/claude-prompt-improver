@@ -121,8 +121,13 @@ export function serializeHookOutput(output: HookOutput): string {
   if (output.userMessage !== undefined) {
     result.userMessage = output.userMessage;
   }
+  // additionalContext must be inside hookSpecificOutput per Claude Code docs
+  // See: https://code.claude.com/docs/en/hooks#hook-output
   if (output.additionalContext !== undefined) {
-    result.additionalContext = output.additionalContext;
+    result.hookSpecificOutput = {
+      hookEventName: 'UserPromptSubmit',
+      additionalContext: output.additionalContext,
+    };
   }
 
   return JSON.stringify(result);

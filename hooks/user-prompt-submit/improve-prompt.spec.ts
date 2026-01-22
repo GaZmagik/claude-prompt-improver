@@ -149,7 +149,7 @@ describe('Hook Input/Output', () => {
       const json = serializeHookOutput(output);
       const parsed = JSON.parse(json);
 
-      expect(parsed.additionalContext).toContain('<improved_prompt>');
+      expect(parsed.hookSpecificOutput.additionalContext).toContain('<improved_prompt>');
     });
 
     it('should serialize full improved prompt output', () => {
@@ -167,7 +167,7 @@ describe('Hook Input/Output', () => {
 
       expect(parsed.continue).toBe(true);
       expect(parsed.systemMessage).toBe('🎯 Prompt improved');
-      expect(parsed.additionalContext).toContain('<task>');
+      expect(parsed.hookSpecificOutput.additionalContext).toContain('<task>');
     });
 
     it('should not include undefined fields in output', () => {
