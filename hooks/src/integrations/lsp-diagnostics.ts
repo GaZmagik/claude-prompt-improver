@@ -105,7 +105,7 @@ export function filterDiagnostics(diagnostics: Diagnostic[]): Diagnostic[] {
 }
 
 /**
- * Matches diagnostics to prompt keywords and prioritizes relevant ones
+ * Matches diagnostics to prompt keywords and prioritises relevant ones
  */
 export function matchDiagnosticsToPrompt(diagnostics: Diagnostic[], prompt: string): Diagnostic[] {
   const promptLower = prompt.toLowerCase();
@@ -193,7 +193,7 @@ export async function gatherLspDiagnostics(
     diagnostics = [];
   }
 
-  // Filter and prioritize diagnostics
+  // Filter and prioritise diagnostics
   let filtered = filterDiagnostics(diagnostics);
 
   // If prompt is provided, match to keywords

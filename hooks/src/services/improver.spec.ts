@@ -92,6 +92,17 @@ describe('Improver', () => {
 
       expect(prompt).toContain('NOT the assistant from the previous conversation');
     });
+
+    it('should place forked session framing before the original prompt', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      const framingIndex = prompt.indexOf('[FORKED SESSION');
+      const promptIndex = prompt.indexOf('<original_prompt>');
+      expect(framingIndex).toBeLessThan(promptIndex);
+      expect(framingIndex).toBeGreaterThanOrEqual(0);
+    });
   });
 
   describe('T039: buildImprovementPrompt - injects context', () => {
