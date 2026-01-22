@@ -97,7 +97,7 @@ jobs:
             if [ "$IS_FLAKY" = "true" ]; then
               TITLE="Flaky Test Detected"
               # Only claim retry if confidence threshold was met
-              if awk -v conf="$CONFIDENCE" 'BEGIN {exit !(conf >= 0.7)}'; then
+              if awk "BEGIN {exit !($CONFIDENCE >= 0.7)}"; then
                 ACTION="Automatically retrying the workflow"
               else
                 ACTION="Confidence too low ($CONFIDENCE) - manual review recommended"
@@ -107,16 +107,7 @@ jobs:
               ACTION="This appears to be a real bug - manual intervention needed"
             fi
 
-            BODY=$(cat <<EOF
-## $TITLE
-
-**Analysis**: $SUMMARY
-**Confidence**: $CONFIDENCE
-
-$ACTION
-
-[View workflow run]($WORKFLOW_URL)
-EOF
-)
+            BODY=$(printf '## %s\n\n**Analysis**: %s\n**Confidence**: %s\n\n%s\n\n[View workflow run](%s)' \
+              "$TITLE" "$SUMMARY" "$CONFIDENCE" "$ACTION" "$WORKFLOW_URL")
             gh pr comment "$pr_number" --body "$BODY"
           fi
