@@ -19,6 +19,7 @@ export interface ImprovementContext {
   readonly agents?: string;
   readonly memory?: string;
   readonly session?: string;
+  readonly dynamicDiscovery?: string;
 }
 
 /**
@@ -76,6 +77,7 @@ function getContextSources(context?: ImprovementContext): ContextSource[] {
   if (context.agents) sources.push('agents');
   if (context.memory) sources.push('memory');
   if (context.session) sources.push('session');
+  if (context.dynamicDiscovery) sources.push('dynamicDiscovery');
 
   return sources;
 }
@@ -164,6 +166,9 @@ function buildContextSection(context?: ImprovementContext): string {
   }
   if (context.session) {
     sections.push(`<session_context>\n${escapeXmlContent(context.session)}\n</session_context>`);
+  }
+  if (context.dynamicDiscovery) {
+    sections.push(`<discovered_resources>\n${escapeXmlContent(context.dynamicDiscovery)}\n</discovered_resources>`);
   }
 
   return sections.length > 0 ? sections.join('\n\n') : '';

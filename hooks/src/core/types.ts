@@ -17,7 +17,8 @@ export type ContextSource =
   | 'lsp'
   | 'spec'
   | 'memory'
-  | 'session';
+  | 'session'
+  | 'dynamicDiscovery';
 
 // Reasons why a prompt may be bypassed
 export type BypassReason =
@@ -95,6 +96,7 @@ export interface IntegrationToggles {
   readonly spec: boolean;
   readonly memory: boolean;
   readonly session: boolean;
+  readonly dynamicDiscovery: boolean;
 }
 
 /**
