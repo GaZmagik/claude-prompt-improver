@@ -908,6 +908,26 @@
     {
       "id": "decision-dynamic-context-injection-v120-exploration-phase",
       "type": "decision"
+    },
+    {
+      "id": "decision-session-context-preservation-strategy-capturing-compacted-sessions-for-prompt-improvement",
+      "type": "decision"
+    },
+    {
+      "id": "gotcha-fork-session-hangs-on-large-sessions",
+      "type": "gotcha"
+    },
+    {
+      "id": "decision-decision-point-index-over-session-summaries",
+      "type": "decision"
+    },
+    {
+      "id": "learning-memory-think-call-claude-requires-no-session-persistence",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-userpromptsubmit-fork-session-confirmed-broken",
+      "type": "gotcha"
     }
   ],
   "edges": [
@@ -1624,6 +1644,16 @@
     {
       "source": "gotcha-project-scoped-plugin-hooks-dont-auto-load-despite-claude-pluginpluginjson",
       "target": "learning-claude-code-userpromptsubmit-hook-input-format-is-flat-not-nested",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-fork-session-hangs-on-large-sessions",
+      "target": "gotcha-retro-userpromptsubmit-hooks-should-not-use-fork-session",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-userpromptsubmit-fork-session-confirmed-broken",
+      "target": "decision-decision-point-index-over-session-summaries",
       "label": "relates-to"
     }
   ]

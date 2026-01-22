@@ -60,10 +60,13 @@ export function buildClaudeCommand(options: ClaudeClientOptions): ClaudeCommandA
   // Array-based arguments prevent shell injection
   // Arguments are passed directly to process, not through shell
   // CRITICAL: --no-session-persistence required to avoid EROFS errors in Claude Code sandbox
+  // CRITICAL: --output-format json required for fork-session to work properly
   const args = [
     'claude',
     '--print',
     '--no-session-persistence',
+    '--output-format',
+    'json',
     '--model',
     modelId,
   ];
@@ -162,10 +165,21 @@ export async function executeClaudeCommand(
       };
     }
 
-    return {
-      success: true,
-      output: stdout.trim(),
-    };
+    // Parse JSON output and extract .result field (--output-format json wraps response)
+    try {
+      const parsed = JSON.parse(stdout);
+      const result = parsed.result ?? parsed.output ?? stdout.trim();
+      return {
+        success: true,
+        output: typeof result === 'string' ? result.trim() : String(result),
+      };
+    } catch {
+      // Fallback to raw output if JSON parsing fails
+      return {
+        success: true,
+        output: stdout.trim(),
+      };
+    }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     if (message.includes('timeout')) {

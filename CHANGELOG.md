@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] - 2026-01-22
+
+### Fixed
+
+- **Fork-session now works correctly** - Added `--output-format json` flag which is required for fork-session to function properly
+  - v1.3.1 fork-session was hanging/timing out because it was missing this critical flag
+  - The working pattern was discovered in the original ~/.claude/hooks/archive/user-prompt-quality-check.sh implementation
+- **JSON output parsing** - Added proper extraction of `.result` field from Claude CLI JSON output
+
+### Technical Details
+
+- Added `--output-format json` to buildClaudeCommand() args
+- Added JSON parsing with fallback to extract `.result` or `.output` field from CLI response
+- Added test for --output-format json flag presence
+
 ## [1.3.1] - 2026-01-22
 
 ### Fixed
@@ -16,6 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated `buildClaudeCommand()` in claude-client.ts to conditionally add fork-session args when sessionId is available
 - The fork-session pattern was restored from the original ~/.claude/hooks implementation
+
+### Known Issues
+
+- **BROKEN**: Fork-session was hanging/timing out - missing `--output-format json` flag (fixed in v1.3.2)
 
 ## [1.3.0] - 2026-01-21
 

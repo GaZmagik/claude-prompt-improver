@@ -30,6 +30,20 @@ describe('Claude Client', () => {
       expect(args).toContain('--print');
     });
 
+    it('should build command with --output-format json (required for fork-session)', () => {
+      const options: ClaudeClientOptions = {
+        prompt: 'Test prompt',
+        model: 'haiku',
+        sessionId: 'session-123',
+      };
+
+      const { args } = buildClaudeCommand(options);
+
+      // --output-format json is critical for fork-session to work properly
+      expect(args).toContain('--output-format');
+      expect(args).toContain('json');
+    });
+
     it('should build command with --fork-session when sessionId is available', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
