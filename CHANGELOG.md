@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] - 2026-01-22
+
+### Fixed
+
+- **Fork-session now works correctly** - Three critical fixes discovered through debugging:
+  1. **Added `--debug` flag** - CLI bug causes commands to hang without it
+  2. **Removed `--output-format json`** - Causes fork-session to hang indefinitely
+  3. **Run from project directory** - Fork-session can only find session files from the project cwd, not /tmp
+
+### Technical Details
+
+- Added `--debug` flag to buildClaudeCommand() args (CLI bug workaround)
+- Removed `--output-format json` which caused hangs with fork-session
+- Added `cwd` parameter to ClaudeClientOptions, passed through from hook input
+- Changed default cwd from tmpdir() to project directory when available
+- Updated improver.ts and improve-prompt.ts to pass cwd through the call chain
+
 ## [1.3.1] - 2026-01-22
 
 ### Fixed
@@ -16,6 +33,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated `buildClaudeCommand()` in claude-client.ts to conditionally add fork-session args when sessionId is available
 - The fork-session pattern was restored from the original ~/.claude/hooks implementation
+
+### Known Issues
+
+- **BROKEN**: Fork-session was hanging/timing out - missing `--output-format json` flag (fixed in v1.3.2)
 
 ## [1.3.0] - 2026-01-21
 

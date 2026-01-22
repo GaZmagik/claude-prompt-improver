@@ -29,6 +29,8 @@ export interface ImprovePromptOptions {
   readonly sessionId: string;
   readonly config: Configuration;
   readonly context?: ImprovementContext;
+  /** Project directory - required for fork-session to find session files */
+  readonly cwd?: string;
   /** For testing - mock the Claude response */
   readonly _mockClaudeResponse?: string | null;
 }
@@ -212,7 +214,7 @@ export function buildImprovementPrompt(options: {
  * Falls back to original prompt on any error
  */
 export async function improvePrompt(options: ImprovePromptOptions): Promise<ImprovementResult> {
-  const { originalPrompt, sessionId, config, context, _mockClaudeResponse } = options;
+  const { originalPrompt, sessionId, config, context, cwd, _mockClaudeResponse } = options;
   const startTime = Date.now();
 
   // Get model from config
@@ -258,6 +260,7 @@ export async function improvePrompt(options: ImprovePromptOptions): Promise<Impr
     model,
     sessionId,
     timeoutMs: getTimeoutForModel(model),
+    ...(cwd && { cwd }), // Required for fork-session to find session files
   });
 
   const latencyMs = Date.now() - startTime;

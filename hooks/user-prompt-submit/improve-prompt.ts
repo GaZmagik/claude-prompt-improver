@@ -360,6 +360,7 @@ function buildImproveOptions(
   sessionId: string,
   config: Configuration,
   improvementContext: ImprovementContext | undefined,
+  cwd?: string,
   _mockImprovement?: string | null,
   _mockClassification?: string | null
 ): Parameters<typeof improvePrompt>[0] {
@@ -367,6 +368,7 @@ function buildImproveOptions(
     originalPrompt: prompt,
     sessionId,
     config,
+    ...(cwd && { cwd }), // Required for fork-session to find session files
   };
 
   // Handle mocks (combine both params for backward compat)
@@ -426,7 +428,7 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
   const tokensBefore = countTokens(prompt);
 
   // Build improve options with mocks and context
-  const improveOptions = buildImproveOptions(prompt, sessionId, config, improvementContext, _mockImprovement, _mockClassification);
+  const improveOptions = buildImproveOptions(prompt, sessionId, config, improvementContext, cwd, _mockImprovement, _mockClassification);
 
   // Improve the prompt with consistent error handling
   let improvement;

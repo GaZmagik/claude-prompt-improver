@@ -13,6 +13,8 @@ export interface ClaudeClientOptions {
   readonly model: ClaudeModel;
   readonly sessionId: string;
   readonly timeoutMs?: number;
+  /** Project directory - required for fork-session to find the session file */
+  readonly cwd?: string;
   /** For testing - mock the actual execution */
   readonly _mockExecution?: () => Promise<{ output: string; exitCode: number }>;
 }
@@ -50,18 +52,21 @@ export interface ClaudeCommandArgs {
 
 /**
  * Builds the claude command arguments for array-based spawn
- * Per gotcha: Must run from /tmp to avoid project hook interference
+ * CRITICAL: Must run from project cwd for fork-session to find session files
  * Uses array-based approach to prevent shell injection
  */
 export function buildClaudeCommand(options: ClaudeClientOptions): ClaudeCommandArgs {
-  const { prompt, model, sessionId } = options;
+  const { prompt, model, sessionId, cwd } = options;
   const modelId = getModelIdentifier(model);
 
   // Array-based arguments prevent shell injection
   // Arguments are passed directly to process, not through shell
   // CRITICAL: --no-session-persistence required to avoid EROFS errors in Claude Code sandbox
+  // CRITICAL: --debug required due to CLI bug where commands hang without it
+  // NOTE: --output-format json causes hangs with fork-session, so we use plain text output
   const args = [
     'claude',
+    '--debug',
     '--print',
     '--no-session-persistence',
     '--model',
@@ -79,7 +84,9 @@ export function buildClaudeCommand(options: ClaudeClientOptions): ClaudeCommandA
 
   return {
     args,
-    cwd: tmpdir(), // Run from temp dir to avoid project hooks
+    // CRITICAL: Must run from project dir for fork-session to find session files
+    // Falls back to /tmp only if cwd not provided (non-fork scenarios)
+    cwd: cwd || tmpdir(),
   };
 }
 
@@ -162,6 +169,7 @@ export async function executeClaudeCommand(
       };
     }
 
+    // Plain text output (--output-format json causes hangs with fork-session)
     return {
       success: true,
       output: stdout.trim(),

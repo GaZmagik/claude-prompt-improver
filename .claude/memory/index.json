@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-21T19:56:47.939Z",
+  "lastUpdated": "2026-01-22T01:01:24.145Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -3082,6 +3082,80 @@
       "updated": "2026-01-21T19:56:47.937Z",
       "scope": "project",
       "relativePath": "permanent/decision-dynamic-context-injection-v120-exploration-phase.md"
+    },
+    {
+      "id": "decision-session-context-preservation-strategy-capturing-compacted-sessions-for-prompt-improvement",
+      "type": "decision",
+      "title": "Session Context Preservation Strategy - Capturing compacted sessions for prompt improvement",
+      "tags": [
+        "promoted-from-think",
+        "project"
+      ],
+      "created": "2026-01-22T00:03:07.167Z",
+      "updated": "2026-01-22T00:03:07.167Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-session-context-preservation-strategy-capturing-compacted-sessions-for-prompt-improvement.md"
+    },
+    {
+      "id": "gotcha-fork-session-hangs-on-large-sessions",
+      "type": "gotcha",
+      "title": "Fork-session hangs on large sessions",
+      "tags": [
+        "fork-session",
+        "prompt-improver",
+        "scaling",
+        "project"
+      ],
+      "created": "2026-01-22T01:01:08.502Z",
+      "updated": "2026-01-22T01:01:08.502Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-fork-session-hangs-on-large-sessions.md"
+    },
+    {
+      "id": "decision-decision-point-index-over-session-summaries",
+      "type": "decision",
+      "title": "Decision Point Index approach selected for session context",
+      "tags": [
+        "architecture",
+        "session-context",
+        "prompt-improver",
+        "project"
+      ],
+      "created": "2026-01-22T01:01:14.090Z",
+      "updated": "2026-01-22T01:01:14.090Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-decision-point-index-over-session-summaries.md"
+    },
+    {
+      "id": "learning-memory-think-call-claude-requires-no-session-persistence",
+      "type": "learning",
+      "title": "Memory think --call claude requires --no-session-persistence flag",
+      "tags": [
+        "memory-plugin",
+        "sandbox",
+        "session-persistence",
+        "project"
+      ],
+      "created": "2026-01-22T01:01:18.666Z",
+      "updated": "2026-01-22T01:01:18.666Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-memory-think-call-claude-requires-no-session-persistence.md"
+    },
+    {
+      "id": "gotcha-userpromptsubmit-fork-session-confirmed-broken",
+      "type": "gotcha",
+      "title": "UserPromptSubmit hooks cannot use fork-session—confirmed broken in practice",
+      "tags": [
+        "fork-session",
+        "userpromptsubmit-hooks",
+        "prompt-improver",
+        "session-context",
+        "project"
+      ],
+      "created": "2026-01-22T01:01:24.140Z",
+      "updated": "2026-01-22T01:01:24.140Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-userpromptsubmit-fork-session-confirmed-broken.md"
     }
   ]
 }

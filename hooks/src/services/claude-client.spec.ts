@@ -30,6 +30,33 @@ describe('Claude Client', () => {
       expect(args).toContain('--print');
     });
 
+    it('should build command with --debug (required CLI workaround)', () => {
+      const options: ClaudeClientOptions = {
+        prompt: 'Test prompt',
+        model: 'haiku',
+        sessionId: 'session-123',
+      };
+
+      const { args } = buildClaudeCommand(options);
+
+      // --debug is required due to CLI bug where commands hang without it
+      expect(args).toContain('--debug');
+    });
+
+    it('should NOT include --output-format json (causes hangs with fork-session)', () => {
+      const options: ClaudeClientOptions = {
+        prompt: 'Test prompt',
+        model: 'haiku',
+        sessionId: 'session-123',
+      };
+
+      const { args } = buildClaudeCommand(options);
+
+      // --output-format json causes fork-session to hang
+      expect(args).not.toContain('--output-format');
+      expect(args).not.toContain('json');
+    });
+
     it('should build command with --fork-session when sessionId is available', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
@@ -84,7 +111,21 @@ describe('Claude Client', () => {
       expect(args).not.toContain('--resume');
     });
 
-    it('should set cwd to /tmp/claude to avoid project hooks', () => {
+    it('should use project cwd when provided (required for fork-session)', () => {
+      const options: ClaudeClientOptions = {
+        prompt: 'Test prompt',
+        model: 'haiku',
+        sessionId: 'session-123',
+        cwd: '/home/user/project',
+      };
+
+      const { cwd } = buildClaudeCommand(options);
+
+      // Must run from project dir for fork-session to find session files
+      expect(cwd).toBe('/home/user/project');
+    });
+
+    it('should fallback to /tmp when cwd not provided', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
         model: 'haiku',
@@ -93,7 +134,8 @@ describe('Claude Client', () => {
 
       const { cwd } = buildClaudeCommand(options);
 
-      expect(cwd).toBe('/tmp/claude');
+      // Falls back to temp dir when project cwd not available
+      expect(cwd).toBe('/tmp');
     });
   });
 
