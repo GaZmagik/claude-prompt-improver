@@ -97,7 +97,7 @@ jobs:
             if [ "$IS_FLAKY" = "true" ]; then
               TITLE="Flaky Test Detected"
               # Only claim retry if confidence threshold was met
-              if awk "BEGIN {exit !($CONFIDENCE >= 0.7)}"; then
+              if awk -v conf="$CONFIDENCE" 'BEGIN {exit !(conf >= 0.7)}'; then
                 ACTION="Automatically retrying the workflow"
               else
                 ACTION="Confidence too low ($CONFIDENCE) - manual review recommended"
