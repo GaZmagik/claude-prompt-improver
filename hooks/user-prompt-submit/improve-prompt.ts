@@ -22,6 +22,7 @@ import { formatSystemMessage } from '../src/utils/message-formatter.ts';
 import { countTokens } from '../src/utils/token-counter.ts';
 import { createLogEntry, writeLogEntry } from '../src/utils/logger.ts';
 import { generateLogFilePath } from '../src/utils/logger.ts';
+import { calculateContextFromTranscript } from '../src/integrations/compaction-detector.ts';
 
 /**
  * Result of parsing hook input
@@ -511,11 +512,22 @@ async function main(): Promise<void> {
     (processOptions as { permissionMode?: string }).permissionMode = context.permission_mode;
   }
 
+  // Get context usage - prefer from stdin, fallback to transcript calculation
   if (context.context_usage) {
     (processOptions as { contextUsage?: { used: number; max: number } }).contextUsage = {
       used: context.context_usage.used,
       max: context.context_usage.max,
     };
+  } else if (context.transcript_path) {
+    // Claude Code doesn't provide context_usage to UserPromptSubmit hooks
+    // Calculate it from the transcript file instead
+    const transcriptUsage = await calculateContextFromTranscript(context.transcript_path);
+    if (transcriptUsage) {
+      (processOptions as { contextUsage?: { used: number; max: number } }).contextUsage = {
+        used: transcriptUsage.used,
+        max: transcriptUsage.total,
+      };
+    }
   }
 
   // Add integration toggles from config
