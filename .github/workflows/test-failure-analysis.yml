@@ -107,7 +107,16 @@ jobs:
               ACTION="This appears to be a real bug - manual intervention needed"
             fi
 
-            BODY=$(printf '## %s\n\n**Analysis**: %s\n**Confidence**: %s\n\n%s\n\n[View workflow run](%s)' \
-              "$TITLE" "$SUMMARY" "$CONFIDENCE" "$ACTION" "$WORKFLOW_URL")
+            BODY=$(cat <<EOF
+## $TITLE
+
+**Analysis**: $SUMMARY
+**Confidence**: $CONFIDENCE
+
+$ACTION
+
+[View workflow run]($WORKFLOW_URL)
+EOF
+)
             gh pr comment "$pr_number" --body "$BODY"
           fi
