@@ -972,6 +972,66 @@
     {
       "id": "decision-hook-timeout-120-seconds-opus-support",
       "type": "decision"
+    },
+    {
+      "id": "learning-retro-exploration-phase-dramatically-clarifies-fix-scope",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-installed-plugin-version-affects-testing-not-repo-changes",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-version-bump-is-part-of-feature-release-checklist",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-claude-code-stdin-availabletools-not-parsed",
+      "type": "gotcha"
+    },
+    {
+      "id": "gotcha-installed-plugins-run-from-claudepluginscacheenhance-not-repo",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-orphaned-infrastructure-fixed-by-wiring-entry-point",
+      "type": "learning"
+    },
+    {
+      "id": "learning-sdd-exploration-phase-revealed-root-cause-faster-than-trial-and-error",
+      "type": "learning"
+    },
+    {
+      "id": "artifact-transcript-context-calculator",
+      "type": "artifact"
+    },
+    {
+      "id": "gotcha-claude-code-does-not-send-contextusage-to-hooks",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-transcript-based-context-detection-from-jsonl",
+      "type": "learning"
+    },
+    {
+      "id": "learning-cache-tokens-are-context-regardless-of-source",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-command-injection-risk-with-unquoted-variables-in-awk-expressions",
+      "type": "gotcha"
+    },
+    {
+      "id": "gotcha-validate-extracted-json-values-before-shell-interpolation",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-verify-api-contracts-before-implementing-workarounds",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-cross-reference-working-implementations-for-faster-debugging",
+      "type": "learning"
     }
   ],
   "edges": [
@@ -1733,6 +1793,41 @@
     {
       "source": "learning-userpromptsubmit-hook-additionalcontext-must-be-wrapped-in-hookspecificoutput",
       "target": "decision-remove-fork-session-from-userpromptsubmit-hooks",
+      "label": "relates-to"
+    },
+    {
+      "source": "artifact-transcript-context-calculator",
+      "target": "learning-transcript-based-context-detection-from-jsonl",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-transcript-based-context-detection-from-jsonl",
+      "target": "gotcha-claude-code-does-not-send-contextusage-to-hooks",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-cache-tokens-are-context-regardless-of-source",
+      "target": "learning-transcript-based-context-detection-from-jsonl",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-claude-code-does-not-send-contextusage-to-hooks",
+      "target": "learning-retro-verify-api-contracts-before-implementing-workarounds",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-command-injection-risk-with-unquoted-variables-in-awk-expressions",
+      "target": "gotcha-validate-extracted-json-values-before-shell-interpolation",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-validate-extracted-json-values-before-shell-interpolation",
+      "target": "decision-git-command-array-based-arguments",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-verify-api-contracts-before-implementing-workarounds",
+      "target": "artifact-transcript-context-calculator",
       "label": "relates-to"
     }
   ]

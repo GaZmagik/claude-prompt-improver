@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-22T13:42:31.163Z",
+  "lastUpdated": "2026-01-22T19:59:07.830Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -3335,6 +3335,250 @@
       "updated": "2026-01-22T13:42:31.157Z",
       "scope": "project",
       "relativePath": "permanent/decision-hook-timeout-120-seconds-opus-support.md"
+    },
+    {
+      "id": "learning-retro-exploration-phase-dramatically-clarifies-fix-scope",
+      "type": "learning",
+      "title": "Retro - Exploration phase dramatically clarifies fix scope",
+      "tags": [
+        "retrospective",
+        "process",
+        "debugging",
+        "project"
+      ],
+      "created": "2026-01-22T19:55:27.964Z",
+      "updated": "2026-01-22T19:55:27.964Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-exploration-phase-dramatically-clarifies-fix-scope.md",
+      "severity": "medium"
+    },
+    {
+      "id": "gotcha-retro-installed-plugin-version-affects-testing-not-repo-changes",
+      "type": "gotcha",
+      "title": "Retro - Installed plugin version affects testing, not repo changes",
+      "tags": [
+        "retrospective",
+        "process",
+        "plugins",
+        "testing",
+        "project"
+      ],
+      "created": "2026-01-22T19:55:32.985Z",
+      "updated": "2026-01-22T19:55:32.985Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-installed-plugin-version-affects-testing-not-repo-changes.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-retro-version-bump-is-part-of-feature-release-checklist",
+      "type": "learning",
+      "title": "Retro - Version bump is part of feature release checklist",
+      "tags": [
+        "retrospective",
+        "process",
+        "releases",
+        "project"
+      ],
+      "created": "2026-01-22T19:55:37.099Z",
+      "updated": "2026-01-22T19:55:37.099Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-version-bump-is-part-of-feature-release-checklist.md",
+      "severity": "low"
+    },
+    {
+      "id": "gotcha-claude-code-stdin-availabletools-not-parsed",
+      "type": "gotcha",
+      "title": "Claude Code stdin available_tools not parsed",
+      "tags": [
+        "hooks",
+        "stdin",
+        "context-injection",
+        "entry-point",
+        "project"
+      ],
+      "created": "2026-01-22T19:55:48.836Z",
+      "updated": "2026-01-22T19:55:48.836Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-claude-code-stdin-availabletools-not-parsed.md"
+    },
+    {
+      "id": "gotcha-installed-plugins-run-from-claudepluginscacheenhance-not-repo",
+      "type": "gotcha",
+      "title": "Installed plugins run from ~/.claude/plugins/cache/enhance/ not repo",
+      "tags": [
+        "hooks",
+        "plugins",
+        "testing",
+        "installation",
+        "project"
+      ],
+      "created": "2026-01-22T19:55:59.370Z",
+      "updated": "2026-01-22T19:55:59.370Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-installed-plugins-run-from-claudepluginscacheenhance-not-repo.md"
+    },
+    {
+      "id": "learning-orphaned-infrastructure-fixed-by-wiring-entry-point",
+      "type": "learning",
+      "title": "Orphaned infrastructure fixed by wiring entry point",
+      "tags": [
+        "architecture",
+        "orchestration",
+        "integration",
+        "refactoring",
+        "project"
+      ],
+      "created": "2026-01-22T19:56:05.885Z",
+      "updated": "2026-01-22T19:56:05.885Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-orphaned-infrastructure-fixed-by-wiring-entry-point.md"
+    },
+    {
+      "id": "learning-sdd-exploration-phase-revealed-root-cause-faster-than-trial-and-error",
+      "type": "learning",
+      "title": "SDD exploration phase revealed root cause faster than trial-and-error",
+      "tags": [
+        "speckit",
+        "sdd",
+        "investigation",
+        "architecture",
+        "debugging",
+        "project"
+      ],
+      "created": "2026-01-22T19:56:11.178Z",
+      "updated": "2026-01-22T19:56:11.178Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-sdd-exploration-phase-revealed-root-cause-faster-than-trial-and-error.md"
+    },
+    {
+      "id": "artifact-transcript-context-calculator",
+      "type": "artifact",
+      "title": "Transcript-based context calculator pattern",
+      "tags": [
+        "hooks",
+        "context",
+        "pattern",
+        "parser",
+        "project"
+      ],
+      "created": "2026-01-22T19:58:50.977Z",
+      "updated": "2026-01-22T19:58:50.977Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-transcript-context-calculator.md"
+    },
+    {
+      "id": "gotcha-claude-code-does-not-send-contextusage-to-hooks",
+      "type": "gotcha",
+      "title": "Claude Code does not send context_usage to hooks",
+      "tags": [
+        "hooks",
+        "context",
+        "claude-code",
+        "bypass-detection",
+        "project"
+      ],
+      "created": "2026-01-22T19:58:51.526Z",
+      "updated": "2026-01-22T19:58:51.526Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-claude-code-does-not-send-contextusage-to-hooks.md"
+    },
+    {
+      "id": "learning-transcript-based-context-detection-from-jsonl",
+      "type": "learning",
+      "title": "Transcript-based context detection from .jsonl",
+      "tags": [
+        "hooks",
+        "context",
+        "transcript",
+        "workaround",
+        "context-calculation",
+        "project"
+      ],
+      "created": "2026-01-22T19:58:52.028Z",
+      "updated": "2026-01-22T19:58:52.028Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-transcript-based-context-detection-from-jsonl.md"
+    },
+    {
+      "id": "learning-cache-tokens-are-context-regardless-of-source",
+      "type": "learning",
+      "title": "Cache tokens are context (regardless of source)",
+      "tags": [
+        "context",
+        "tokens",
+        "cache",
+        "calculation",
+        "project"
+      ],
+      "created": "2026-01-22T19:59:01.880Z",
+      "updated": "2026-01-22T19:59:01.880Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-cache-tokens-are-context-regardless-of-source.md"
+    },
+    {
+      "id": "gotcha-command-injection-risk-with-unquoted-variables-in-awk-expressions",
+      "type": "gotcha",
+      "title": "Command injection risk with unquoted variables in awk expressions",
+      "tags": [
+        "security",
+        "bash",
+        "workflow",
+        "command-injection",
+        "project"
+      ],
+      "created": "2026-01-22T19:59:02.350Z",
+      "updated": "2026-01-22T19:59:02.350Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-command-injection-risk-with-unquoted-variables-in-awk-expressions.md"
+    },
+    {
+      "id": "gotcha-validate-extracted-json-values-before-shell-interpolation",
+      "type": "gotcha",
+      "title": "Validate extracted JSON values before shell interpolation",
+      "tags": [
+        "retrospective",
+        "security",
+        "github-actions",
+        "process",
+        "project"
+      ],
+      "created": "2026-01-22T19:59:02.909Z",
+      "updated": "2026-01-22T19:59:02.909Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-validate-extracted-json-values-before-shell-interpolation.md",
+      "severity": "high"
+    },
+    {
+      "id": "learning-retro-verify-api-contracts-before-implementing-workarounds",
+      "type": "learning",
+      "title": "Verify API contracts before implementing workarounds",
+      "tags": [
+        "retrospective",
+        "api-integration",
+        "process",
+        "project"
+      ],
+      "created": "2026-01-22T19:59:03.422Z",
+      "updated": "2026-01-22T19:59:03.422Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-verify-api-contracts-before-implementing-workarounds.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-retro-cross-reference-working-implementations-for-faster-debugging",
+      "type": "learning",
+      "title": "Cross-reference working implementations for faster debugging",
+      "tags": [
+        "retrospective",
+        "debugging",
+        "process",
+        "project"
+      ],
+      "created": "2026-01-22T19:59:07.819Z",
+      "updated": "2026-01-22T19:59:07.819Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-cross-reference-working-implementations-for-faster-debugging.md",
+      "severity": "medium"
     }
   ]
 }
