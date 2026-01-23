@@ -548,6 +548,72 @@ export function formatAgentSuggestions(agents: readonly DiscoveredItem[], total:
 }
 
 /**
+ * Formats skill suggestions for prompt injection
+ */
+export function formatSkillSuggestions(skills: readonly DiscoveredItem[], total: number): string {
+  if (skills.length === 0) {
+    return '';
+  }
+
+  const lines: string[] = ['Available skills (invoke with /skill-name):'];
+
+  for (const skill of skills) {
+    lines.push(`- /${skill.name}: ${skill.description}`);
+  }
+
+  const remaining = total - skills.length;
+  if (remaining > 0) {
+    lines.push(`(and ${remaining} more available)`);
+  }
+
+  return lines.join('\n');
+}
+
+/**
+ * Formats command suggestions for prompt injection
+ */
+export function formatCommandSuggestions(commands: readonly DiscoveredItem[], total: number): string {
+  if (commands.length === 0) {
+    return '';
+  }
+
+  const lines: string[] = ['Available commands:'];
+
+  for (const command of commands) {
+    lines.push(`- /${command.name}: ${command.description}`);
+  }
+
+  const remaining = total - commands.length;
+  if (remaining > 0) {
+    lines.push(`(and ${remaining} more available)`);
+  }
+
+  return lines.join('\n');
+}
+
+/**
+ * Formats output style suggestions for prompt injection
+ */
+export function formatOutputStyleSuggestions(styles: readonly DiscoveredItem[], total: number): string {
+  if (styles.length === 0) {
+    return '';
+  }
+
+  const lines: string[] = ['Available output styles:'];
+
+  for (const style of styles) {
+    lines.push(`- ${style.name}: ${style.description}`);
+  }
+
+  const remaining = total - styles.length;
+  if (remaining > 0) {
+    lines.push(`(and ${remaining} more available)`);
+  }
+
+  return lines.join('\n');
+}
+
+/**
  * Memory think command pattern regex
  * Matches: memory think create/add/counter/branch/conclude
  */
@@ -651,6 +717,21 @@ export function formatDynamicContext(context: DynamicContext): string {
   if (context.matchedAgents.length > 0) {
     const agentItems = context.matchedAgents.map((m) => m.item);
     sections.push(formatAgentSuggestions(agentItems, context.totalAgents));
+  }
+
+  if (context.matchedSkills.length > 0) {
+    const skillItems = context.matchedSkills.map((m) => m.item);
+    sections.push(formatSkillSuggestions(skillItems, context.totalSkills));
+  }
+
+  if (context.matchedCommands.length > 0) {
+    const commandItems = context.matchedCommands.map((m) => m.item);
+    sections.push(formatCommandSuggestions(commandItems, context.totalCommands));
+  }
+
+  if (context.matchedOutputStyles.length > 0) {
+    const styleItems = context.matchedOutputStyles.map((m) => m.item);
+    sections.push(formatOutputStyleSuggestions(styleItems, context.totalOutputStyles));
   }
 
   return sections.join('\n\n');

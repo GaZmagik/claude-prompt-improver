@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-22T13:42:31.163Z",
+  "lastUpdated": "2026-01-23T20:32:26.371Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -3335,6 +3335,714 @@
       "updated": "2026-01-22T13:42:31.157Z",
       "scope": "project",
       "relativePath": "permanent/decision-hook-timeout-120-seconds-opus-support.md"
+    },
+    {
+      "id": "learning-retro-exploration-phase-dramatically-clarifies-fix-scope",
+      "type": "learning",
+      "title": "Retro - Exploration phase dramatically clarifies fix scope",
+      "tags": [
+        "retrospective",
+        "process",
+        "debugging",
+        "project"
+      ],
+      "created": "2026-01-22T19:55:27.964Z",
+      "updated": "2026-01-22T19:55:27.964Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-exploration-phase-dramatically-clarifies-fix-scope.md",
+      "severity": "medium"
+    },
+    {
+      "id": "gotcha-retro-installed-plugin-version-affects-testing-not-repo-changes",
+      "type": "gotcha",
+      "title": "Retro - Installed plugin version affects testing, not repo changes",
+      "tags": [
+        "retrospective",
+        "process",
+        "plugins",
+        "testing",
+        "project"
+      ],
+      "created": "2026-01-22T19:55:32.985Z",
+      "updated": "2026-01-22T19:55:32.985Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-installed-plugin-version-affects-testing-not-repo-changes.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-retro-version-bump-is-part-of-feature-release-checklist",
+      "type": "learning",
+      "title": "Retro - Version bump is part of feature release checklist",
+      "tags": [
+        "retrospective",
+        "process",
+        "releases",
+        "project"
+      ],
+      "created": "2026-01-22T19:55:37.099Z",
+      "updated": "2026-01-22T19:55:37.099Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-version-bump-is-part-of-feature-release-checklist.md",
+      "severity": "low"
+    },
+    {
+      "id": "gotcha-claude-code-stdin-availabletools-not-parsed",
+      "type": "gotcha",
+      "title": "Claude Code stdin available_tools not parsed",
+      "tags": [
+        "hooks",
+        "stdin",
+        "context-injection",
+        "entry-point",
+        "project"
+      ],
+      "created": "2026-01-22T19:55:48.836Z",
+      "updated": "2026-01-22T19:55:48.836Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-claude-code-stdin-availabletools-not-parsed.md"
+    },
+    {
+      "id": "gotcha-installed-plugins-run-from-claudepluginscacheenhance-not-repo",
+      "type": "gotcha",
+      "title": "Installed plugins run from ~/.claude/plugins/cache/enhance/ not repo",
+      "tags": [
+        "hooks",
+        "plugins",
+        "testing",
+        "installation",
+        "project"
+      ],
+      "created": "2026-01-22T19:55:59.370Z",
+      "updated": "2026-01-22T19:55:59.370Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-installed-plugins-run-from-claudepluginscacheenhance-not-repo.md"
+    },
+    {
+      "id": "learning-orphaned-infrastructure-fixed-by-wiring-entry-point",
+      "type": "learning",
+      "title": "Orphaned infrastructure fixed by wiring entry point",
+      "tags": [
+        "architecture",
+        "orchestration",
+        "integration",
+        "refactoring",
+        "project"
+      ],
+      "created": "2026-01-22T19:56:05.885Z",
+      "updated": "2026-01-22T19:56:05.885Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-orphaned-infrastructure-fixed-by-wiring-entry-point.md"
+    },
+    {
+      "id": "learning-sdd-exploration-phase-revealed-root-cause-faster-than-trial-and-error",
+      "type": "learning",
+      "title": "SDD exploration phase revealed root cause faster than trial-and-error",
+      "tags": [
+        "speckit",
+        "sdd",
+        "investigation",
+        "architecture",
+        "debugging",
+        "project"
+      ],
+      "created": "2026-01-22T19:56:11.178Z",
+      "updated": "2026-01-22T19:56:11.178Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-sdd-exploration-phase-revealed-root-cause-faster-than-trial-and-error.md"
+    },
+    {
+      "id": "artifact-transcript-context-calculator",
+      "type": "artifact",
+      "title": "Transcript-based context calculator pattern",
+      "tags": [
+        "hooks",
+        "context",
+        "pattern",
+        "parser",
+        "project"
+      ],
+      "created": "2026-01-22T19:58:50.977Z",
+      "updated": "2026-01-22T19:58:50.977Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-transcript-context-calculator.md"
+    },
+    {
+      "id": "gotcha-claude-code-does-not-send-contextusage-to-hooks",
+      "type": "gotcha",
+      "title": "Claude Code does not send context_usage to hooks",
+      "tags": [
+        "hooks",
+        "context",
+        "claude-code",
+        "bypass-detection",
+        "project"
+      ],
+      "created": "2026-01-22T19:58:51.526Z",
+      "updated": "2026-01-22T19:58:51.526Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-claude-code-does-not-send-contextusage-to-hooks.md"
+    },
+    {
+      "id": "learning-transcript-based-context-detection-from-jsonl",
+      "type": "learning",
+      "title": "Transcript-based context detection from .jsonl",
+      "tags": [
+        "hooks",
+        "context",
+        "transcript",
+        "workaround",
+        "context-calculation",
+        "project"
+      ],
+      "created": "2026-01-22T19:58:52.028Z",
+      "updated": "2026-01-22T19:58:52.028Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-transcript-based-context-detection-from-jsonl.md"
+    },
+    {
+      "id": "learning-cache-tokens-are-context-regardless-of-source",
+      "type": "learning",
+      "title": "Cache tokens are context (regardless of source)",
+      "tags": [
+        "context",
+        "tokens",
+        "cache",
+        "calculation",
+        "project"
+      ],
+      "created": "2026-01-22T19:59:01.880Z",
+      "updated": "2026-01-22T19:59:01.880Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-cache-tokens-are-context-regardless-of-source.md"
+    },
+    {
+      "id": "gotcha-command-injection-risk-with-unquoted-variables-in-awk-expressions",
+      "type": "gotcha",
+      "title": "Command injection risk with unquoted variables in awk expressions",
+      "tags": [
+        "security",
+        "bash",
+        "workflow",
+        "command-injection",
+        "project"
+      ],
+      "created": "2026-01-22T19:59:02.350Z",
+      "updated": "2026-01-22T19:59:02.350Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-command-injection-risk-with-unquoted-variables-in-awk-expressions.md"
+    },
+    {
+      "id": "gotcha-validate-extracted-json-values-before-shell-interpolation",
+      "type": "gotcha",
+      "title": "Validate extracted JSON values before shell interpolation",
+      "tags": [
+        "retrospective",
+        "security",
+        "github-actions",
+        "process",
+        "project"
+      ],
+      "created": "2026-01-22T19:59:02.909Z",
+      "updated": "2026-01-22T19:59:02.909Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-validate-extracted-json-values-before-shell-interpolation.md",
+      "severity": "high"
+    },
+    {
+      "id": "learning-retro-verify-api-contracts-before-implementing-workarounds",
+      "type": "learning",
+      "title": "Verify API contracts before implementing workarounds",
+      "tags": [
+        "retrospective",
+        "api-integration",
+        "process",
+        "project"
+      ],
+      "created": "2026-01-22T19:59:03.422Z",
+      "updated": "2026-01-22T19:59:03.422Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-verify-api-contracts-before-implementing-workarounds.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-retro-cross-reference-working-implementations-for-faster-debugging",
+      "type": "learning",
+      "title": "Cross-reference working implementations for faster debugging",
+      "tags": [
+        "retrospective",
+        "debugging",
+        "process",
+        "project"
+      ],
+      "created": "2026-01-22T19:59:07.819Z",
+      "updated": "2026-01-22T19:59:07.819Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-cross-reference-working-implementations-for-faster-debugging.md",
+      "severity": "medium"
+    },
+    {
+      "id": "gotcha-retro-stubbed-implementations-masquerade-as-completed-features",
+      "type": "gotcha",
+      "title": "Retro - Stubbed implementations masquerade as completed features",
+      "tags": [
+        "retrospective",
+        "process",
+        "quality",
+        "implementation",
+        "project"
+      ],
+      "created": "2026-01-23T20:29:43.401Z",
+      "updated": "2026-01-23T20:29:43.401Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-stubbed-implementations-masquerade-as-completed-features.md",
+      "severity": "high"
+    },
+    {
+      "id": "learning-dynamic-discovery-partial-formatting-bug",
+      "type": "learning",
+      "title": "dynamic-discovery-partial-formatting-bug",
+      "tags": [
+        "dynamic-discovery",
+        "formatting",
+        "bug-fix",
+        "project"
+      ],
+      "created": "2026-01-23T20:29:46.680Z",
+      "updated": "2026-01-23T20:29:46.680Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-dynamic-discovery-partial-formatting-bug.md"
+    },
+    {
+      "id": "gotcha-retro-partial-context-injection-defeats-feature-value",
+      "type": "gotcha",
+      "title": "Retro - Partial context injection defeats feature value",
+      "tags": [
+        "retrospective",
+        "process",
+        "testing",
+        "integration",
+        "project"
+      ],
+      "created": "2026-01-23T20:29:48.319Z",
+      "updated": "2026-01-23T20:29:48.319Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-partial-context-injection-defeats-feature-value.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-lsp-diagnostics-hook-subprocess-workaround",
+      "type": "learning",
+      "title": "lsp-diagnostics-hook-subprocess-workaround",
+      "tags": [
+        "lsp",
+        "mcp",
+        "hooks",
+        "implementation",
+        "workaround",
+        "project"
+      ],
+      "created": "2026-01-23T20:29:52.696Z",
+      "updated": "2026-01-23T20:29:52.696Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-lsp-diagnostics-hook-subprocess-workaround.md"
+    },
+    {
+      "id": "learning-structured-exploration-identifies-systemic-issues-faster-than-trial-and-error",
+      "type": "learning",
+      "title": "Learning - Structured exploration identifies systemic issues faster than trial-and-error",
+      "tags": [
+        "retrospective",
+        "process",
+        "methodology",
+        "sdd",
+        "project"
+      ],
+      "created": "2026-01-23T20:29:53.559Z",
+      "updated": "2026-01-23T20:29:53.559Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-structured-exploration-identifies-systemic-issues-faster-than-trial-and-error.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-context-source-options-require-explicit-parameters",
+      "type": "learning",
+      "title": "context-source-options-require-explicit-parameters",
+      "tags": [
+        "context-injection",
+        "architecture",
+        "bug-pattern",
+        "project"
+      ],
+      "created": "2026-01-23T20:29:58.225Z",
+      "updated": "2026-01-23T20:29:58.225Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-context-source-options-require-explicit-parameters.md"
+    },
+    {
+      "id": "learning-code-review-with-all-suggestions-addressed-before-merge-builds-confidence",
+      "type": "learning",
+      "title": "Learning - Code review with all suggestions addressed before merge builds confidence",
+      "tags": [
+        "retrospective",
+        "process",
+        "quality",
+        "code-review",
+        "project"
+      ],
+      "created": "2026-01-23T20:29:59.665Z",
+      "updated": "2026-01-23T20:29:59.665Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-code-review-with-all-suggestions-addressed-before-merge-builds-confidence.md",
+      "severity": "low"
+    },
+    {
+      "id": "gotcha-forked-session-context-bleed-without-explicit-framing",
+      "type": "gotcha",
+      "title": "forked-session-context-bleed-without-explicit-framing",
+      "tags": [
+        "fork-session",
+        "prompt-engineering",
+        "meta-prompting",
+        "project"
+      ],
+      "created": "2026-01-23T20:30:03.626Z",
+      "updated": "2026-01-23T20:30:03.626Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-forked-session-context-bleed-without-explicit-framing.md"
+    },
+    {
+      "id": "learning-retro-codebase-exploration-agent-is-essential-before-specking-new-features",
+      "title": "Retro - Codebase exploration agent is essential before specking new features",
+      "type": "learning",
+      "tags": [
+        "retrospective",
+        "process",
+        "exploration",
+        "architecture-reuse",
+        "project"
+      ],
+      "created": "2026-01-21T20:47:24.494Z",
+      "updated": "2026-01-21T20:47:24.494Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-codebase-exploration-agent-is-essential-before-specking-new-features.md"
+    },
+    {
+      "id": "artifact-filesystem-first-discovery-pattern",
+      "title": "Filesystem-First Discovery Pattern for CLI Plugins",
+      "type": "artifact",
+      "tags": [
+        "discovery",
+        "filesystem",
+        "pattern",
+        "reusable",
+        "project"
+      ],
+      "created": "2026-01-21T21:19:54.475Z",
+      "updated": "2026-01-21T21:19:54.475Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-filesystem-first-discovery-pattern.md"
+    },
+    {
+      "id": "decision-special-pattern-detection-for-memory-think-deliberation",
+      "title": "Special pattern detection for memory think deliberation",
+      "type": "decision",
+      "tags": [
+        "architecture",
+        "memory-integration",
+        "deliberation",
+        "project"
+      ],
+      "created": "2026-01-21T20:47:48.321Z",
+      "updated": "2026-01-21T20:47:48.321Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-special-pattern-detection-for-memory-think-deliberation.md"
+    },
+    {
+      "id": "learning-retro-full-sdd-workflow-in-single-session-accelerates-feature-delivery",
+      "title": "Retro - Full SDD workflow in single session accelerates feature delivery",
+      "type": "learning",
+      "tags": [
+        "retrospective",
+        "process",
+        "sdd-workflow",
+        "planning",
+        "project"
+      ],
+      "created": "2026-01-21T20:47:12.666Z",
+      "updated": "2026-01-21T20:47:12.666Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-full-sdd-workflow-in-single-session-accelerates-feature-delivery.md"
+    },
+    {
+      "id": "learning-lru-cache-with-mtime-invalidation-for-discovery-performance",
+      "title": "LRU Cache with mtime Invalidation for Discovery Performance",
+      "type": "learning",
+      "tags": [
+        "caching",
+        "performance",
+        "filesystem",
+        "discovery",
+        "project"
+      ],
+      "created": "2026-01-21T21:19:42.753Z",
+      "updated": "2026-01-21T21:19:42.753Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-lru-cache-with-mtime-invalidation-for-discovery-performance.md"
+    },
+    {
+      "id": "learning-exactoptionalpropertytypes-requires-conditional-object-spreads",
+      "title": "exactOptionalPropertyTypes Requires Conditional Object Spreads",
+      "type": "learning",
+      "tags": [
+        "typescript",
+        "exactOptionalPropertyTypes",
+        "gotcha",
+        "project"
+      ],
+      "created": "2026-01-21T21:19:46.731Z",
+      "updated": "2026-01-21T21:19:46.731Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-exactoptionalpropertytypes-requires-conditional-object-spreads.md"
+    },
+    {
+      "id": "learning-retro-mock-filesystem-pattern-with-mockfilesystem-enables-deterministic-testing",
+      "title": "Retro - Mock filesystem pattern with _mockFileSystem enables deterministic testing",
+      "type": "learning",
+      "tags": [
+        "retrospective",
+        "process",
+        "testing",
+        "project"
+      ],
+      "created": "2026-01-21T21:19:18.409Z",
+      "updated": "2026-01-21T21:19:18.409Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-mock-filesystem-pattern-with-mockfilesystem-enables-deterministic-testing.md"
+    },
+    {
+      "id": "learning-retro-phase-based-task-organization-012345-scales-well-for-multi-phase-features",
+      "title": "Retro - Phase-based task organization (0→1→2→3→4→5) scales well for multi-phase features",
+      "type": "learning",
+      "tags": [
+        "retrospective",
+        "process",
+        "planning",
+        "project"
+      ],
+      "created": "2026-01-21T21:19:26.059Z",
+      "updated": "2026-01-21T21:19:26.059Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-phase-based-task-organization-012345-scales-well-for-multi-phase-features.md"
+    },
+    {
+      "id": "decision-dynamic-context-injection-v130-spec",
+      "title": "Dynamic Context Injection v1.3.0 Specification",
+      "type": "decision",
+      "tags": [
+        "ready-for-planning",
+        "dynamic-discovery",
+        "filesystem-scanning",
+        "integration",
+        "project"
+      ],
+      "created": "2026-01-21T20:26:20.538Z",
+      "updated": "2026-01-21T20:26:20.538Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-dynamic-context-injection-v130-spec.md"
+    },
+    {
+      "id": "learning-retro-tdd-stub-first-hook-catches-implementation-mistakes-early",
+      "title": "Retro - TDD stub-first hook catches implementation mistakes early",
+      "type": "learning",
+      "tags": [
+        "retrospective",
+        "process",
+        "tdd",
+        "project"
+      ],
+      "created": "2026-01-21T21:19:13.898Z",
+      "updated": "2026-01-21T21:19:13.898Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-tdd-stub-first-hook-catches-implementation-mistakes-early.md"
+    },
+    {
+      "id": "learning-tdd-hook-enforcement-requires-stub-first-approach",
+      "title": "TDD Hook Enforcement Requires Stub-First Approach",
+      "type": "learning",
+      "tags": [
+        "tdd",
+        "bun",
+        "typescript",
+        "hooks",
+        "project"
+      ],
+      "created": "2026-01-21T21:19:39.293Z",
+      "updated": "2026-01-21T21:19:39.293Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-tdd-hook-enforcement-requires-stub-first-approach.md"
+    },
+    {
+      "id": "decision-filesystem-first-discovery-over-config-driven",
+      "title": "Filesystem-first discovery over config-driven",
+      "type": "decision",
+      "tags": [
+        "architecture",
+        "discovery",
+        "configuration",
+        "project"
+      ],
+      "created": "2026-01-21T20:47:31.753Z",
+      "updated": "2026-01-21T20:47:31.753Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-filesystem-first-discovery-over-config-driven.md"
+    },
+    {
+      "id": "learning-consistent-yaml-frontmatter-across-plugin-definition-types",
+      "title": "Consistent YAML frontmatter across plugin definition types",
+      "type": "learning",
+      "tags": [
+        "architecture",
+        "consistency",
+        "design-pattern",
+        "project"
+      ],
+      "created": "2026-01-21T20:47:54.185Z",
+      "updated": "2026-01-21T20:47:54.185Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-consistent-yaml-frontmatter-across-plugin-definition-types.md"
+    },
+    {
+      "id": "learning-multi-tier-filesystem-scanning-pattern-for-plugin-discovery",
+      "title": "Multi-tier filesystem scanning pattern for plugin discovery",
+      "type": "learning",
+      "tags": [
+        "architecture",
+        "pattern",
+        "discovery",
+        "filesystem",
+        "project"
+      ],
+      "created": "2026-01-21T20:47:38.093Z",
+      "updated": "2026-01-21T20:47:38.093Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-multi-tier-filesystem-scanning-pattern-for-plugin-discovery.md"
+    },
+    {
+      "id": "learning-retro-phase-based-task-organization-0-5-pattern-enabled-parallel-mental-planning-and-clear-progress-tracking",
+      "title": "Retro - Phase-based task organization (0-5 pattern) enabled parallel mental planning and clear progress tracking",
+      "type": "learning",
+      "tags": [
+        "retrospective",
+        "process",
+        "sdd",
+        "project"
+      ],
+      "created": "2026-01-21T22:34:30.837Z",
+      "updated": "2026-01-21T22:34:30.837Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-phase-based-task-organization-0-5-pattern-enabled-parallel-mental-planning-and-clear-progress-tracking.md"
+    },
+    {
+      "id": "learning-retro-asking-user-questions-keeps-session-focused-vs-open-ended",
+      "title": "Retro - Asking user questions keeps session focused vs open-ended",
+      "type": "learning",
+      "tags": [
+        "retrospective",
+        "process",
+        "user-engagement",
+        "project"
+      ],
+      "created": "2026-01-21T20:47:30.621Z",
+      "updated": "2026-01-21T20:47:30.621Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-asking-user-questions-keeps-session-focused-vs-open-ended.md"
+    },
+    {
+      "id": "gotcha-retro-memory-file-conflicts-graphjson-indexjson-should-be-auto-resolved-or-gitignored",
+      "title": "Retro - Memory file conflicts (graph.json, index.json) should be auto-resolved or gitignored",
+      "type": "gotcha",
+      "tags": [
+        "retrospective",
+        "process",
+        "git",
+        "project"
+      ],
+      "created": "2026-01-21T22:34:41.974Z",
+      "updated": "2026-01-21T22:34:41.974Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-memory-file-conflicts-graphjson-indexjson-should-be-auto-resolved-or-gitignored.md"
+    },
+    {
+      "id": "gotcha-retro-large-test-files-500-lines-should-be-split-by-resource-type-for-maintainability",
+      "title": "Retro - Large test files (500+ lines) should be split by resource type for maintainability",
+      "type": "gotcha",
+      "tags": [
+        "retrospective",
+        "process",
+        "testing",
+        "project"
+      ],
+      "created": "2026-01-21T21:19:22.029Z",
+      "updated": "2026-01-21T21:19:22.029Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-large-test-files-500-lines-should-be-split-by-resource-type-for-maintainability.md"
+    },
+    {
+      "id": "learning-retro-tdd-stub-first-approach-with-test-before-implementation-caught-errors-immediately",
+      "title": "Retro - TDD stub-first approach with test-before-implementation caught errors immediately",
+      "type": "learning",
+      "tags": [
+        "retrospective",
+        "process",
+        "tdd",
+        "project"
+      ],
+      "created": "2026-01-21T22:34:36.556Z",
+      "updated": "2026-01-21T22:34:36.556Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-tdd-stub-first-approach-with-test-before-implementation-caught-errors-immediately.md"
+    },
+    {
+      "id": "learning-retro-post-compact-context-restoration-with-multiple-agents-works-well",
+      "title": "Retro - Post-compact context restoration with multiple agents works well",
+      "type": "learning",
+      "tags": [
+        "retrospective",
+        "process",
+        "context-restoration",
+        "agents",
+        "project"
+      ],
+      "created": "2026-01-21T20:47:18.304Z",
+      "updated": "2026-01-21T20:47:18.304Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-post-compact-context-restoration-with-multiple-agents-works-well.md"
+    },
+    {
+      "id": "thought-20260121-231745372",
+      "title": "Think: Session Context Preservation Strategy - Capturing compacted sessions for prompt improvement",
+      "type": "breadcrumb",
+      "tags": [
+        "think",
+        "concluded"
+      ],
+      "created": "2026-01-21T23:17:45.375Z",
+      "updated": "2026-01-22T00:03:07.152Z",
+      "scope": "project",
+      "relativePath": "temporary/thought-20260121-231745372.md"
+    },
+    {
+      "id": "thought-20260121-195531569",
+      "title": "Think: Dynamic Context Injection v1.2.0 - Exploration Phase",
+      "type": "breadcrumb",
+      "tags": [
+        "think",
+        "concluded"
+      ],
+      "created": "2026-01-21T19:55:31.572Z",
+      "updated": "2026-01-21T19:56:47.923Z",
+      "scope": "project",
+      "relativePath": "temporary/thought-20260121-195531569.md"
     }
   ]
 }

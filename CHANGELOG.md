@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.2] - 2026-01-23
+
+### Fixed
+
+- **Dynamic discovery now formats all resource types** - Previously only agents were included in improved prompts
+  - Added `formatSkillSuggestions()` for skill recommendations
+  - Added `formatCommandSuggestions()` for command recommendations
+  - Added `formatOutputStyleSuggestions()` for output style recommendations
+  - All matched resources now appear in `<discovered_resources>` section
+
+- **LSP diagnostics no longer stubbed** - Implemented real TypeScript diagnostics gathering
+  - Runs `tsc --noEmit` to gather compiler errors and warnings
+  - Includes 5-second timeout to prevent hanging
+  - Gracefully falls back to empty array if tsc unavailable
+  - Note: MCP tools not accessible from hooks; uses subprocess instead
+
+### Technical Details
+
+- Added format functions for skills, commands, and output styles in `dynamic-discovery.ts`
+- Updated `formatDynamicContext()` to include all matched resource types
+- Implemented `gatherTypeScriptDiagnostics()` in `lsp-diagnostics.ts`
+
 ## [1.5.1] - 2026-01-22
 
 ### Fixed

@@ -18,6 +18,7 @@ import {
   gatherLspDiagnostics,
   isDebuggingPrompt,
   matchDiagnosticsToPrompt,
+  parseTscOutput,
 } from './lsp-diagnostics.ts';
 
 describe('LSP Diagnostics Integration', () => {
@@ -434,6 +435,75 @@ describe('LSP Diagnostics Integration', () => {
 
       expect(result.skipped).toBe(true);
       expect(result.skipReason).toBe('not_debugging_prompt');
+    });
+  });
+
+  describe('parseTscOutput - regex edge cases', () => {
+    it('should parse standard tsc error output', () => {
+      const output = `src/index.ts(10,5): error TS2322: Type 'string' is not assignable to type 'number'.`;
+      const result = parseTscOutput(output);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]!.filePath).toBe('src/index.ts');
+      expect(result[0]!.line).toBe(10);
+      expect(result[0]!.column).toBe(5);
+      expect(result[0]!.severity).toBe('error');
+      expect(result[0]!.message).toBe("Type 'string' is not assignable to type 'number'.");
+    });
+
+    it('should parse warnings', () => {
+      const output = `lib/utils.ts(1,1): warning TS6133: 'x' is declared but its value is never read.`;
+      const result = parseTscOutput(output);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]!.severity).toBe('warning');
+    });
+
+    it('should handle paths with spaces', () => {
+      const output = `src/my file.ts(5,3): error TS1234: Some error`;
+      const result = parseTscOutput(output);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]!.filePath).toBe('src/my file.ts');
+    });
+
+    it('should handle paths with parentheses in directory names', () => {
+      const output = `src/(components)/Button.ts(15,10): error TS2345: Argument error`;
+      const result = parseTscOutput(output);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]!.filePath).toBe('src/(components)/Button.ts');
+    });
+
+    it('should handle multiple diagnostics', () => {
+      const output = `src/a.ts(1,1): error TS1001: Error one
+src/b.ts(2,2): error TS1002: Error two
+src/c.ts(3,3): warning TS1003: Warning three`;
+      const result = parseTscOutput(output);
+
+      expect(result).toHaveLength(3);
+    });
+
+    it('should skip non-diagnostic lines', () => {
+      const output = `Starting compilation...
+src/index.ts(10,5): error TS2322: Type error
+Compilation finished.`;
+      const result = parseTscOutput(output);
+
+      expect(result).toHaveLength(1);
+    });
+
+    it('should return empty array for empty input', () => {
+      expect(parseTscOutput('')).toEqual([]);
+      expect(parseTscOutput('\n\n')).toEqual([]);
+    });
+
+    it('should handle messages with colons', () => {
+      const output = `src/index.ts(1,1): error TS2322: Type: 'A' is not: assignable to: 'B'.`;
+      const result = parseTscOutput(output);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]!.message).toBe("Type: 'A' is not: assignable to: 'B'.");
     });
   });
 });

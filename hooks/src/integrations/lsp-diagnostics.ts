@@ -1,10 +1,30 @@
 /**
  * LSP diagnostics integration for enriching prompts with errors/warnings
- * Gathers diagnostics from IDE via MCP and filters for relevance
+ * Gathers diagnostics from TypeScript compiler and filters for relevance
+ *
+ * Performance: Runs tsc with 5-second timeout to prevent blocking the hook
+ * Note: MCP tools (mcp__ide__getDiagnostics) are not accessible from hooks
+ * since hooks run as external processes. We use tsc subprocess instead.
+ *
+ * Security: Uses process.cwd() which is set by Claude Code to the project
+ * directory. Hooks cannot run outside their designated project context.
  */
 
 /** Maximum number of diagnostics to include */
 const MAX_DIAGNOSTICS = 5;
+
+/** Timeout for tsc execution in milliseconds */
+const TSC_TIMEOUT_MS = 5000;
+
+/** Cache TTL for tsc results in milliseconds (30 seconds) */
+const TSC_CACHE_TTL_MS = 30000;
+
+/** Cached tsc results to avoid repeated executions */
+let tscCache: {
+  diagnostics: Diagnostic[];
+  timestamp: number;
+  cwd: string;
+} | null = null;
 
 /** Keywords that indicate a debugging-related prompt */
 const DEBUGGING_KEYWORDS = [
@@ -74,6 +94,103 @@ export interface LspDiagnosticsResult {
   readonly error?: string;
   readonly skipped?: boolean;
   readonly skipReason?: 'disabled' | 'lsp_not_configured' | 'not_debugging_prompt' | 'timeout';
+}
+
+/**
+ * Parses tsc output into Diagnostic objects
+ * Exported for testability - handles edge cases in tsc output format
+ *
+ * Expected format: file(line,col): severity TS####: message
+ * Examples:
+ *   src/index.ts(10,5): error TS2322: Type 'string' is not assignable to type 'number'.
+ *   lib/utils.ts(1,1): warning TS6133: 'x' is declared but its value is never read.
+ */
+export function parseTscOutput(stdout: string): Diagnostic[] {
+  const diagnostics: Diagnostic[] = [];
+  const lines = stdout.split('\n').filter((line) => line.trim());
+
+  for (const line of lines) {
+    // Match: file(line,col): severity TS####: message
+    // Use non-greedy match for file path to handle paths with special chars
+    const match = line.match(/^(.+?)\((\d+),(\d+)\):\s*(error|warning)\s+TS\d+:\s*(.+)$/);
+    if (match && match[1] && match[2] && match[3] && match[4] && match[5]) {
+      diagnostics.push({
+        filePath: match[1].trim(),
+        line: parseInt(match[2], 10),
+        column: parseInt(match[3], 10),
+        severity: match[4] as DiagnosticSeverity,
+        message: match[5].trim(),
+        source: 'typescript',
+      });
+    }
+  }
+
+  return diagnostics;
+}
+
+/**
+ * Gathers TypeScript diagnostics by running tsc --noEmit
+ * Falls back gracefully if tsc is not available or fails
+ * Results are cached for TSC_CACHE_TTL_MS to avoid repeated executions
+ */
+async function gatherTypeScriptDiagnostics(): Promise<Diagnostic[]> {
+  const cwd = process.cwd();
+
+  // Check cache - return cached results if still valid and same directory
+  if (tscCache && tscCache.cwd === cwd) {
+    const age = Date.now() - tscCache.timestamp;
+    if (age < TSC_CACHE_TTL_MS) {
+      return tscCache.diagnostics;
+    }
+  }
+
+  try {
+    // Try to run tsc with JSON output
+    const proc = Bun.spawn(['npx', 'tsc', '--noEmit', '--pretty', 'false'], {
+      stdout: 'pipe',
+      stderr: 'pipe',
+      cwd,
+    });
+
+    // Set a timeout to avoid hanging
+    const timeoutPromise = new Promise<null>((resolve) => {
+      setTimeout(() => {
+        proc.kill();
+        resolve(null);
+      }, TSC_TIMEOUT_MS);
+    });
+
+    const exitPromise = proc.exited.then(async (exitCode) => {
+      // tsc returns non-zero when there are errors, which is expected
+      const stdout = await new Response(proc.stdout).text();
+      return { exitCode, stdout };
+    });
+
+    const result = await Promise.race([exitPromise, timeoutPromise]);
+
+    if (result === null) {
+      // Timeout - return empty
+      return [];
+    }
+
+    const { stdout } = result;
+
+    // Parse tsc output using extracted helper
+    const diagnostics = parseTscOutput(stdout);
+
+    // Update cache with results
+    tscCache = {
+      diagnostics,
+      timestamp: Date.now(),
+      cwd,
+    };
+
+    return diagnostics;
+  } catch {
+    // If tsc fails or isn't available, return empty array
+    // This is expected in non-TypeScript projects
+    return [];
+  }
 }
 
 /**
@@ -181,16 +298,17 @@ export async function gatherLspDiagnostics(
     };
   }
 
-  // Gather diagnostics via MCP or mock
+  // Gather diagnostics via MCP mock or real TypeScript compiler
   let diagnostics: Diagnostic[];
 
   if (_mockMcpCall) {
     const result = await _mockMcpCall();
     diagnostics = result.diagnostics;
   } else {
-    // In real implementation, this would call mcp__ide__getDiagnostics
-    // For now, return empty diagnostics when no mock is provided
-    diagnostics = [];
+    // Get real diagnostics from TypeScript compiler
+    // Note: MCP tools (mcp__ide__getDiagnostics) are not accessible from hooks
+    // since hooks run as external processes. We shell out to tsc instead.
+    diagnostics = await gatherTypeScriptDiagnostics();
   }
 
   // Filter and prioritise diagnostics
