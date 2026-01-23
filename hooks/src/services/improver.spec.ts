@@ -67,7 +67,42 @@ describe('Improver', () => {
       expect(prompt).toContain('make it faster');
     });
 
-    // Test removed - classification no longer included in prompt template
+    it('should include forked session framing', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toContain('FORKED SESSION');
+      expect(prompt).toContain('prompt improvement agent');
+    });
+
+    it('should include explicit boundary instructions', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt.toLowerCase()).toContain('do not continue');
+      expect(prompt.toLowerCase()).toContain('do not ask questions');
+    });
+
+    it('should clarify model is not the previous assistant', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toContain('NOT the assistant from the previous conversation');
+    });
+
+    it('should place forked session framing before the original prompt', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      const framingIndex = prompt.indexOf('[FORKED SESSION');
+      const promptIndex = prompt.indexOf('<original_prompt>');
+      expect(framingIndex).toBeLessThan(promptIndex);
+      expect(framingIndex).toBeGreaterThanOrEqual(0);
+    });
   });
 
   describe('T039: buildImprovementPrompt - injects context', () => {
