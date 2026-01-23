@@ -77,6 +77,68 @@ export interface LspDiagnosticsResult {
 }
 
 /**
+ * Gathers TypeScript diagnostics by running tsc --noEmit
+ * Falls back gracefully if tsc is not available or fails
+ */
+async function gatherTypeScriptDiagnostics(): Promise<Diagnostic[]> {
+  try {
+    // Try to run tsc with JSON output
+    const proc = Bun.spawn(['npx', 'tsc', '--noEmit', '--pretty', 'false'], {
+      stdout: 'pipe',
+      stderr: 'pipe',
+      cwd: process.cwd(),
+    });
+
+    // Set a timeout to avoid hanging
+    const timeoutPromise = new Promise<null>((resolve) => {
+      setTimeout(() => {
+        proc.kill();
+        resolve(null);
+      }, 5000); // 5 second timeout
+    });
+
+    const exitPromise = proc.exited.then(async (exitCode) => {
+      // tsc returns non-zero when there are errors, which is expected
+      const stdout = await new Response(proc.stdout).text();
+      return { exitCode, stdout };
+    });
+
+    const result = await Promise.race([exitPromise, timeoutPromise]);
+
+    if (result === null) {
+      // Timeout - return empty
+      return [];
+    }
+
+    const { stdout } = result;
+
+    // Parse tsc output format: file(line,col): severity TS####: message
+    const diagnostics: Diagnostic[] = [];
+    const lines = stdout.split('\n').filter((line) => line.trim());
+
+    for (const line of lines) {
+      const match = line.match(/^(.+?)\((\d+),(\d+)\):\s*(error|warning)\s+TS\d+:\s*(.+)$/);
+      if (match && match[1] && match[2] && match[3] && match[4] && match[5]) {
+        diagnostics.push({
+          filePath: match[1].trim(),
+          line: parseInt(match[2], 10),
+          column: parseInt(match[3], 10),
+          severity: match[4] as DiagnosticSeverity,
+          message: match[5].trim(),
+          source: 'typescript',
+        });
+      }
+    }
+
+    return diagnostics;
+  } catch {
+    // If tsc fails or isn't available, return empty array
+    // This is expected in non-TypeScript projects
+    return [];
+  }
+}
+
+/**
  * Checks if a prompt is debugging-related
  */
 export function isDebuggingPrompt(prompt: string): boolean {
@@ -181,16 +243,17 @@ export async function gatherLspDiagnostics(
     };
   }
 
-  // Gather diagnostics via MCP or mock
+  // Gather diagnostics via MCP mock or real TypeScript compiler
   let diagnostics: Diagnostic[];
 
   if (_mockMcpCall) {
     const result = await _mockMcpCall();
     diagnostics = result.diagnostics;
   } else {
-    // In real implementation, this would call mcp__ide__getDiagnostics
-    // For now, return empty diagnostics when no mock is provided
-    diagnostics = [];
+    // Get real diagnostics from TypeScript compiler
+    // Note: MCP tools (mcp__ide__getDiagnostics) are not accessible from hooks
+    // since hooks run as external processes. We shell out to tsc instead.
+    diagnostics = await gatherTypeScriptDiagnostics();
   }
 
   // Filter and prioritise diagnostics
