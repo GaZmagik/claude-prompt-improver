@@ -1,10 +1,30 @@
 /**
  * LSP diagnostics integration for enriching prompts with errors/warnings
- * Gathers diagnostics from IDE via MCP and filters for relevance
+ * Gathers diagnostics from TypeScript compiler and filters for relevance
+ *
+ * Performance: Runs tsc with 5-second timeout to prevent blocking the hook
+ * Note: MCP tools (mcp__ide__getDiagnostics) are not accessible from hooks
+ * since hooks run as external processes. We use tsc subprocess instead.
+ *
+ * Security: Uses process.cwd() which is set by Claude Code to the project
+ * directory. Hooks cannot run outside their designated project context.
  */
 
 /** Maximum number of diagnostics to include */
 const MAX_DIAGNOSTICS = 5;
+
+/** Timeout for tsc execution in milliseconds */
+const TSC_TIMEOUT_MS = 5000;
+
+/** Cache TTL for tsc results in milliseconds (30 seconds) */
+const TSC_CACHE_TTL_MS = 30000;
+
+/** Cached tsc results to avoid repeated executions */
+let tscCache: {
+  diagnostics: Diagnostic[];
+  timestamp: number;
+  cwd: string;
+} | null = null;
 
 /** Keywords that indicate a debugging-related prompt */
 const DEBUGGING_KEYWORDS = [
@@ -79,14 +99,25 @@ export interface LspDiagnosticsResult {
 /**
  * Gathers TypeScript diagnostics by running tsc --noEmit
  * Falls back gracefully if tsc is not available or fails
+ * Results are cached for TSC_CACHE_TTL_MS to avoid repeated executions
  */
 async function gatherTypeScriptDiagnostics(): Promise<Diagnostic[]> {
+  const cwd = process.cwd();
+
+  // Check cache - return cached results if still valid and same directory
+  if (tscCache && tscCache.cwd === cwd) {
+    const age = Date.now() - tscCache.timestamp;
+    if (age < TSC_CACHE_TTL_MS) {
+      return tscCache.diagnostics;
+    }
+  }
+
   try {
     // Try to run tsc with JSON output
     const proc = Bun.spawn(['npx', 'tsc', '--noEmit', '--pretty', 'false'], {
       stdout: 'pipe',
       stderr: 'pipe',
-      cwd: process.cwd(),
+      cwd,
     });
 
     // Set a timeout to avoid hanging
@@ -94,7 +125,7 @@ async function gatherTypeScriptDiagnostics(): Promise<Diagnostic[]> {
       setTimeout(() => {
         proc.kill();
         resolve(null);
-      }, 5000); // 5 second timeout
+      }, TSC_TIMEOUT_MS);
     });
 
     const exitPromise = proc.exited.then(async (exitCode) => {
