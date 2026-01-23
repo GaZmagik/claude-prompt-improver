@@ -723,315 +723,543 @@
     },
     {
       "id": "learning-retro-capture-actual-hook-input-format-before-implementing-parser",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Capture actual hook input format before implementing parser"
     },
     {
       "id": "gotcha-retro-sandbox-stdin-is-devnull-making-local-testing-impossible",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Retro - Sandbox stdin is /dev/null, making local testing impossible"
     },
     {
       "id": "learning-retro-claude-code-hook-stdin-captures-with-shell-scripts-for-debugging",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Claude Code hook stdin captures with shell scripts for debugging"
     },
     {
       "id": "learning-claude-code-userpromptsubmit-hook-input-format-is-flat-not-nested",
-      "type": "learning"
+      "type": "learning",
+      "title": "Claude Code UserPromptSubmit hook input format is flat, not nested"
     },
     {
       "id": "learning-sandbox-blocks-stdin-piping-to-bun-scripts",
-      "type": "learning"
+      "type": "learning",
+      "title": "Sandbox blocks stdin piping to Bun scripts"
     },
     {
       "id": "gotcha-claude-cli-needs-no-session-persistence-to-run-in-sandbox",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Claude CLI needs --no-session-persistence to run in sandbox"
     },
     {
       "id": "gotcha-project-scoped-plugin-hooks-dont-auto-load-despite-claude-pluginpluginjson",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Project-scoped plugin hooks don't auto-load despite .claude-plugin/plugin.json"
     },
     {
       "id": "gotcha-userpromptsubmit-hooks-trigger-recursively-when-spawning-claude-cli",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "UserPromptSubmit hooks trigger recursively when spawning Claude CLI"
     },
     {
       "id": "decision-restore-nonesimplecomplex-classification-per-original-spec",
-      "type": "decision"
+      "type": "decision",
+      "title": "Restore NONE/SIMPLE/COMPLEX classification per original spec"
     },
     {
       "id": "gotcha-classification-requires-2-api-calls-unacceptable-latency",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Classification requires 2 API calls - unacceptable latency"
     },
     {
       "id": "learning-retro-audit-driven-task-reconciliation-exposed-15-20-false-completion-rate",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Audit-driven task reconciliation exposed 15-20% false-completion rate"
     },
     {
       "id": "gotcha-retro-conflicting-architectural-decisions-led-to-wasted-implementation",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Retro - Conflicting architectural decisions led to wasted implementation"
     },
     {
       "id": "learning-retro-recursion-prevention-discovered-via-runaway-logs-not-testing",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Recursion prevention discovered via runaway logs, not testing"
     },
     {
       "id": "learning-spec-vs-implementation-audit-revealed-major-feature-gaps",
-      "type": "learning"
+      "type": "learning",
+      "title": "Spec-vs-implementation audit revealed major feature gaps"
     },
     {
       "id": "decision-integration-wiring-single-pass",
-      "type": "decision"
+      "type": "decision",
+      "title": "Single-pass integration wiring for hook flow"
     },
     {
       "id": "learning-retro-test-spec-mismatch-revealed-via-systematic-failures-across-multiple-test-suites",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Test-spec mismatch revealed via systematic failures across multiple test suites"
     },
     {
       "id": "learning-classification-rejected-due-to-latency-and-cost",
-      "type": "learning"
+      "type": "learning",
+      "title": "Classification rejected due to latency and cost"
     },
     {
       "id": "learning-retro-config-driven-integration-wiring-eliminated-need-for-classification-layer",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Config-driven integration wiring eliminated need for classification layer"
     },
     {
       "id": "artifact-hook-auto-setup-pattern",
-      "type": "artifact"
+      "type": "artifact",
+      "title": "Hook auto-setup from bundled template"
     },
     {
       "id": "learning-hook-test-format-flat-sessionid-vs-nested-context",
-      "type": "learning"
+      "type": "learning",
+      "title": "Hook test format: flat session_id vs nested context"
     },
     {
       "id": "learning-prompt-improver-test-coverage-at-v120",
-      "type": "learning"
+      "type": "learning",
+      "title": "Prompt improver test coverage at v1.2.0"
     },
     {
       "id": "learning-retro-bundled-template-files-enable-seamless-auto-setup-without-embedding-strings",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Bundled template files enable seamless auto-setup without embedding strings"
     },
     {
       "id": "learning-retro-parallel-expert-agents-dramatically-improved-review-efficiency",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Parallel expert agents dramatically improved review efficiency"
     },
     {
       "id": "learning-retro-memory-curator-proactively-surfaces-decision-conflicts-for-cleanup",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Memory curator proactively surfaces decision conflicts for cleanup"
     },
     {
       "id": "learning-bundled-template-path-resolution-requires-relative-traversal-from-srccore",
-      "type": "learning"
+      "type": "learning",
+      "title": "Bundled template path resolution requires relative traversal from src/core"
     },
     {
       "id": "gotcha-gotcha-specify-symlinks-not-auto-created-in-project-clone",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Gotcha - Specify symlinks not auto-created in project clone"
     },
     {
       "id": "learning-ensureconfigsetup-test-coverage-required-8-tests-for-4-status-outcomes",
-      "type": "learning"
+      "type": "learning",
+      "title": "ensureConfigSetup() test coverage required 8 tests for 4 status outcomes"
     },
     {
       "id": "gotcha-gotcha-dead-code-unused-constants-only-discovered-during-comprehensive-review",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Gotcha - Dead code (unused constants) only discovered during comprehensive review"
     },
     {
       "id": "learning-pre-shipping-review-identified-5-major-issues-and-12-minor-issues-across-7-expert-reviews",
-      "type": "learning"
+      "type": "learning",
+      "title": "Pre-shipping review identified 5 major issues and 12 minor issues across 7 expert reviews"
     },
     {
       "id": "artifact-config-default-sync-validation",
-      "type": "artifact"
+      "type": "artifact",
+      "title": "Ensure example config defaults match actual code defaults"
     },
     {
       "id": "decision-integration-wiring-fixed-issues-before-shipping",
-      "type": "decision"
+      "type": "decision",
+      "title": "Fixed 5 major and 12 minor issues before shipping v1.2.0"
     },
     {
       "id": "learning-retro-systematic-issue-fixing-with-test-validation-prevents-regression",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Systematic issue fixing with test validation prevents regression"
     },
     {
       "id": "learning-retro-prompt-engineering-docs-showed-xml-should-be-mandatory-not-optional",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Prompt engineering docs showed XML should be mandatory not optional"
     },
     {
       "id": "gotcha-retro-async-file-ops-conversion-broke-tests-due-to-syncasync-boundary-confusion",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Retro - Async file ops conversion broke tests due to sync/async boundary confusion"
     },
     {
       "id": "gotcha-retro-hook-testing-showed-silent-failures-on-api-timeouts-error-visibility-needed",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Retro - Hook testing showed silent failures on API timeouts - error visibility needed"
     },
     {
       "id": "decision-integration-wiring-v120-fixed-8-review-issues-before-shipping",
-      "type": "decision"
+      "type": "decision",
+      "title": "Integration Wiring v1.2.0 - Fixed 8 Review Issues Before Shipping"
     },
     {
       "id": "learning-token-counting-optimization-o1-space-complexity",
-      "type": "learning"
+      "type": "learning",
+      "title": "Token Counting Optimization - O(1) Space Complexity"
     },
     {
       "id": "learning-async-file-operations-migration-pattern",
-      "type": "learning"
+      "type": "learning",
+      "title": "Async File Operations Migration Pattern"
     },
     {
       "id": "artifact-lru-cache-eviction-pattern",
-      "type": "artifact"
+      "type": "artifact",
+      "title": "LRU Cache Eviction Pattern"
     },
     {
       "id": "gotcha-hook-xml-structure-consistency-optional-vs-mandatory",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Hook XML Structure Consistency - Optional vs Mandatory"
     },
     {
       "id": "gotcha-retro-silent-error-handling-masks-integration-failures",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Retro - Silent error handling masks integration failures"
     },
     {
       "id": "gotcha-retro-context-sources-were-hardcoded-empty-despite-gathering-logic",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Retro - Context sources were hardcoded empty despite gathering logic"
     },
     {
       "id": "learning-retro-pre-compact-memory-capture-provided-immediate-debugging-context",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Pre-compact memory capture provided immediate debugging context"
     },
     {
       "id": "gotcha-hook-improvement-failures-silent-without-error-details",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Hook improvement failures silent without error details"
     },
     {
       "id": "learning-context-sources-hardcoded-to-empty-array-in-hook-output",
-      "type": "learning"
+      "type": "learning",
+      "title": "Context sources hardcoded to empty array in hook output"
     },
     {
       "id": "learning-integration-context-gathering-verified-working-with-git-and-memory-sources",
-      "type": "learning"
+      "type": "learning",
+      "title": "Integration context gathering verified working with git and memory sources"
     },
     {
       "id": "decision-dynamic-context-injection-v120-exploration-phase",
-      "type": "decision"
+      "type": "decision",
+      "title": "Dynamic Context Injection v1.2.0 - Exploration Phase"
     },
     {
       "id": "decision-session-context-preservation-strategy-capturing-compacted-sessions-for-prompt-improvement",
-      "type": "decision"
+      "type": "decision",
+      "title": "Session Context Preservation Strategy - Capturing compacted sessions for prompt improvement"
     },
     {
       "id": "gotcha-fork-session-hangs-on-large-sessions",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Fork-session hangs on large sessions"
     },
     {
       "id": "decision-decision-point-index-over-session-summaries",
-      "type": "decision"
+      "type": "decision",
+      "title": "Decision Point Index approach selected for session context"
     },
     {
       "id": "learning-memory-think-call-claude-requires-no-session-persistence",
-      "type": "learning"
+      "type": "learning",
+      "title": "Memory think --call claude requires --no-session-persistence flag"
     },
     {
       "id": "gotcha-userpromptsubmit-fork-session-confirmed-broken",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "UserPromptSubmit hooks cannot use fork-session—confirmed broken in practice"
     },
     {
       "id": "learning-retro-cross-reference-working-implementations-before-redesigning",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Cross-reference working implementations before redesigning"
     },
     {
       "id": "gotcha-retro-multiple-independent-failures-masked-by-single-symptom",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Retro - Multiple independent failures masked by single symptom"
     },
     {
       "id": "learning-retro-cli-debug-flag-was-critical-discovery-not-in-docs",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - CLI --debug flag was critical discovery not in docs"
     },
     {
       "id": "learning-fork-session-requires-project-cwd-not-tmp-directory",
-      "type": "learning"
+      "type": "learning",
+      "title": "fork-session requires project cwd not tmp directory"
     },
     {
       "id": "learning-retro-comparing-working-vs-broken-implementations-accelerated-debugging",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Comparing working vs broken implementations accelerated debugging"
     },
     {
       "id": "learning-claude-cli-debug-flag-workaround-enables-fork-session",
-      "type": "learning"
+      "type": "learning",
+      "title": "claude cli --debug flag workaround enables fork-session"
     },
     {
       "id": "gotcha-retro-hook-output-format-documentation-required-external-lookup",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Retro - Hook output format documentation required external lookup"
     },
     {
       "id": "learning-userpromptsubmit-hook-additionalcontext-must-be-wrapped-in-hookspecificoutput",
-      "type": "learning"
+      "type": "learning",
+      "title": "userpromptsubmit hook additionalcontext must be wrapped in hookspecificoutput"
     },
     {
       "id": "learning-opus-timeout-on-large-sessions-requires-hook-timeout-increase",
-      "type": "learning"
+      "type": "learning",
+      "title": "opus timeout on large sessions requires hook timeout increase"
     },
     {
       "id": "gotcha-output-format-json-causes-fork-session-hangs",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "output-format json causes fork-session hangs"
     },
     {
       "id": "decision-hook-timeout-120-seconds-opus-support",
-      "type": "decision"
+      "type": "decision",
+      "title": "hook timeout set to 120 seconds for opus support"
     },
     {
       "id": "learning-retro-exploration-phase-dramatically-clarifies-fix-scope",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Exploration phase dramatically clarifies fix scope"
     },
     {
       "id": "gotcha-retro-installed-plugin-version-affects-testing-not-repo-changes",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Retro - Installed plugin version affects testing, not repo changes"
     },
     {
       "id": "learning-retro-version-bump-is-part-of-feature-release-checklist",
-      "type": "learning"
+      "type": "learning",
+      "title": "Retro - Version bump is part of feature release checklist"
     },
     {
       "id": "gotcha-claude-code-stdin-availabletools-not-parsed",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Claude Code stdin available_tools not parsed"
     },
     {
       "id": "gotcha-installed-plugins-run-from-claudepluginscacheenhance-not-repo",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Installed plugins run from ~/.claude/plugins/cache/enhance/ not repo"
     },
     {
       "id": "learning-orphaned-infrastructure-fixed-by-wiring-entry-point",
-      "type": "learning"
+      "type": "learning",
+      "title": "Orphaned infrastructure fixed by wiring entry point"
     },
     {
       "id": "learning-sdd-exploration-phase-revealed-root-cause-faster-than-trial-and-error",
-      "type": "learning"
+      "type": "learning",
+      "title": "SDD exploration phase revealed root cause faster than trial-and-error"
     },
     {
       "id": "artifact-transcript-context-calculator",
-      "type": "artifact"
+      "type": "artifact",
+      "title": "Transcript-based context calculator pattern"
     },
     {
       "id": "gotcha-claude-code-does-not-send-contextusage-to-hooks",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Claude Code does not send context_usage to hooks"
     },
     {
       "id": "learning-transcript-based-context-detection-from-jsonl",
-      "type": "learning"
+      "type": "learning",
+      "title": "Transcript-based context detection from .jsonl"
     },
     {
       "id": "learning-cache-tokens-are-context-regardless-of-source",
-      "type": "learning"
+      "type": "learning",
+      "title": "Cache tokens are context (regardless of source)"
     },
     {
       "id": "gotcha-command-injection-risk-with-unquoted-variables-in-awk-expressions",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Command injection risk with unquoted variables in awk expressions"
     },
     {
       "id": "gotcha-validate-extracted-json-values-before-shell-interpolation",
-      "type": "gotcha"
+      "type": "gotcha",
+      "title": "Validate extracted JSON values before shell interpolation"
     },
     {
       "id": "learning-retro-verify-api-contracts-before-implementing-workarounds",
-      "type": "learning"
+      "type": "learning",
+      "title": "Verify API contracts before implementing workarounds"
     },
     {
       "id": "learning-retro-cross-reference-working-implementations-for-faster-debugging",
-      "type": "learning"
+      "type": "learning",
+      "title": "Cross-reference working implementations for faster debugging"
+    },
+    {
+      "id": "gotcha-retro-stubbed-implementations-masquerade-as-completed-features",
+      "type": "gotcha",
+      "title": "Retro - Stubbed implementations masquerade as completed features"
+    },
+    {
+      "id": "learning-dynamic-discovery-partial-formatting-bug",
+      "type": "learning",
+      "title": "dynamic-discovery-partial-formatting-bug"
+    },
+    {
+      "id": "gotcha-retro-partial-context-injection-defeats-feature-value",
+      "type": "gotcha",
+      "title": "Retro - Partial context injection defeats feature value"
+    },
+    {
+      "id": "learning-lsp-diagnostics-hook-subprocess-workaround",
+      "type": "learning",
+      "title": "lsp-diagnostics-hook-subprocess-workaround"
+    },
+    {
+      "id": "learning-structured-exploration-identifies-systemic-issues-faster-than-trial-and-error",
+      "type": "learning",
+      "title": "Learning - Structured exploration identifies systemic issues faster than trial-and-error"
+    },
+    {
+      "id": "learning-context-source-options-require-explicit-parameters",
+      "type": "learning",
+      "title": "context-source-options-require-explicit-parameters"
+    },
+    {
+      "id": "learning-code-review-with-all-suggestions-addressed-before-merge-builds-confidence",
+      "type": "learning",
+      "title": "Learning - Code review with all suggestions addressed before merge builds confidence"
+    },
+    {
+      "id": "gotcha-forked-session-context-bleed-without-explicit-framing",
+      "type": "gotcha",
+      "title": "forked-session-context-bleed-without-explicit-framing"
+    },
+    {
+      "id": "learning-retro-codebase-exploration-agent-is-essential-before-specking-new-features",
+      "type": "learning",
+      "title": "Retro - Codebase exploration agent is essential before specking new features"
+    },
+    {
+      "id": "artifact-filesystem-first-discovery-pattern",
+      "type": "artifact",
+      "title": "Filesystem-First Discovery Pattern for CLI Plugins"
+    },
+    {
+      "id": "decision-special-pattern-detection-for-memory-think-deliberation",
+      "type": "decision",
+      "title": "Special pattern detection for memory think deliberation"
+    },
+    {
+      "id": "learning-retro-full-sdd-workflow-in-single-session-accelerates-feature-delivery",
+      "type": "learning",
+      "title": "Retro - Full SDD workflow in single session accelerates feature delivery"
+    },
+    {
+      "id": "learning-lru-cache-with-mtime-invalidation-for-discovery-performance",
+      "type": "learning",
+      "title": "LRU Cache with mtime Invalidation for Discovery Performance"
+    },
+    {
+      "id": "learning-exactoptionalpropertytypes-requires-conditional-object-spreads",
+      "type": "learning",
+      "title": "exactOptionalPropertyTypes Requires Conditional Object Spreads"
+    },
+    {
+      "id": "learning-retro-mock-filesystem-pattern-with-mockfilesystem-enables-deterministic-testing",
+      "type": "learning",
+      "title": "Retro - Mock filesystem pattern with _mockFileSystem enables deterministic testing"
+    },
+    {
+      "id": "learning-retro-phase-based-task-organization-012345-scales-well-for-multi-phase-features",
+      "type": "learning",
+      "title": "Retro - Phase-based task organization (0→1→2→3→4→5) scales well for multi-phase features"
+    },
+    {
+      "id": "decision-dynamic-context-injection-v130-spec",
+      "type": "decision",
+      "title": "Dynamic Context Injection v1.3.0 Specification"
+    },
+    {
+      "id": "learning-retro-tdd-stub-first-hook-catches-implementation-mistakes-early",
+      "type": "learning",
+      "title": "Retro - TDD stub-first hook catches implementation mistakes early"
+    },
+    {
+      "id": "learning-tdd-hook-enforcement-requires-stub-first-approach",
+      "type": "learning",
+      "title": "TDD Hook Enforcement Requires Stub-First Approach"
+    },
+    {
+      "id": "decision-filesystem-first-discovery-over-config-driven",
+      "type": "decision",
+      "title": "Filesystem-first discovery over config-driven"
+    },
+    {
+      "id": "learning-consistent-yaml-frontmatter-across-plugin-definition-types",
+      "type": "learning",
+      "title": "Consistent YAML frontmatter across plugin definition types"
+    },
+    {
+      "id": "learning-multi-tier-filesystem-scanning-pattern-for-plugin-discovery",
+      "type": "learning",
+      "title": "Multi-tier filesystem scanning pattern for plugin discovery"
+    },
+    {
+      "id": "learning-retro-phase-based-task-organization-0-5-pattern-enabled-parallel-mental-planning-and-clear-progress-tracking",
+      "type": "learning",
+      "title": "Retro - Phase-based task organization (0-5 pattern) enabled parallel mental planning and clear progress tracking"
+    },
+    {
+      "id": "learning-retro-asking-user-questions-keeps-session-focused-vs-open-ended",
+      "type": "learning",
+      "title": "Retro - Asking user questions keeps session focused vs open-ended"
+    },
+    {
+      "id": "gotcha-retro-memory-file-conflicts-graphjson-indexjson-should-be-auto-resolved-or-gitignored",
+      "type": "gotcha",
+      "title": "Retro - Memory file conflicts (graph.json, index.json) should be auto-resolved or gitignored"
+    },
+    {
+      "id": "gotcha-retro-large-test-files-500-lines-should-be-split-by-resource-type-for-maintainability",
+      "type": "gotcha",
+      "title": "Retro - Large test files (500+ lines) should be split by resource type for maintainability"
+    },
+    {
+      "id": "learning-retro-tdd-stub-first-approach-with-test-before-implementation-caught-errors-immediately",
+      "type": "learning",
+      "title": "Retro - TDD stub-first approach with test-before-implementation caught errors immediately"
+    },
+    {
+      "id": "learning-retro-post-compact-context-restoration-with-multiple-agents-works-well",
+      "type": "learning",
+      "title": "Retro - Post-compact context restoration with multiple agents works well"
+    },
+    {
+      "id": "thought-20260121-231745372",
+      "type": "breadcrumb",
+      "title": "Think: Session Context Preservation Strategy - Capturing compacted sessions for prompt improvement"
+    },
+    {
+      "id": "thought-20260121-195531569",
+      "type": "breadcrumb",
+      "title": "Think: Dynamic Context Injection v1.2.0 - Exploration Phase"
     }
   ],
   "edges": [
@@ -1828,6 +2056,56 @@
     {
       "source": "learning-retro-verify-api-contracts-before-implementing-workarounds",
       "target": "artifact-transcript-context-calculator",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-claude-code-does-not-send-contextusage-to-hooks",
+      "target": "artifact-transcript-context-calculator",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-forked-session-context-bleed-without-explicit-framing",
+      "target": "learning-dynamic-discovery-partial-formatting-bug",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-orphaned-infrastructure-fixed-by-wiring-entry-point",
+      "target": "gotcha-claude-code-stdin-availabletools-not-parsed",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-sdd-exploration-phase-revealed-root-cause-faster-than-trial-and-error",
+      "target": "learning-orphaned-infrastructure-fixed-by-wiring-entry-point",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-claude-code-stdin-availabletools-not-parsed",
+      "target": "gotcha-retro-partial-context-injection-defeats-feature-value",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-dynamic-discovery-partial-formatting-bug",
+      "target": "learning-orphaned-infrastructure-fixed-by-wiring-entry-point",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-exploration-phase-dramatically-clarifies-fix-scope",
+      "target": "learning-sdd-exploration-phase-revealed-root-cause-faster-than-trial-and-error",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-userpromptsubmit-fork-session-confirmed-broken",
+      "target": "gotcha-retro-userpromptsubmit-hooks-should-not-use-fork-session",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-installed-plugins-run-from-claudepluginscacheenhance-not-repo",
+      "target": "gotcha-retro-installed-plugin-version-affects-testing-not-repo-changes",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-cross-reference-working-implementations-for-faster-debugging",
+      "target": "learning-retro-exploration-phase-dramatically-clarifies-fix-scope",
       "label": "relates-to"
     }
   ]

@@ -8,6 +8,9 @@ import {
   discoverAgents,
   matchAgentsToPrompt,
   formatAgentSuggestions,
+  formatSkillSuggestions,
+  formatCommandSuggestions,
+  formatOutputStyleSuggestions,
   gatherDynamicContext,
   formatDynamicContext,
   type DiscoveredItem,
@@ -351,6 +354,71 @@ describe('formatAgentSuggestions', () => {
     const formatted = formatAgentSuggestions(testAgents, 10); // 10 total but only 1 displayed
 
     expect(formatted).toContain('and 9 more available');
+  });
+
+  it('should return empty string for empty array', () => {
+    expect(formatAgentSuggestions([], 0)).toBe('');
+  });
+});
+
+describe('formatSkillSuggestions', () => {
+  const testSkills: DiscoveredItem[] = [
+    { name: 'commit', description: 'Commit changes', keywords: ['git'], filePath: '/path', resourceType: 'skill', source: 'local' },
+  ];
+
+  it('should format skills with slash prefix', () => {
+    const formatted = formatSkillSuggestions(testSkills, 1);
+    expect(formatted).toContain('/commit');
+    expect(formatted).toContain('Available skills');
+  });
+
+  it('should return empty string for empty array', () => {
+    expect(formatSkillSuggestions([], 0)).toBe('');
+  });
+
+  it('should note remaining when total > displayed', () => {
+    expect(formatSkillSuggestions(testSkills, 5)).toContain('and 4 more available');
+  });
+});
+
+describe('formatCommandSuggestions', () => {
+  const testCommands: DiscoveredItem[] = [
+    { name: 'test', description: 'Run tests', keywords: ['test'], filePath: '/path', resourceType: 'command', source: 'global' },
+  ];
+
+  it('should format commands with slash prefix', () => {
+    const formatted = formatCommandSuggestions(testCommands, 1);
+    expect(formatted).toContain('/test');
+    expect(formatted).toContain('Available commands');
+  });
+
+  it('should return empty string for empty array', () => {
+    expect(formatCommandSuggestions([], 0)).toBe('');
+  });
+
+  it('should note remaining when total > displayed', () => {
+    expect(formatCommandSuggestions(testCommands, 3)).toContain('and 2 more available');
+  });
+});
+
+describe('formatOutputStyleSuggestions', () => {
+  const testStyles: DiscoveredItem[] = [
+    { name: 'concise', description: 'Brief responses', keywords: ['short'], filePath: '/path', resourceType: 'outputStyle', source: 'local' },
+  ];
+
+  it('should format output styles without slash', () => {
+    const formatted = formatOutputStyleSuggestions(testStyles, 1);
+    expect(formatted).toContain('concise');
+    expect(formatted).not.toContain('/concise');
+    expect(formatted).toContain('Available output styles');
+  });
+
+  it('should return empty string for empty array', () => {
+    expect(formatOutputStyleSuggestions([], 0)).toBe('');
+  });
+
+  it('should note remaining when total > displayed', () => {
+    expect(formatOutputStyleSuggestions(testStyles, 7)).toContain('and 6 more available');
   });
 });
 

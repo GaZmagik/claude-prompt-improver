@@ -97,6 +97,38 @@ export interface LspDiagnosticsResult {
 }
 
 /**
+ * Parses tsc output into Diagnostic objects
+ * Exported for testability - handles edge cases in tsc output format
+ *
+ * Expected format: file(line,col): severity TS####: message
+ * Examples:
+ *   src/index.ts(10,5): error TS2322: Type 'string' is not assignable to type 'number'.
+ *   lib/utils.ts(1,1): warning TS6133: 'x' is declared but its value is never read.
+ */
+export function parseTscOutput(stdout: string): Diagnostic[] {
+  const diagnostics: Diagnostic[] = [];
+  const lines = stdout.split('\n').filter((line) => line.trim());
+
+  for (const line of lines) {
+    // Match: file(line,col): severity TS####: message
+    // Use non-greedy match for file path to handle paths with special chars
+    const match = line.match(/^(.+?)\((\d+),(\d+)\):\s*(error|warning)\s+TS\d+:\s*(.+)$/);
+    if (match && match[1] && match[2] && match[3] && match[4] && match[5]) {
+      diagnostics.push({
+        filePath: match[1].trim(),
+        line: parseInt(match[2], 10),
+        column: parseInt(match[3], 10),
+        severity: match[4] as DiagnosticSeverity,
+        message: match[5].trim(),
+        source: 'typescript',
+      });
+    }
+  }
+
+  return diagnostics;
+}
+
+/**
  * Gathers TypeScript diagnostics by running tsc --noEmit
  * Falls back gracefully if tsc is not available or fails
  * Results are cached for TSC_CACHE_TTL_MS to avoid repeated executions
@@ -143,23 +175,15 @@ async function gatherTypeScriptDiagnostics(): Promise<Diagnostic[]> {
 
     const { stdout } = result;
 
-    // Parse tsc output format: file(line,col): severity TS####: message
-    const diagnostics: Diagnostic[] = [];
-    const lines = stdout.split('\n').filter((line) => line.trim());
+    // Parse tsc output using extracted helper
+    const diagnostics = parseTscOutput(stdout);
 
-    for (const line of lines) {
-      const match = line.match(/^(.+?)\((\d+),(\d+)\):\s*(error|warning)\s+TS\d+:\s*(.+)$/);
-      if (match && match[1] && match[2] && match[3] && match[4] && match[5]) {
-        diagnostics.push({
-          filePath: match[1].trim(),
-          line: parseInt(match[2], 10),
-          column: parseInt(match[3], 10),
-          severity: match[4] as DiagnosticSeverity,
-          message: match[5].trim(),
-          source: 'typescript',
-        });
-      }
-    }
+    // Update cache with results
+    tscCache = {
+      diagnostics,
+      timestamp: Date.now(),
+      cwd,
+    };
 
     return diagnostics;
   } catch {
