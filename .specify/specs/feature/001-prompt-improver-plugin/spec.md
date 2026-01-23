@@ -53,8 +53,18 @@ user_stories:
 # Feature Specification: Claude Prompt Improver Plugin
 
 **Created**: 2026-01-18
-**Status**: Draft
+**Status**: Superseded (v1.3.0+)
 **Input**: User description: "Create a Claude Code plugin named 'claude-prompt-improver' for the GaZmagik/enhance marketplace that automatically improves user prompts before they reach the main Claude session."
+
+> ⚠️ **SUPERSEDED NOTICE (v1.3.0+)**
+>
+> The NONE/SIMPLE/COMPLEX classification system documented in this specification was removed in v1.3.0. The original design required two API calls per prompt: one to classify complexity, then one to improve. This was replaced with a single-model architecture using the configurable `improverModel` setting (default: `haiku`).
+>
+> **Reason for change**: Reduced API calls from 2 to 1 per prompt, halving latency and cost whilst maintaining quality. The classification step added overhead without proportional benefit - Haiku handles most improvements adequately, and users can configure `sonnet` or `opus` for higher quality when needed.
+>
+> **What still applies**: Bypass mechanisms (US2), context injection (US3-US8), XML structuring (US9), configuration (US10), logging (US11), and documentation (US12) remain valid and implemented.
+>
+> **What changed**: US1 acceptance scenarios 1-4 (classification logic), FR-001/FR-002 (classification requirements), and model-per-complexity configuration are no longer implemented.
 
 ## User Scenarios & Testing *(mandatory)*
 

@@ -134,6 +134,7 @@ For backwards compatibility, the plugin also supports JSON configuration at `.cl
 | `integrations.spec` | boolean | `true` | Enable specification awareness |
 | `integrations.memory` | boolean | `true` | Enable memory plugin integration |
 | `integrations.session` | boolean | `true` | Enable session context |
+| `integrations.dynamicDiscovery` | boolean | `true` | Enable dynamic discovery of skills, agents, commands, and output styles |
 | `logging.enabled` | boolean | `true` | Enable logging |
 | `logging.logFilePath` | string | `.claude/logs/...` | Log file location |
 | `logging.logLevel` | string | `INFO` | Log level: ERROR, INFO, or DEBUG |
