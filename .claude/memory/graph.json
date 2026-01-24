@@ -1284,7 +1284,7 @@
       "type": "artifact"
     },
     {
-      "id": "learning-hooks-use-mtime-based-cache-lookup-for-context-usage",
+      "id": "learning-use-claudecodesseport-for-session-specific-hook-caching",
       "type": "learning"
     }
   ],

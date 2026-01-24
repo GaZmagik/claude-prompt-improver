@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-24T00:45:14.658Z",
+  "lastUpdated": "2026-01-24T00:52:42.080Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -4159,21 +4159,22 @@
       "relativePath": "permanent/artifact-memory-curation-session-20260124.md"
     },
     {
-      "id": "learning-hooks-use-mtime-based-cache-lookup-for-context-usage",
+      "id": "learning-use-claudecodesseport-for-session-specific-hook-caching",
       "type": "learning",
-      "title": "Hooks use mtime-based cache lookup for context usage",
+      "title": "Use CLAUDE_CODE_SSE_PORT for session-specific hook caching",
       "tags": [
         "hooks",
         "context",
         "caching",
         "statusline",
-        "mtime",
+        "sse-port",
+        "session",
         "project"
       ],
-      "created": "2026-01-24T00:45:05.400Z",
-      "updated": "2026-01-24T00:45:05.400Z",
+      "created": "2026-01-24T00:52:32.024Z",
+      "updated": "2026-01-24T00:52:32.024Z",
       "scope": "project",
-      "relativePath": "permanent/learning-hooks-use-mtime-based-cache-lookup-for-context-usage.md"
+      "relativePath": "permanent/learning-use-claudecodesseport-for-session-specific-hook-caching.md"
     }
   ]
 }
