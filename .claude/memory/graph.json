@@ -1310,6 +1310,14 @@
     {
       "id": "decision-v1.6.0-incomplete-release-scope",
       "type": "decision"
+    },
+    {
+      "id": "decision-scanner-module-design-patterns-strategy-builder-template-method",
+      "type": "decision"
+    },
+    {
+      "id": "decision-session-scoped-caching-opportunity-for-plugin-scans",
+      "type": "decision"
     }
   ],
   "edges": [

@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-24T11:14:12.554Z",
+  "lastUpdated": "2026-01-24T12:17:37.428Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -4263,6 +4263,38 @@
       "updated": "2026-01-24T11:14:12.549Z",
       "scope": "project",
       "relativePath": "permanent/decision-v1.6.0-incomplete-release-scope.md"
+    },
+    {
+      "id": "decision-scanner-module-design-patterns-strategy-builder-template-method",
+      "type": "decision",
+      "title": "Scanner module design patterns - Strategy, Builder, Template Method",
+      "tags": [
+        "design-patterns",
+        "architecture",
+        "extensibility",
+        "plugin-scanner",
+        "project"
+      ],
+      "created": "2026-01-24T12:17:11.159Z",
+      "updated": "2026-01-24T12:17:11.159Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-scanner-module-design-patterns-strategy-builder-template-method.md"
+    },
+    {
+      "id": "decision-session-scoped-caching-opportunity-for-plugin-scans",
+      "type": "decision",
+      "title": "Session-scoped caching opportunity for plugin scans",
+      "tags": [
+        "performance",
+        "caching",
+        "plugin-scanner",
+        "future-enhancement",
+        "project"
+      ],
+      "created": "2026-01-24T12:17:37.422Z",
+      "updated": "2026-01-24T12:17:37.422Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-session-scoped-caching-opportunity-for-plugin-scans.md"
     }
   ]
 }
