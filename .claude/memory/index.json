@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-23T20:32:26.371Z",
+  "lastUpdated": "2026-01-24T00:45:14.658Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -4019,30 +4019,161 @@
       "relativePath": "permanent/learning-retro-post-compact-context-restoration-with-multiple-agents-works-well.md"
     },
     {
-      "id": "thought-20260121-231745372",
-      "title": "Think: Session Context Preservation Strategy - Capturing compacted sessions for prompt improvement",
-      "type": "breadcrumb",
+      "id": "learning-mcp-server-configuration-discovery-via-mcpjson",
+      "type": "learning",
+      "title": "MCP server configuration discovery via .mcp.json",
       "tags": [
-        "think",
-        "concluded"
+        "mcp",
+        "discovery",
+        "configuration",
+        "tools",
+        "project"
       ],
-      "created": "2026-01-21T23:17:45.375Z",
-      "updated": "2026-01-22T00:03:07.152Z",
+      "created": "2026-01-24T00:29:14.552Z",
+      "updated": "2026-01-24T00:29:14.552Z",
       "scope": "project",
-      "relativePath": "temporary/thought-20260121-231745372.md"
+      "relativePath": "permanent/learning-mcp-server-configuration-discovery-via-mcpjson.md"
     },
     {
-      "id": "thought-20260121-195531569",
-      "title": "Think: Dynamic Context Injection v1.2.0 - Exploration Phase",
-      "type": "breadcrumb",
+      "id": "gotcha-claude-code-does-not-share-availabletools-in-userpromptsubmit-hook-stdin",
+      "type": "gotcha",
+      "title": "Claude Code does not share available_tools in UserPromptSubmit hook stdin",
       "tags": [
-        "think",
-        "concluded"
+        "hooks",
+        "claude-code",
+        "stdin",
+        "tools",
+        "limitation",
+        "project"
       ],
-      "created": "2026-01-21T19:55:31.572Z",
-      "updated": "2026-01-21T19:56:47.923Z",
+      "created": "2026-01-24T00:29:20.201Z",
+      "updated": "2026-01-24T00:29:20.201Z",
       "scope": "project",
-      "relativePath": "temporary/thought-20260121-195531569.md"
+      "relativePath": "permanent/gotcha-claude-code-does-not-share-availabletools-in-userpromptsubmit-hook-stdin.md"
+    },
+    {
+      "id": "learning-retro-code-review-with-all-suggestions-addressed-before-merge-builds-confidence",
+      "type": "learning",
+      "title": "Retro - Code review with all suggestions addressed before merge builds confidence",
+      "tags": [
+        "retrospective",
+        "process",
+        "code-review",
+        "quality",
+        "project"
+      ],
+      "created": "2026-01-24T00:29:33.235Z",
+      "updated": "2026-01-24T00:29:33.235Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-code-review-with-all-suggestions-addressed-before-merge-builds-confidence.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-retro-reuse-existing-calculations-to-avoid-duplicate-work",
+      "type": "learning",
+      "title": "Retro - Reuse existing calculations to avoid duplicate work",
+      "tags": [
+        "retrospective",
+        "process",
+        "architecture",
+        "efficiency",
+        "project"
+      ],
+      "created": "2026-01-24T00:29:42.398Z",
+      "updated": "2026-01-24T00:29:42.398Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-reuse-existing-calculations-to-avoid-duplicate-work.md",
+      "severity": "medium"
+    },
+    {
+      "id": "artifact-enhanced-timestamp-hook-pattern",
+      "type": "artifact",
+      "title": "Enhanced timestamp hook with timezone and context caching",
+      "tags": [
+        "hooks",
+        "timestamp",
+        "context",
+        "pattern",
+        "bun",
+        "project",
+        "infrastructure",
+        "retrospective"
+      ],
+      "created": "2026-01-24T00:29:27.907Z",
+      "updated": "2026-01-24T00:33:25.704Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-enhanced-timestamp-hook-pattern.md"
+    },
+    {
+      "id": "gotcha-retro-hook-security-checks-may-flag-safe-patterns",
+      "type": "gotcha",
+      "title": "Retro - Hook security checks may flag safe patterns",
+      "tags": [
+        "retrospective",
+        "process",
+        "hooks",
+        "security-checking",
+        "project",
+        "infrastructure"
+      ],
+      "created": "2026-01-24T00:29:42.756Z",
+      "updated": "2026-01-24T00:33:32.242Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-hook-security-checks-may-flag-safe-patterns.md",
+      "severity": "low"
+    },
+    {
+      "id": "learning-retro-session-scoped-ephemeral-cache-prevents-multi-session-conflicts",
+      "type": "learning",
+      "title": "Retro - Session-scoped ephemeral cache prevents multi-session conflicts",
+      "tags": [
+        "retrospective",
+        "process",
+        "architecture",
+        "design-patterns",
+        "project",
+        "caching",
+        "infrastructure"
+      ],
+      "created": "2026-01-24T00:29:42.568Z",
+      "updated": "2026-01-24T00:33:34.083Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-session-scoped-ephemeral-cache-prevents-multi-session-conflicts.md",
+      "severity": "low"
+    },
+    {
+      "id": "artifact-memory-curation-session-20260124",
+      "type": "artifact",
+      "title": "Memory curation session: linking and quality audit (2026-01-24)",
+      "tags": [
+        "memory-system",
+        "graph-linking",
+        "quality-audit",
+        "curation",
+        "session-report",
+        "project"
+      ],
+      "created": "2026-01-24T00:33:56.984Z",
+      "updated": "2026-01-24T00:33:56.984Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-memory-curation-session-20260124.md"
+    },
+    {
+      "id": "learning-hooks-use-mtime-based-cache-lookup-for-context-usage",
+      "type": "learning",
+      "title": "Hooks use mtime-based cache lookup for context usage",
+      "tags": [
+        "hooks",
+        "context",
+        "caching",
+        "statusline",
+        "mtime",
+        "project"
+      ],
+      "created": "2026-01-24T00:45:05.400Z",
+      "updated": "2026-01-24T00:45:05.400Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-hooks-use-mtime-based-cache-lookup-for-context-usage.md"
     }
   ]
 }
