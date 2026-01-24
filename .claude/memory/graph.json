@@ -1252,14 +1252,72 @@
       "title": "Retro - Post-compact context restoration with multiple agents works well"
     },
     {
-      "id": "thought-20260121-231745372",
-      "type": "breadcrumb",
-      "title": "Think: Session Context Preservation Strategy - Capturing compacted sessions for prompt improvement"
+      "id": "learning-mcp-server-configuration-discovery-via-mcpjson",
+      "type": "learning"
     },
     {
-      "id": "thought-20260121-195531569",
-      "type": "breadcrumb",
-      "title": "Think: Dynamic Context Injection v1.2.0 - Exploration Phase"
+      "id": "gotcha-claude-code-does-not-share-availabletools-in-userpromptsubmit-hook-stdin",
+      "type": "gotcha"
+    },
+    {
+      "id": "artifact-enhanced-timestamp-hook-pattern",
+      "type": "artifact"
+    },
+    {
+      "id": "learning-retro-code-review-with-all-suggestions-addressed-before-merge-builds-confidence",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-reuse-existing-calculations-to-avoid-duplicate-work",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-session-scoped-ephemeral-cache-prevents-multi-session-conflicts",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-retro-hook-security-checks-may-flag-safe-patterns",
+      "type": "gotcha"
+    },
+    {
+      "id": "artifact-memory-curation-session-20260124",
+      "type": "artifact"
+    },
+    {
+      "id": "learning-use-claudecodesseport-for-session-specific-hook-caching",
+      "type": "learning"
+    },
+    {
+      "id": "learning-claude-code-hooks-dont-receive-sessionid-in-stdin",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-mtime-based-cache-file-lookup-causes-cross-session-pollution",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-plugin-scanner-implementation-location-mistake-breaks-pr-visibility",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-changelog-claims-features-not-yet-implemented-in-pr",
+      "type": "gotcha"
+    },
+    {
+      "id": "artifact-plugin-scanner-tdd-pattern",
+      "type": "artifact"
+    },
+    {
+      "id": "decision-v1.6.0-incomplete-release-scope",
+      "type": "decision"
+    },
+    {
+      "id": "decision-scanner-module-design-patterns-strategy-builder-template-method",
+      "type": "decision"
+    },
+    {
+      "id": "decision-session-scoped-caching-opportunity-for-plugin-scans",
+      "type": "decision"
     }
   ],
   "edges": [
@@ -2106,6 +2164,26 @@
     {
       "source": "learning-retro-cross-reference-working-implementations-for-faster-debugging",
       "target": "learning-retro-exploration-phase-dramatically-clarifies-fix-scope",
+      "label": "relates-to"
+    },
+    {
+      "source": "artifact-enhanced-timestamp-hook-pattern",
+      "target": "artifact-hook-auto-setup-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-retro-hook-security-checks-may-flag-safe-patterns",
+      "target": "artifact-enhanced-timestamp-hook-pattern",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-session-scoped-ephemeral-cache-prevents-multi-session-conflicts",
+      "target": "learning-retro-modular-context-builder-design-enabled-6-incremental-integrations-without-conflicts",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-session-restore-with-parallel-agents-improves-memory-graph-health-efficiently",
+      "target": "learning-session-restoration-with-parallel-agents-improves-memory-curation",
       "label": "relates-to"
     }
   ]

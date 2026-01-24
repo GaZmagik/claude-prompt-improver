@@ -35,6 +35,15 @@ import {
   gatherDynamicContext,
 } from '../integrations/dynamic-discovery.ts';
 import {
+  type ResourceContext,
+  formatResourcesXml,
+  gatherResourceContext,
+} from '../integrations/resource-formatter.ts';
+import {
+  scanEnhancePlugins,
+  scanMcpServers,
+} from '../integrations/plugin-scanner.ts';
+import {
   type AgentDefinition,
   type SuggestedAgent,
   formatAgentsContext,
@@ -100,11 +109,20 @@ export type ContextSource =
   | 'spec'
   | 'memory'
   | 'session'
-  | 'dynamicDiscovery';
+  | 'dynamicDiscovery'
+  | 'pluginResources';
 
 /**
  * Input for building context
  */
+/**
+ * Options for plugin resource discovery
+ */
+export interface PluginResourcesOptions {
+  readonly enabled?: boolean;
+  readonly cwd?: string;
+}
+
 export interface ContextBuilderInput {
   readonly prompt: string;
   readonly availableTools?: readonly string[];
@@ -116,6 +134,7 @@ export interface ContextBuilderInput {
   readonly memoryOptions?: MemoryPluginOptions;
   readonly sessionOptions?: SessionContextOptions;
   readonly dynamicDiscoveryOptions?: DynamicDiscoveryOptions;
+  readonly pluginResourcesOptions?: PluginResourcesOptions;
   readonly timeoutMs?: number;
 }
 
@@ -133,6 +152,7 @@ export interface BuiltContext {
   readonly memory?: MemoryContext;
   readonly session?: SessionContext;
   readonly dynamicDiscovery?: DynamicContext;
+  readonly pluginResources?: ResourceContext;
 }
 
 /**
@@ -148,6 +168,7 @@ export interface FormattedContext {
   readonly memory?: string;
   readonly session?: string;
   readonly dynamicDiscovery?: string;
+  readonly pluginResources?: string;
 }
 
 /**
@@ -165,6 +186,7 @@ export async function buildContext(input: ContextBuilderInput): Promise<BuiltCon
     memoryOptions,
     sessionOptions,
     dynamicDiscoveryOptions,
+    pluginResourcesOptions,
   } = input;
   const sources: ContextSource[] = [];
 
@@ -179,6 +201,7 @@ export async function buildContext(input: ContextBuilderInput): Promise<BuiltCon
     memory?: MemoryContext;
     session?: SessionContext;
     dynamicDiscovery?: DynamicContext;
+    pluginResources?: ResourceContext;
   } = {};
 
   // Gather synchronous context
@@ -193,6 +216,7 @@ export async function buildContext(input: ContextBuilderInput): Promise<BuiltCon
     memoryOptions,
     sessionOptions,
     dynamicDiscoveryOptions,
+    pluginResourcesOptions,
     sources,
     results
   );
@@ -256,6 +280,7 @@ function buildAsyncTasks(
   memoryOptions: MemoryPluginOptions | undefined,
   sessionOptions: SessionContextOptions | undefined,
   dynamicDiscoveryOptions: DynamicDiscoveryOptions | undefined,
+  pluginResourcesOptions: PluginResourcesOptions | undefined,
   sources: ContextSource[],
   results: {
     git?: GitContext;
@@ -264,6 +289,7 @@ function buildAsyncTasks(
     memory?: MemoryContext;
     session?: SessionContext;
     dynamicDiscovery?: DynamicContext;
+    pluginResources?: ResourceContext;
   }
 ): Promise<void>[] {
   const tasks: Promise<void>[] = [];
@@ -340,6 +366,34 @@ function buildAsyncTasks(
     );
   }
 
+  if (pluginResourcesOptions && pluginResourcesOptions.enabled !== false) {
+    tasks.push(
+      createAsyncTask(
+        async () => {
+          const cwd = pluginResourcesOptions.cwd || process.cwd();
+          const [plugins, mcpServers] = await Promise.all([
+            scanEnhancePlugins(),
+            scanMcpServers(),
+          ]);
+          const context = gatherResourceContext(
+            cwd,
+            plugins.map((p) => ({ name: p.name, version: p.version, description: p.description })),
+            mcpServers.map((s) => ({
+              name: s.name,
+              type: s.type,
+              ...(s.description !== undefined && { description: s.description }),
+            }))
+          );
+          return { success: true, context };
+        },
+        (ctx) => {
+          results.pluginResources = ctx;
+          sources.push('pluginResources');
+        }
+      )
+    );
+  }
+
   return tasks;
 }
 
@@ -364,6 +418,12 @@ export function formatContextForInjection(context: BuiltContext): FormattedConte
     'dynamicDiscovery',
     formatDynamicContext
   );
+  const pluginResources = formatField(
+    context.pluginResources,
+    sources,
+    'pluginResources',
+    formatResourcesXml
+  );
 
   // Build result with conditional property inclusion (exactOptionalPropertyTypes)
   return {
@@ -376,5 +436,6 @@ export function formatContextForInjection(context: BuiltContext): FormattedConte
     ...(memory !== undefined && { memory }),
     ...(session !== undefined && { session }),
     ...(dynamicDiscovery !== undefined && { dynamicDiscovery }),
+    ...(pluginResources !== undefined && { pluginResources }),
   };
 }

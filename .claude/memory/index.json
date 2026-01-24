@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-23T20:32:26.371Z",
+  "lastUpdated": "2026-01-24T12:17:37.428Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -4019,30 +4019,282 @@
       "relativePath": "permanent/learning-retro-post-compact-context-restoration-with-multiple-agents-works-well.md"
     },
     {
-      "id": "thought-20260121-231745372",
-      "title": "Think: Session Context Preservation Strategy - Capturing compacted sessions for prompt improvement",
-      "type": "breadcrumb",
+      "id": "learning-mcp-server-configuration-discovery-via-mcpjson",
+      "type": "learning",
+      "title": "MCP server configuration discovery via .mcp.json",
       "tags": [
-        "think",
-        "concluded"
+        "mcp",
+        "discovery",
+        "configuration",
+        "tools",
+        "project"
       ],
-      "created": "2026-01-21T23:17:45.375Z",
-      "updated": "2026-01-22T00:03:07.152Z",
+      "created": "2026-01-24T00:29:14.552Z",
+      "updated": "2026-01-24T00:29:14.552Z",
       "scope": "project",
-      "relativePath": "temporary/thought-20260121-231745372.md"
+      "relativePath": "permanent/learning-mcp-server-configuration-discovery-via-mcpjson.md"
     },
     {
-      "id": "thought-20260121-195531569",
-      "title": "Think: Dynamic Context Injection v1.2.0 - Exploration Phase",
-      "type": "breadcrumb",
+      "id": "gotcha-claude-code-does-not-share-availabletools-in-userpromptsubmit-hook-stdin",
+      "type": "gotcha",
+      "title": "Claude Code does not share available_tools in UserPromptSubmit hook stdin",
       "tags": [
-        "think",
-        "concluded"
+        "hooks",
+        "claude-code",
+        "stdin",
+        "tools",
+        "limitation",
+        "project"
       ],
-      "created": "2026-01-21T19:55:31.572Z",
-      "updated": "2026-01-21T19:56:47.923Z",
+      "created": "2026-01-24T00:29:20.201Z",
+      "updated": "2026-01-24T00:29:20.201Z",
       "scope": "project",
-      "relativePath": "temporary/thought-20260121-195531569.md"
+      "relativePath": "permanent/gotcha-claude-code-does-not-share-availabletools-in-userpromptsubmit-hook-stdin.md"
+    },
+    {
+      "id": "learning-retro-code-review-with-all-suggestions-addressed-before-merge-builds-confidence",
+      "type": "learning",
+      "title": "Retro - Code review with all suggestions addressed before merge builds confidence",
+      "tags": [
+        "retrospective",
+        "process",
+        "code-review",
+        "quality",
+        "project"
+      ],
+      "created": "2026-01-24T00:29:33.235Z",
+      "updated": "2026-01-24T00:29:33.235Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-code-review-with-all-suggestions-addressed-before-merge-builds-confidence.md",
+      "severity": "medium"
+    },
+    {
+      "id": "learning-retro-reuse-existing-calculations-to-avoid-duplicate-work",
+      "type": "learning",
+      "title": "Retro - Reuse existing calculations to avoid duplicate work",
+      "tags": [
+        "retrospective",
+        "process",
+        "architecture",
+        "efficiency",
+        "project"
+      ],
+      "created": "2026-01-24T00:29:42.398Z",
+      "updated": "2026-01-24T00:29:42.398Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-reuse-existing-calculations-to-avoid-duplicate-work.md",
+      "severity": "medium"
+    },
+    {
+      "id": "artifact-enhanced-timestamp-hook-pattern",
+      "type": "artifact",
+      "title": "Enhanced timestamp hook with timezone and context caching",
+      "tags": [
+        "hooks",
+        "timestamp",
+        "context",
+        "pattern",
+        "bun",
+        "project",
+        "infrastructure",
+        "retrospective"
+      ],
+      "created": "2026-01-24T00:29:27.907Z",
+      "updated": "2026-01-24T00:33:25.704Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-enhanced-timestamp-hook-pattern.md"
+    },
+    {
+      "id": "gotcha-retro-hook-security-checks-may-flag-safe-patterns",
+      "type": "gotcha",
+      "title": "Retro - Hook security checks may flag safe patterns",
+      "tags": [
+        "retrospective",
+        "process",
+        "hooks",
+        "security-checking",
+        "project",
+        "infrastructure"
+      ],
+      "created": "2026-01-24T00:29:42.756Z",
+      "updated": "2026-01-24T00:33:32.242Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-hook-security-checks-may-flag-safe-patterns.md",
+      "severity": "low"
+    },
+    {
+      "id": "learning-retro-session-scoped-ephemeral-cache-prevents-multi-session-conflicts",
+      "type": "learning",
+      "title": "Retro - Session-scoped ephemeral cache prevents multi-session conflicts",
+      "tags": [
+        "retrospective",
+        "process",
+        "architecture",
+        "design-patterns",
+        "project",
+        "caching",
+        "infrastructure"
+      ],
+      "created": "2026-01-24T00:29:42.568Z",
+      "updated": "2026-01-24T00:33:34.083Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-session-scoped-ephemeral-cache-prevents-multi-session-conflicts.md",
+      "severity": "low"
+    },
+    {
+      "id": "artifact-memory-curation-session-20260124",
+      "type": "artifact",
+      "title": "Memory curation session: linking and quality audit (2026-01-24)",
+      "tags": [
+        "memory-system",
+        "graph-linking",
+        "quality-audit",
+        "curation",
+        "session-report",
+        "project"
+      ],
+      "created": "2026-01-24T00:33:56.984Z",
+      "updated": "2026-01-24T00:33:56.984Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-memory-curation-session-20260124.md"
+    },
+    {
+      "id": "learning-claude-code-hooks-dont-receive-sessionid-in-stdin",
+      "type": "learning",
+      "title": "Claude Code hooks don't receive session_id in stdin",
+      "tags": [
+        "hooks",
+        "session-identification",
+        "claude-code",
+        "project"
+      ],
+      "created": "2026-01-24T10:07:11.398Z",
+      "updated": "2026-01-24T10:07:11.398Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-claude-code-hooks-dont-receive-sessionid-in-stdin.md"
+    },
+    {
+      "id": "gotcha-mtime-based-cache-file-lookup-causes-cross-session-pollution",
+      "type": "gotcha",
+      "title": "Mtime-based cache file lookup causes cross-session pollution",
+      "tags": [
+        "caching",
+        "concurrency",
+        "session-isolation",
+        "project"
+      ],
+      "created": "2026-01-24T10:07:14.732Z",
+      "updated": "2026-01-24T10:07:14.732Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-mtime-based-cache-file-lookup-causes-cross-session-pollution.md"
+    },
+    {
+      "id": "learning-use-claudecodesseport-for-session-specific-hook-caching",
+      "type": "learning",
+      "title": "Use CLAUDE_CODE_SSE_PORT for session-specific hook caching",
+      "tags": [
+        "hooks",
+        "caching",
+        "session-isolation",
+        "project"
+      ],
+      "created": "2026-01-24T10:07:18.999Z",
+      "updated": "2026-01-24T10:07:18.999Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-use-claudecodesseport-for-session-specific-hook-caching.md"
+    },
+    {
+      "id": "learning-plugin-scanner-implementation-location-mistake-breaks-pr-visibility",
+      "type": "learning",
+      "title": "Plugin scanner implementation location mistake breaks PR visibility",
+      "tags": [
+        "hooks",
+        "project-structure",
+        "pr-process",
+        "project"
+      ],
+      "created": "2026-01-24T11:13:58.405Z",
+      "updated": "2026-01-24T11:13:58.405Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-plugin-scanner-implementation-location-mistake-breaks-pr-visibility.md"
+    },
+    {
+      "id": "gotcha-changelog-claims-features-not-yet-implemented-in-pr",
+      "type": "gotcha",
+      "title": "CHANGELOG claims features not yet implemented in PR",
+      "tags": [
+        "changelog",
+        "pr-completeness",
+        "documentation",
+        "project"
+      ],
+      "created": "2026-01-24T11:14:02.441Z",
+      "updated": "2026-01-24T11:14:02.441Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-changelog-claims-features-not-yet-implemented-in-pr.md"
+    },
+    {
+      "id": "artifact-plugin-scanner-tdd-pattern",
+      "type": "artifact",
+      "title": "Plugin scanner TDD pattern - separate concerns for testing",
+      "tags": [
+        "tdd",
+        "testing",
+        "module-design",
+        "plugin-architecture",
+        "project"
+      ],
+      "created": "2026-01-24T11:14:08.754Z",
+      "updated": "2026-01-24T11:14:08.754Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-plugin-scanner-tdd-pattern.md"
+    },
+    {
+      "id": "decision-v1.6.0-incomplete-release-scope",
+      "type": "decision",
+      "title": "v1.6.0 released with partial implementation - plugin-scanner only",
+      "tags": [
+        "versioning",
+        "release-scope",
+        "incomplete-features",
+        "project"
+      ],
+      "created": "2026-01-24T11:14:12.549Z",
+      "updated": "2026-01-24T11:14:12.549Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-v1.6.0-incomplete-release-scope.md"
+    },
+    {
+      "id": "decision-scanner-module-design-patterns-strategy-builder-template-method",
+      "type": "decision",
+      "title": "Scanner module design patterns - Strategy, Builder, Template Method",
+      "tags": [
+        "design-patterns",
+        "architecture",
+        "extensibility",
+        "plugin-scanner",
+        "project"
+      ],
+      "created": "2026-01-24T12:17:11.159Z",
+      "updated": "2026-01-24T12:17:11.159Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-scanner-module-design-patterns-strategy-builder-template-method.md"
+    },
+    {
+      "id": "decision-session-scoped-caching-opportunity-for-plugin-scans",
+      "type": "decision",
+      "title": "Session-scoped caching opportunity for plugin scans",
+      "tags": [
+        "performance",
+        "caching",
+        "plugin-scanner",
+        "future-enhancement",
+        "project"
+      ],
+      "created": "2026-01-24T12:17:37.422Z",
+      "updated": "2026-01-24T12:17:37.422Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-session-scoped-caching-opportunity-for-plugin-scans.md"
     }
   ]
 }

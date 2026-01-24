@@ -8,6 +8,7 @@ import { parseFrontmatter } from './spec-awareness.ts';
 import { matchItemsByKeywords, type ItemMatchResult } from '../utils/keyword-matcher.ts';
 import { scanDirectory, type DirectoryScannerOptions } from '../utils/directory-scanner.ts';
 import { readFileSyncSafe } from '../utils/file-reader.ts';
+import { detectDeliberationKeywords } from './plugin-scanner.ts';
 
 /** Maximum number of suggestions to show */
 export const MAX_SUGGESTIONS = 5;
@@ -627,6 +628,14 @@ export function isMemoryThinkPrompt(prompt: string): boolean {
 }
 
 /**
+ * Detects if a prompt suggests deliberation context
+ * Returns true if the prompt contains memory think commands OR deliberation keywords
+ */
+export function isDeliberationContext(prompt: string): boolean {
+  return isMemoryThinkPrompt(prompt) || detectDeliberationKeywords(prompt);
+}
+
+/**
  * Gathers dynamic context from all sources
  */
 export async function gatherDynamicContext(
@@ -671,7 +680,7 @@ export async function gatherDynamicContext(
       matchedCommands,
       matchedSkills,
       matchedOutputStyles,
-      isMemoryThinkContext: isMemoryThinkPrompt(prompt),
+      isMemoryThinkContext: isDeliberationContext(prompt),
       totalAgents: allAgents.length,
       totalCommands: allCommands.length,
       totalSkills: allSkills.length,
