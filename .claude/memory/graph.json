@@ -1294,6 +1294,22 @@
     {
       "id": "gotcha-mtime-based-cache-file-lookup-causes-cross-session-pollution",
       "type": "gotcha"
+    },
+    {
+      "id": "learning-plugin-scanner-implementation-location-mistake-breaks-pr-visibility",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-changelog-claims-features-not-yet-implemented-in-pr",
+      "type": "gotcha"
+    },
+    {
+      "id": "artifact-plugin-scanner-tdd-pattern",
+      "type": "artifact"
+    },
+    {
+      "id": "decision-v1.6.0-incomplete-release-scope",
+      "type": "decision"
     }
   ],
   "edges": [

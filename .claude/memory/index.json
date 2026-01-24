@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-24T10:07:19.004Z",
+  "lastUpdated": "2026-01-24T11:14:12.554Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -4202,6 +4202,67 @@
       "updated": "2026-01-24T10:07:18.999Z",
       "scope": "project",
       "relativePath": "permanent/learning-use-claudecodesseport-for-session-specific-hook-caching.md"
+    },
+    {
+      "id": "learning-plugin-scanner-implementation-location-mistake-breaks-pr-visibility",
+      "type": "learning",
+      "title": "Plugin scanner implementation location mistake breaks PR visibility",
+      "tags": [
+        "hooks",
+        "project-structure",
+        "pr-process",
+        "project"
+      ],
+      "created": "2026-01-24T11:13:58.405Z",
+      "updated": "2026-01-24T11:13:58.405Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-plugin-scanner-implementation-location-mistake-breaks-pr-visibility.md"
+    },
+    {
+      "id": "gotcha-changelog-claims-features-not-yet-implemented-in-pr",
+      "type": "gotcha",
+      "title": "CHANGELOG claims features not yet implemented in PR",
+      "tags": [
+        "changelog",
+        "pr-completeness",
+        "documentation",
+        "project"
+      ],
+      "created": "2026-01-24T11:14:02.441Z",
+      "updated": "2026-01-24T11:14:02.441Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-changelog-claims-features-not-yet-implemented-in-pr.md"
+    },
+    {
+      "id": "artifact-plugin-scanner-tdd-pattern",
+      "type": "artifact",
+      "title": "Plugin scanner TDD pattern - separate concerns for testing",
+      "tags": [
+        "tdd",
+        "testing",
+        "module-design",
+        "plugin-architecture",
+        "project"
+      ],
+      "created": "2026-01-24T11:14:08.754Z",
+      "updated": "2026-01-24T11:14:08.754Z",
+      "scope": "project",
+      "relativePath": "permanent/artifact-plugin-scanner-tdd-pattern.md"
+    },
+    {
+      "id": "decision-v1.6.0-incomplete-release-scope",
+      "type": "decision",
+      "title": "v1.6.0 released with partial implementation - plugin-scanner only",
+      "tags": [
+        "versioning",
+        "release-scope",
+        "incomplete-features",
+        "project"
+      ],
+      "created": "2026-01-24T11:14:12.549Z",
+      "updated": "2026-01-24T11:14:12.549Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-v1.6.0-incomplete-release-scope.md"
     }
   ]
 }

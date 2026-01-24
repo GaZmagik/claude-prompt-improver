@@ -114,7 +114,9 @@ function getLatestVersionDir(pluginPath: string): string | null {
     }
     return 0;
   });
-  return join(pluginPath, versions[0]);
+  const latestVersion = versions[0];
+  if (!latestVersion) return null;
+  return join(pluginPath, latestVersion);
 }
 
 function scanPluginSkills(pluginPath: string, pluginName: string): SkillInfo[] {

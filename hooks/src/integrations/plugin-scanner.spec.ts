@@ -7,8 +7,6 @@ import {
   suggestMemoryThink,
   scanEnhancePlugins,
   scanMcpServers,
-  type PluginInfo,
-  type McpServerInfo,
 } from './plugin-scanner.ts';
 
 describe('plugin-scanner', () => {

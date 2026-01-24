@@ -13,6 +13,8 @@ import {
   formatOutputStyleSuggestions,
   gatherDynamicContext,
   formatDynamicContext,
+  isDeliberationContext,
+  isMemoryThinkPrompt,
   type DiscoveredItem,
   type DynamicDiscoveryOptions,
   type DynamicContext,
@@ -943,5 +945,26 @@ describe('formatDynamicContext with memory think', () => {
     expect(formatted).toContain('--agent');
     expect(formatted).toContain('--style');
     expect(formatted).toContain('api-expert');
+  });
+});
+
+describe('isDeliberationContext', () => {
+  it('returns true for memory think commands', () => {
+    expect(isDeliberationContext('memory think create "Topic"')).toBe(true);
+  });
+
+  it('returns true for deliberation keywords', () => {
+    expect(isDeliberationContext('help me weigh my options')).toBe(true);
+    expect(isDeliberationContext('what are the pros and cons')).toBe(true);
+  });
+
+  it('returns false for non-deliberation prompts', () => {
+    expect(isDeliberationContext('add a button')).toBe(false);
+    expect(isDeliberationContext('fix the bug')).toBe(false);
+  });
+
+  it('detects isMemoryThinkPrompt correctly', () => {
+    expect(isMemoryThinkPrompt('memory think add "thought"')).toBe(true);
+    expect(isMemoryThinkPrompt('brainstorm ideas')).toBe(false);
   });
 });

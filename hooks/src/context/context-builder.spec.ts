@@ -307,5 +307,77 @@ describe('Context Builder', () => {
       expect(result.skills).toBeDefined();
       expect(result.agents).toBeDefined();
     });
+
+    it('should format pluginResources context as XML', () => {
+      const context: BuiltContext = {
+        sources: ['pluginResources'],
+        pluginResources: {
+          language: 'typescript',
+          speckitStatus: { hasSpec: true, hasPlan: true, hasTasks: false },
+          plugins: [{ name: 'test-plugin', version: '1.0.0', description: 'Test' }],
+          mcpServers: [{ name: 'context7', type: 'sse' }],
+        },
+      };
+
+      const result = formatContextForInjection(context);
+
+      expect(result.pluginResources).toBeDefined();
+      expect(result.pluginResources).toContain('<project-context>');
+      expect(result.pluginResources).toContain('<language>typescript</language>');
+      expect(result.pluginResources).toContain('spec="true"');
+    });
+  });
+
+  describe('buildContext - plugin resources integration', () => {
+    it('should include pluginResources source when options enabled', async () => {
+      const input: ContextBuilderInput = {
+        prompt: 'test prompt',
+        pluginResourcesOptions: { enabled: true },
+      };
+
+      const result = await buildContext(input);
+
+      // Should attempt to gather plugin resources (may be empty if no plugins installed)
+      expect(result.sources).toContain('pluginResources');
+    });
+
+    it('should skip pluginResources when explicitly disabled', async () => {
+      const input: ContextBuilderInput = {
+        prompt: 'test prompt',
+        pluginResourcesOptions: { enabled: false },
+      };
+
+      const result = await buildContext(input);
+
+      expect(result.sources).not.toContain('pluginResources');
+    });
+
+    it('should include language detection in pluginResources', async () => {
+      // Use parent directory which has tsconfig.json
+      const parentDir = process.cwd().replace(/\/hooks$/, '');
+      const input: ContextBuilderInput = {
+        prompt: 'test prompt',
+        pluginResourcesOptions: { enabled: true, cwd: parentDir },
+      };
+
+      const result = await buildContext(input);
+
+      // Parent project has tsconfig.json so should detect typescript
+      expect(result.pluginResources?.language).toBe('typescript');
+    });
+
+    it('should include speckit status in pluginResources', async () => {
+      // Use parent directory which has .specify/ folder
+      const parentDir = process.cwd().replace(/\/hooks$/, '');
+      const input: ContextBuilderInput = {
+        prompt: 'test prompt',
+        pluginResourcesOptions: { enabled: true, cwd: parentDir },
+      };
+
+      const result = await buildContext(input);
+
+      expect(result.pluginResources?.speckitStatus).toBeDefined();
+      expect(typeof result.pluginResources?.speckitStatus.hasSpec).toBe('boolean');
+    });
   });
 });
