@@ -14,7 +14,7 @@ import type {
 } from '../src/core/types.ts';
 import { detectBypass, type BypassCheckInput } from '../src/core/bypass-detector.ts';
 import { improvePrompt, type ImprovementContext } from '../src/services/improver.ts';
-import { buildContext, formatContextForInjection } from '../src/context/context-builder.ts';
+import { buildContext, formatContextForInjection, type ContextBuilderInput, type FormattedContext } from '../src/context/context-builder.ts';
 import type { SkillRule } from '../src/context/skill-matcher.ts';
 import type { AgentDefinition } from '../src/context/agent-suggester.ts';
 import { ensureConfigSetup, loadConfigFromStandardPaths } from '../src/core/config-loader.ts';
@@ -261,8 +261,67 @@ interface BuildImprovementContextOptions {
 }
 
 /**
+ * Builds integration options for context builder based on enabled toggles
+ */
+function buildIntegrationOptions(
+  integrations: IntegrationToggles,
+  cwd?: string
+): Partial<ContextBuilderInput> {
+  const cwdOption = cwd ? { cwd } : {};
+  return {
+    ...(integrations.git && { gitOptions: { enabled: true, ...cwdOption } }),
+    ...(integrations.lsp && { lspOptions: { enabled: true } }),
+    ...(integrations.spec && { specOptions: { enabled: true, ...cwdOption } }),
+    ...(integrations.memory && { memoryOptions: { enabled: true } }),
+    ...(integrations.session && { sessionOptions: { enabled: true } }),
+    ...(integrations.dynamicDiscovery && { dynamicDiscoveryOptions: { enabled: true, ...cwdOption } }),
+    ...(integrations.pluginResources && { pluginResourcesOptions: { enabled: true, ...cwdOption } }),
+  };
+}
+
+/**
+ * Maps formatted context to improvement context, excluding undefined fields
+ */
+function mapFormattedToImprovement(formatted: FormattedContext): ImprovementContext {
+  return {
+    ...(formatted.tools && { tools: formatted.tools }),
+    ...(formatted.skills && { skills: formatted.skills }),
+    ...(formatted.agents && { agents: formatted.agents }),
+    ...(formatted.git && { git: formatted.git }),
+    ...(formatted.lsp && { lsp: formatted.lsp }),
+    ...(formatted.spec && { spec: formatted.spec }),
+    ...(formatted.memory && { memory: formatted.memory }),
+    ...(formatted.session && { session: formatted.session }),
+    ...(formatted.dynamicDiscovery && { dynamicDiscovery: formatted.dynamicDiscovery }),
+    ...(formatted.pluginResources && { pluginResources: formatted.pluginResources }),
+  };
+}
+
+/**
+ * Checks if any integration is enabled
+ */
+function hasEnabledIntegrations(integrations?: IntegrationToggles): boolean {
+  if (!integrations) return false;
+  return !!(
+    integrations.git || integrations.lsp || integrations.spec ||
+    integrations.memory || integrations.session || integrations.dynamicDiscovery ||
+    integrations.pluginResources
+  );
+}
+
+/**
+ * Checks if formatted context has any content
+ */
+function hasFormattedContent(ctx: FormattedContext): boolean {
+  return !!(
+    ctx.tools || ctx.skills || ctx.agents || ctx.git || ctx.lsp ||
+    ctx.spec || ctx.memory || ctx.session || ctx.dynamicDiscovery || ctx.pluginResources
+  );
+}
+
+/**
  * Builds improvement context from available sources
- * Wires up all integration services (git, lsp, spec, memory, session)
+ * Wires up all integration services (git, lsp, spec, memory, session, dynamicDiscovery, pluginResources)
  */
 async function buildImprovementContext(
   options: BuildImprovementContextOptions
@@ -270,115 +329,28 @@ async function buildImprovementContext(
   const { prompt, availableTools, skillRules, agentDefinitions, integrations, cwd } = options;
 
   // Check if we have any context sources to gather
-  const hasToolContext = availableTools || skillRules || agentDefinitions;
-  const hasIntegrations = integrations && (
-    integrations.git || integrations.lsp || integrations.spec ||
-    integrations.memory || integrations.session || integrations.dynamicDiscovery ||
-    integrations.pluginResources
-  );
-
-  if (!hasToolContext && !hasIntegrations) {
+  const hasToolContext = !!(availableTools || skillRules || agentDefinitions);
+  if (!hasToolContext && !hasEnabledIntegrations(integrations)) {
     return undefined;
   }
 
-  // Build context input with all sources
-  const contextInput: Parameters<typeof buildContext>[0] = { prompt };
-
-  // Add tool/skill/agent context
-  if (availableTools) {
-    (contextInput as { availableTools?: readonly string[] }).availableTools = availableTools;
-  }
-  if (skillRules) {
-    (contextInput as { skillRules?: SkillRule[] }).skillRules = skillRules;
-  }
-  if (agentDefinitions) {
-    (contextInput as { agentDefinitions?: AgentDefinition[] }).agentDefinitions = agentDefinitions;
-  }
-
-  // Add integration context options based on config toggles
-  if (integrations) {
-    if (integrations.git) {
-      (contextInput as { gitOptions?: { enabled: boolean; cwd?: string } }).gitOptions = {
-        enabled: true,
-        ...(cwd && { cwd }),
-      };
-    }
-    if (integrations.lsp) {
-      (contextInput as { lspOptions?: { enabled: boolean } }).lspOptions = { enabled: true };
-    }
-    if (integrations.spec) {
-      (contextInput as { specOptions?: { enabled: boolean; cwd?: string } }).specOptions = {
-        enabled: true,
-        ...(cwd && { cwd }),
-      };
-    }
-    if (integrations.memory) {
-      (contextInput as { memoryOptions?: { enabled: boolean } }).memoryOptions = { enabled: true };
-    }
-    if (integrations.session) {
-      (contextInput as { sessionOptions?: { enabled: boolean } }).sessionOptions = { enabled: true };
-    }
-    if (integrations.dynamicDiscovery) {
-      (contextInput as { dynamicDiscoveryOptions?: { enabled: boolean; cwd?: string } }).dynamicDiscoveryOptions = {
-        enabled: true,
-        ...(cwd && { cwd }),
-      };
-    }
-    if (integrations.pluginResources) {
-      (contextInput as { pluginResourcesOptions?: { enabled: boolean; cwd?: string } }).pluginResourcesOptions = {
-        enabled: true,
-        ...(cwd && { cwd }),
-      };
-    }
-  }
+  // Build context input using proper typing
+  const contextInput: ContextBuilderInput = {
+    prompt,
+    ...(availableTools && { availableTools }),
+    ...(skillRules && { skillRules }),
+    ...(agentDefinitions && { agentDefinitions }),
+    ...(integrations && buildIntegrationOptions(integrations, cwd)),
+  };
 
   const builtContext = await buildContext(contextInput);
   const formattedContext = formatContextForInjection(builtContext);
 
-  // Check if we have any context
-  const hasAnyContext = formattedContext.tools || formattedContext.skills || formattedContext.agents ||
-    formattedContext.git || formattedContext.lsp || formattedContext.spec ||
-    formattedContext.memory || formattedContext.session || formattedContext.dynamicDiscovery ||
-    formattedContext.pluginResources;
-
-  if (!hasAnyContext) {
+  if (!hasFormattedContent(formattedContext)) {
     return undefined;
   }
 
-  // Build improvement context with all available fields
-  const improvementContext: ImprovementContext = {};
-  if (formattedContext.tools) {
-    (improvementContext as { tools?: string }).tools = formattedContext.tools;
-  }
-  if (formattedContext.skills) {
-    (improvementContext as { skills?: string }).skills = formattedContext.skills;
-  }
-  if (formattedContext.agents) {
-    (improvementContext as { agents?: string }).agents = formattedContext.agents;
-  }
-  if (formattedContext.git) {
-    (improvementContext as { git?: string }).git = formattedContext.git;
-  }
-  if (formattedContext.lsp) {
-    (improvementContext as { lsp?: string }).lsp = formattedContext.lsp;
-  }
-  if (formattedContext.spec) {
-    (improvementContext as { spec?: string }).spec = formattedContext.spec;
-  }
-  if (formattedContext.memory) {
-    (improvementContext as { memory?: string }).memory = formattedContext.memory;
-  }
-  if (formattedContext.session) {
-    (improvementContext as { session?: string }).session = formattedContext.session;
-  }
-  if (formattedContext.dynamicDiscovery) {
-    (improvementContext as { dynamicDiscovery?: string }).dynamicDiscovery = formattedContext.dynamicDiscovery;
-  }
-  if (formattedContext.pluginResources) {
-    (improvementContext as { pluginResources?: string }).pluginResources = formattedContext.pluginResources;
-  }
-
-  return improvementContext;
+  return mapFormattedToImprovement(formattedContext);
 }
 
 /**
