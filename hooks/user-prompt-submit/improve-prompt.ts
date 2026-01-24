@@ -273,7 +273,8 @@ async function buildImprovementContext(
   const hasToolContext = availableTools || skillRules || agentDefinitions;
   const hasIntegrations = integrations && (
     integrations.git || integrations.lsp || integrations.spec ||
-    integrations.memory || integrations.session
+    integrations.memory || integrations.session || integrations.dynamicDiscovery ||
+    integrations.pluginResources
   );
 
   if (!hasToolContext && !hasIntegrations) {
@@ -323,6 +324,12 @@ async function buildImprovementContext(
         ...(cwd && { cwd }),
       };
     }
+    if (integrations.pluginResources) {
+      (contextInput as { pluginResourcesOptions?: { enabled: boolean; cwd?: string } }).pluginResourcesOptions = {
+        enabled: true,
+        ...(cwd && { cwd }),
+      };
+    }
   }
 
   const builtContext = await buildContext(contextInput);
@@ -331,7 +338,8 @@ async function buildImprovementContext(
   // Check if we have any context
   const hasAnyContext = formattedContext.tools || formattedContext.skills || formattedContext.agents ||
     formattedContext.git || formattedContext.lsp || formattedContext.spec ||
-    formattedContext.memory || formattedContext.session || formattedContext.dynamicDiscovery;
+    formattedContext.memory || formattedContext.session || formattedContext.dynamicDiscovery ||
+    formattedContext.pluginResources;
 
   if (!hasAnyContext) {
     return undefined;
@@ -365,6 +373,9 @@ async function buildImprovementContext(
   }
   if (formattedContext.dynamicDiscovery) {
     (improvementContext as { dynamicDiscovery?: string }).dynamicDiscovery = formattedContext.dynamicDiscovery;
+  }
+  if (formattedContext.pluginResources) {
+    (improvementContext as { pluginResources?: string }).pluginResources = formattedContext.pluginResources;
   }
 
   return improvementContext;

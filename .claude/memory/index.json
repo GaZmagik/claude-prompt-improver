@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-24T12:17:37.428Z",
+  "lastUpdated": "2026-01-24T14:01:35.676Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -3581,23 +3581,6 @@
       "severity": "medium"
     },
     {
-      "id": "gotcha-retro-stubbed-implementations-masquerade-as-completed-features",
-      "type": "gotcha",
-      "title": "Retro - Stubbed implementations masquerade as completed features",
-      "tags": [
-        "retrospective",
-        "process",
-        "quality",
-        "implementation",
-        "project"
-      ],
-      "created": "2026-01-23T20:29:43.401Z",
-      "updated": "2026-01-23T20:29:43.401Z",
-      "scope": "project",
-      "relativePath": "permanent/gotcha-retro-stubbed-implementations-masquerade-as-completed-features.md",
-      "severity": "high"
-    },
-    {
       "id": "learning-dynamic-discovery-partial-formatting-bug",
       "type": "learning",
       "title": "dynamic-discovery-partial-formatting-bug",
@@ -4219,21 +4202,6 @@
       "relativePath": "permanent/learning-plugin-scanner-implementation-location-mistake-breaks-pr-visibility.md"
     },
     {
-      "id": "gotcha-changelog-claims-features-not-yet-implemented-in-pr",
-      "type": "gotcha",
-      "title": "CHANGELOG claims features not yet implemented in PR",
-      "tags": [
-        "changelog",
-        "pr-completeness",
-        "documentation",
-        "project"
-      ],
-      "created": "2026-01-24T11:14:02.441Z",
-      "updated": "2026-01-24T11:14:02.441Z",
-      "scope": "project",
-      "relativePath": "permanent/gotcha-changelog-claims-features-not-yet-implemented-in-pr.md"
-    },
-    {
       "id": "artifact-plugin-scanner-tdd-pattern",
       "type": "artifact",
       "title": "Plugin scanner TDD pattern - separate concerns for testing",
@@ -4295,6 +4263,182 @@
       "updated": "2026-01-24T12:17:37.422Z",
       "scope": "project",
       "relativePath": "permanent/decision-session-scoped-caching-opportunity-for-plugin-scans.md"
+    },
+    {
+      "id": "gotcha-v160-pluginresources-feature-incomplete-wiring-gap-investigation",
+      "type": "gotcha",
+      "title": "v1.6.0 pluginResources feature incomplete - wiring gap investigation",
+      "tags": [
+        "promoted-from-think",
+        "project"
+      ],
+      "created": "2026-01-24T13:44:44.089Z",
+      "updated": "2026-01-24T13:44:44.089Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-v160-pluginresources-feature-incomplete-wiring-gap-investigation.md"
+    },
+    {
+      "id": "learning-retro-multi-agent-deliberation-reveals-architectural-issues-unit-analysis-misses",
+      "type": "learning",
+      "title": "Retro - Multi-agent deliberation reveals architectural issues unit analysis misses",
+      "tags": [
+        "retrospective",
+        "process",
+        "multi-agent-analysis",
+        "architecture",
+        "project"
+      ],
+      "created": "2026-01-24T13:50:35.830Z",
+      "updated": "2026-01-24T13:50:35.830Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-multi-agent-deliberation-reveals-architectural-issues-unit-analysis-misses.md",
+      "severity": "high"
+    },
+    {
+      "id": "decision-pluginresources-feature-incomplete-until-wiring-to-improve-promptts",
+      "type": "decision",
+      "title": "pluginResources feature incomplete until wiring to improve-prompt.ts",
+      "tags": [
+        "v1.6.0",
+        "wiring-gap",
+        "integration-bug",
+        "incomplete-feature",
+        "project"
+      ],
+      "created": "2026-01-24T13:50:39.405Z",
+      "updated": "2026-01-24T13:50:39.405Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-pluginresources-feature-incomplete-until-wiring-to-improve-promptts.md"
+    },
+    {
+      "id": "gotcha-retro-integration-test-parity-critical-for-orchestration-features",
+      "type": "gotcha",
+      "title": "Retro - Integration test parity critical for orchestration features",
+      "tags": [
+        "retrospective",
+        "process",
+        "testing",
+        "quality-gates",
+        "project"
+      ],
+      "created": "2026-01-24T13:50:44.180Z",
+      "updated": "2026-01-24T13:50:44.180Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-integration-test-parity-critical-for-orchestration-features.md",
+      "severity": "high"
+    },
+    {
+      "id": "decision-modular-features-need-orchestration-glue-to-work-end-to-end",
+      "type": "decision",
+      "title": "Modular features need orchestration glue to work end-to-end",
+      "tags": [
+        "integration-testing",
+        "modular-architecture",
+        "wiring-gap",
+        "feature-development",
+        "project"
+      ],
+      "created": "2026-01-24T13:50:45.142Z",
+      "updated": "2026-01-24T13:50:45.142Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-modular-features-need-orchestration-glue-to-work-end-to-end.md"
+    },
+    {
+      "id": "decision-changelog-test-count-should-reflect-actual-new-tests-not-total-tests-in-modified-files",
+      "type": "decision",
+      "title": "CHANGELOG test count should reflect actual new tests, not total tests in modified files",
+      "tags": [
+        "changelog",
+        "test-counting",
+        "release-process",
+        "accuracy",
+        "project"
+      ],
+      "created": "2026-01-24T13:50:50.234Z",
+      "updated": "2026-01-24T13:50:50.234Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-changelog-test-count-should-reflect-actual-new-tests-not-total-tests-in-modified-files.md"
+    },
+    {
+      "id": "learning-retro-end-to-end-feature-validation-catches-issues-tests-miss",
+      "type": "learning",
+      "title": "Retro - End-to-end feature validation catches issues tests miss",
+      "tags": [
+        "retrospective",
+        "process",
+        "validation",
+        "user-experience",
+        "project"
+      ],
+      "created": "2026-01-24T13:50:51.708Z",
+      "updated": "2026-01-24T13:50:51.708Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-end-to-end-feature-validation-catches-issues-tests-miss.md",
+      "severity": "high"
+    },
+    {
+      "id": "decision-memory-plugin-output-styles-discovery-uses-processcwd-instead-of-plugin-install-path",
+      "type": "decision",
+      "title": "Memory plugin output-styles discovery uses process.cwd() instead of plugin install path",
+      "tags": [
+        "memory-plugin",
+        "discovery-bug",
+        "plugin-systems",
+        "project"
+      ],
+      "created": "2026-01-24T13:50:56.153Z",
+      "updated": "2026-01-24T13:50:56.153Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-memory-plugin-output-styles-discovery-uses-processcwd-instead-of-plugin-install-path.md"
+    },
+    {
+      "id": "decision-multi-agent-deliberation-pattern-for-wiring-gap-investigation",
+      "type": "decision",
+      "title": "Multi-agent deliberation pattern for wiring gap investigation",
+      "tags": [
+        "deliberation-pattern",
+        "multi-agent-investigation",
+        "problem-solving",
+        "project"
+      ],
+      "created": "2026-01-24T13:51:02.853Z",
+      "updated": "2026-01-24T13:51:02.853Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-multi-agent-deliberation-pattern-for-wiring-gap-investigation.md"
+    },
+    {
+      "id": "gotcha-changelog-claims-features-not-yet-implemented-in-pr",
+      "type": "gotcha",
+      "title": "CHANGELOG claims features not yet implemented in PR",
+      "tags": [
+        "changelog",
+        "pr-completeness",
+        "documentation",
+        "project",
+        "resolved"
+      ],
+      "created": "2026-01-24T11:14:02.441Z",
+      "updated": "2026-01-24T14:01:33.855Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-changelog-claims-features-not-yet-implemented-in-pr.md"
+    },
+    {
+      "id": "gotcha-retro-stubbed-implementations-masquerade-as-completed-features",
+      "type": "gotcha",
+      "title": "Retro - Stubbed implementations masquerade as completed features",
+      "tags": [
+        "retrospective",
+        "process",
+        "quality",
+        "implementation",
+        "project",
+        "resolved"
+      ],
+      "created": "2026-01-23T20:29:43.401Z",
+      "updated": "2026-01-24T14:01:35.671Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-retro-stubbed-implementations-masquerade-as-completed-features.md",
+      "severity": "high"
     }
   ]
 }

@@ -28,6 +28,7 @@ const mockConfig: Configuration = {
     memory: false,
     session: false,
     dynamicDiscovery: false,
+    pluginResources: false,
   },
   logging: {
     enabled: false,

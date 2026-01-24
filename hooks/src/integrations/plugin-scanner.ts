@@ -27,6 +27,11 @@ export interface CommandInfo {
   description: string;
 }
 
+export interface OutputStyleInfo {
+  name: string;
+  description: string;
+}
+
 export interface PluginInfo {
   name: string;
   version: string;
@@ -34,6 +39,7 @@ export interface PluginInfo {
   skills: SkillInfo[];
   agents: AgentInfo[];
   commands: CommandInfo[];
+  outputStyles: OutputStyleInfo[];
 }
 
 export interface McpServerInfo {
@@ -94,6 +100,67 @@ function parseFrontmatter(content: string): Record<string, string> {
     result[key] = value;
   }
   return result;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Path Normalisation (with security validation)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Normalises a single component path with security validation
+ * Returns null if path is invalid (absolute or contains parent traversal)
+ */
+export function normaliseComponentPath(path: string): string | null {
+  if (!path || typeof path !== 'string') {
+    return null;
+  }
+
+  // Reject absolute paths
+  if (path.startsWith('/') || /^[A-Za-z]:/.test(path)) {
+    return null;
+  }
+
+  // Reject parent directory traversal
+  if (path.includes('..')) {
+    return null;
+  }
+
+  // Normalise ./ prefix
+  if (path.startsWith('./')) {
+    return path.slice(2);
+  }
+
+  return path;
+}
+
+/**
+ * Normalises component paths from plugin.json
+ * Supports both string and array formats per Claude Code specification
+ * Returns array of valid paths, falling back to default if none valid
+ */
+export function normaliseComponentPaths(pathValue: unknown, defaultPath: string): string[] {
+  // Handle undefined/null
+  if (pathValue === undefined || pathValue === null) {
+    return [defaultPath];
+  }
+
+  // Handle string input
+  if (typeof pathValue === 'string') {
+    const normalised = normaliseComponentPath(pathValue);
+    return normalised ? [normalised] : [defaultPath];
+  }
+
+  // Handle array input
+  if (Array.isArray(pathValue)) {
+    const validPaths = pathValue
+      .map((p) => (typeof p === 'string' ? normaliseComponentPath(p) : null))
+      .filter((p): p is string => p !== null);
+
+    return validPaths.length > 0 ? validPaths : [defaultPath];
+  }
+
+  // Unknown type - return default
+  return [defaultPath];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -191,6 +258,27 @@ function scanPluginCommands(pluginPath: string): CommandInfo[] {
   return commands;
 }
 
+function scanPluginOutputStyles(pluginPath: string): OutputStyleInfo[] {
+  const outputStylesDir = join(pluginPath, 'output-styles');
+  if (!existsSync(outputStylesDir)) return [];
+
+  const outputStyles: OutputStyleInfo[] = [];
+  for (const entry of readdirSync(outputStylesDir).filter((f) => f.endsWith('.md'))) {
+    try {
+      const fm = parseFrontmatter(readFileSync(join(outputStylesDir, entry), 'utf-8'));
+      outputStyles.push({
+        name: fm.name || basename(entry, '.md'),
+        description: fm.description || '',
+      });
+    } catch (error) {
+      if (process.env.DEBUG) {
+        console.warn(`[plugin-scanner] Failed to parse output style at ${join(outputStylesDir, entry)}:`, error);
+      }
+    }
+  }
+  return outputStyles;
+}
+
 export async function scanEnhancePlugins(enhanceDir?: string): Promise<PluginInfo[]> {
   const dir = enhanceDir || join(homedir(), '.claude', 'plugins', 'cache', 'enhance');
   if (!existsSync(dir)) return [];
@@ -226,6 +314,7 @@ export async function scanEnhancePlugins(enhanceDir?: string): Promise<PluginInf
         skills: scanPluginSkills(versionDir, name),
         agents: scanPluginAgents(versionDir),
         commands: scanPluginCommands(versionDir),
+        outputStyles: scanPluginOutputStyles(versionDir),
       });
     } catch (error) {
       if (process.env.DEBUG) {

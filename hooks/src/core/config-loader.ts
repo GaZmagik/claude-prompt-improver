@@ -33,6 +33,7 @@ const DEFAULT_INTEGRATIONS: IntegrationToggles = {
   memory: true,
   session: true,
   dynamicDiscovery: true,
+  pluginResources: true,
 };
 
 /**
@@ -407,6 +408,7 @@ function mergeConfig(defaults: Configuration, partial: Partial<Configuration>): 
       memory: partial.integrations?.memory ?? defaults.integrations.memory,
       session: partial.integrations?.session ?? defaults.integrations.session,
       dynamicDiscovery: partial.integrations?.dynamicDiscovery ?? defaults.integrations.dynamicDiscovery,
+      pluginResources: partial.integrations?.pluginResources ?? defaults.integrations.pluginResources,
     },
     logging: {
       enabled: partial.logging?.enabled ?? defaults.logging.enabled,

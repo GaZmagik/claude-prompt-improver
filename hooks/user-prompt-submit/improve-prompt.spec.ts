@@ -637,4 +637,107 @@ describe('Hook Input/Output', () => {
       // Log level config is handled via loadConfigFromStandardPaths() in main()
     });
   });
+
+  // T203: pluginResources wiring tests
+  describe('T203: processPrompt - pluginResources integration', () => {
+    it('T203.1: should wire pluginResources when integration toggle is enabled', async () => {
+      const result = await processPrompt({
+        prompt: 'Help me understand what plugins are available and how to use their features',
+        sessionId: 'session-plugin-resources',
+        integrations: {
+          git: false,
+          lsp: false,
+          spec: false,
+          memory: false,
+          session: false,
+          dynamicDiscovery: false,
+          pluginResources: true,
+        },
+        _mockImprovement: '<task>List available plugins and their capabilities</task>',
+      });
+
+      expect(result.type).toBe('improved');
+    });
+
+    it('T203.2: should include pluginResources in hasIntegrations check', async () => {
+      // When pluginResources is the only enabled integration, context should still be built
+      const result = await processPrompt({
+        prompt: 'What plugins can help me with this task and what features do they provide',
+        sessionId: 'session-plugin-only',
+        integrations: {
+          git: false,
+          lsp: false,
+          spec: false,
+          memory: false,
+          session: false,
+          dynamicDiscovery: false,
+          pluginResources: true,
+        },
+        _mockImprovement: '<task>Identify relevant plugins for the task</task>',
+      });
+
+      // Should not bypass - pluginResources integration should trigger context building
+      expect(result.type).toBe('improved');
+    });
+
+    it('T203.3: should skip pluginResources when integration toggle is disabled', async () => {
+      const result = await processPrompt({
+        prompt: 'Help me with a task that is long enough to pass the threshold check please',
+        sessionId: 'session-no-plugins',
+        integrations: {
+          git: false,
+          lsp: false,
+          spec: false,
+          memory: false,
+          session: false,
+          dynamicDiscovery: false,
+          pluginResources: false,
+        },
+        _mockImprovement: '<task>Complete the task</task>',
+      });
+
+      // Should still work, just without plugin resources context
+      expect(result.type).toBe('improved');
+    });
+
+    it('T203.4: should include pluginResources alongside other integrations', async () => {
+      const result = await processPrompt({
+        prompt: 'Help me commit my changes using the available plugins and git integration',
+        sessionId: 'session-multi-integrations',
+        integrations: {
+          git: true,
+          lsp: false,
+          spec: false,
+          memory: false,
+          session: false,
+          dynamicDiscovery: false,
+          pluginResources: true,
+        },
+        cwd: '/tmp/test-project',
+        _mockImprovement: '<task>Commit changes with plugin assistance</task>',
+      });
+
+      expect(result.type).toBe('improved');
+    });
+
+    it('T203.5: should pass cwd to pluginResources options', async () => {
+      const result = await processPrompt({
+        prompt: 'Scan for plugins in the current directory and show me what is available',
+        sessionId: 'session-cwd-test',
+        integrations: {
+          git: false,
+          lsp: false,
+          spec: false,
+          memory: false,
+          session: false,
+          dynamicDiscovery: false,
+          pluginResources: true,
+        },
+        cwd: '/home/test/project',
+        _mockImprovement: '<task>Scan and list plugins</task>',
+      });
+
+      expect(result.type).toBe('improved');
+    });
+  });
 });

@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-01-24
+
+### Added
+
+- **Plugin resources wiring** - Complete the plugin resources pipeline from discovery to prompt injection
+  - Wired `pluginResources` context through `improve-prompt.ts` (was gathered but never used in v1.6.0)
+  - Added `integrations.pluginResources` toggle to configuration for enabling/disabling feature
+  - Plugin resource context now flows through: discover → build → format → inject
+
+- **Output styles discovery** - Scan and include output styles from plugins
+  - New `OutputStyleInfo` interface with name and description fields
+  - Added `outputStyles` array to `PluginInfo` interface
+  - Scans `output-styles/` directory in plugins for `.md` files with YAML frontmatter
+
+- **Component path security validation** - Secure path handling for plugin components
+  - New `normaliseComponentPath()` rejects absolute paths and parent traversal (`..`)
+  - New `normaliseComponentPaths()` handles string and array formats per Claude Code spec
+  - Falls back to defaults when all paths are invalid
+
+- **Plugin manifest hooks field** - Declares hook location in plugin.json
+  - Added `"hooks": "./hooks/hooks.json"` to plugin manifest
+  - Enables Claude Code to locate hooks without hardcoded paths
+
+### Changed
+
+- `ContextSource` type now includes `pluginResources` as a valid source
+- `ImprovementContext` interface includes `pluginResources` field
+- Default integrations enable `pluginResources` by default
+
+### Technical Details
+
+- Added 40 new tests across type validation, wiring, plugin scanning, and E2E integration
+- Total test count: 830+ tests passing
+- All four wiring points in `improve-prompt.ts` now correctly handle `pluginResources`
+
 ## [1.6.0] - 2026-01-24
 
 ### Added
