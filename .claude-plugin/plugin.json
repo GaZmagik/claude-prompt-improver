@@ -1,6 +1,6 @@
 {
   "name": "claude-prompt-improver",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Automatically improves prompts for better Claude responses with configurable AI models",
   "author": {
     "name": "Gareth Williams",
@@ -9,6 +9,5 @@
   "homepage": "https://github.com/GaZmagik/claude-prompt-improver",
   "repository": "https://github.com/GaZmagik/claude-prompt-improver",
   "license": "MIT",
-  "keywords": ["prompt-engineering", "automation", "productivity"],
-  "hooks": "./hooks/hooks.json"
+  "keywords": ["prompt-engineering", "automation", "productivity"]
 }
