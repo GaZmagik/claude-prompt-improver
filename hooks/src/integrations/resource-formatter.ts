@@ -69,7 +69,7 @@ export function detectLanguage(cwd: string): string | null {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Checks the Speckit SDD status for a project
+ * Checks the Speckit specification status for a project
  * Looks for spec.md, plan.md, and tasks.md in the .specify/ directory
  * @param cwd - Directory to check
  * @returns Status of each Speckit file

@@ -139,7 +139,11 @@ function scanPluginSkills(pluginPath: string, pluginName: string): SkillInfo[] {
         description: fm.description || '',
         qualifiedName: `${pluginName}:${fm.name || entry}`,
       });
-    } catch { /* skip */ }
+    } catch (error) {
+      if (process.env.DEBUG) {
+        console.warn(`[plugin-scanner] Failed to parse skill at ${mdPath}:`, error);
+      }
+    }
   }
   return skills;
 }
@@ -157,7 +161,11 @@ function scanPluginAgents(pluginPath: string): AgentInfo[] {
         description: fm.description || '',
         model: fm.model || 'unknown',
       });
-    } catch { /* skip */ }
+    } catch (error) {
+      if (process.env.DEBUG) {
+        console.warn(`[plugin-scanner] Failed to parse agent at ${join(agentsDir, entry)}:`, error);
+      }
+    }
   }
   return agents;
 }
@@ -174,7 +182,11 @@ function scanPluginCommands(pluginPath: string): CommandInfo[] {
         name: basename(entry, '.md'),
         description: fm.description || '',
       });
-    } catch { /* skip */ }
+    } catch (error) {
+      if (process.env.DEBUG) {
+        console.warn(`[plugin-scanner] Failed to parse command at ${join(commandsDir, entry)}:`, error);
+      }
+    }
   }
   return commands;
 }
@@ -185,6 +197,10 @@ export async function scanEnhancePlugins(enhanceDir?: string): Promise<PluginInf
 
   const plugins: PluginInfo[] = [];
   for (const pluginName of readdirSync(dir)) {
+    // Skip entries with path traversal sequences
+    if (pluginName.includes('..') || pluginName.includes('/') || pluginName.includes('\\')) {
+      continue;
+    }
     const pluginPath = join(dir, pluginName);
     if (!statSync(pluginPath).isDirectory()) continue;
 
@@ -196,16 +212,26 @@ export async function scanEnhancePlugins(enhanceDir?: string): Promise<PluginInf
 
     try {
       const pluginJson = JSON.parse(readFileSync(pluginJsonPath, 'utf-8'));
-      const name = pluginJson.name || pluginName;
+      // Validate JSON structure
+      if (typeof pluginJson !== 'object' || pluginJson === null) {
+        continue;
+      }
+      const name = typeof pluginJson.name === 'string' ? pluginJson.name : pluginName;
+      const version = typeof pluginJson.version === 'string' ? pluginJson.version : 'unknown';
+      const description = typeof pluginJson.description === 'string' ? pluginJson.description : '';
       plugins.push({
         name,
-        version: pluginJson.version || 'unknown',
-        description: pluginJson.description || '',
+        version,
+        description,
         skills: scanPluginSkills(versionDir, name),
         agents: scanPluginAgents(versionDir),
         commands: scanPluginCommands(versionDir),
       });
-    } catch { /* skip */ }
+    } catch (error) {
+      if (process.env.DEBUG) {
+        console.warn(`[plugin-scanner] Failed to parse plugin.json at ${pluginJsonPath}:`, error);
+      }
+    }
   }
   return plugins;
 }
@@ -227,18 +253,30 @@ export async function scanMcpServers(mcpPaths?: string[]): Promise<McpServerInfo
     if (!existsSync(mcpPath)) continue;
     try {
       const content = JSON.parse(readFileSync(mcpPath, 'utf-8'));
-      for (const [name, config] of Object.entries(content.mcpServers || {})) {
+      // Validate JSON structure
+      if (typeof content !== 'object' || content === null) {
+        continue;
+      }
+      const mcpServers = content.mcpServers;
+      if (typeof mcpServers !== 'object' || mcpServers === null) {
+        continue;
+      }
+      for (const [name, config] of Object.entries(mcpServers)) {
         if (seenNames.has(name)) continue;
         seenNames.add(name);
         const cfg = config as Record<string, unknown>;
-        const desc = cfg.description as string | undefined;
+        const desc = typeof cfg.description === 'string' ? cfg.description : undefined;
         servers.push({
           name,
           type: (cfg.type as 'sse' | 'stdio' | 'http') || (cfg.command ? 'stdio' : 'sse'),
           ...(desc ? { description: desc } : {}),
         });
       }
-    } catch { /* skip */ }
+    } catch (error) {
+      if (process.env.DEBUG) {
+        console.warn(`[plugin-scanner] Failed to parse MCP config at ${mcpPath}:`, error);
+      }
+    }
   }
   return servers;
 }
