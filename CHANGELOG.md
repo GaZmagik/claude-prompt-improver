@@ -41,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Technical Details
 
-- Added 87 new tests for plugin scanning and resource formatting
+- Added 40 new tests for plugin scanning and resource formatting
 - YAML frontmatter parser handles malformed files gracefully
 - XML escaping for special characters in resource descriptions
 
