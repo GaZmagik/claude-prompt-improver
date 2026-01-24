@@ -14,6 +14,7 @@ import type {
   HookInput,
   HookOutput,
   ImprovedPrompt,
+  IntegrationToggles,
   LogEntry,
   Prompt,
   XmlTag,
@@ -43,9 +44,11 @@ describe('Core Types', () => {
         'spec',
         'memory',
         'session',
+        'dynamicDiscovery',
+        'pluginResources',
       ];
 
-      expect(sources).toHaveLength(8);
+      expect(sources).toHaveLength(10);
     });
   });
 
@@ -174,6 +177,7 @@ describe('Core Types', () => {
           memory: true,
           session: false,
           dynamicDiscovery: true,
+          pluginResources: true,
         },
         logging: {
           enabled: true,
@@ -190,6 +194,60 @@ describe('Core Types', () => {
       expect(config.shortPromptThreshold).toBe(10);
       expect(config.integrations.session).toBe(false);
       expect(config.logging.displayImprovedPrompt).toBe(true);
+    });
+  });
+
+  // T200-T202: IntegrationToggles pluginResources tests
+  describe('IntegrationToggles', () => {
+    it('T200: should accept pluginResources boolean toggle', () => {
+      const toggles: IntegrationToggles = {
+        git: true,
+        lsp: true,
+        spec: false,
+        memory: true,
+        session: false,
+        dynamicDiscovery: true,
+        pluginResources: true,
+      };
+
+      expect(toggles.pluginResources).toBe(true);
+    });
+
+    it('T201: should allow pluginResources to be disabled', () => {
+      const toggles: IntegrationToggles = {
+        git: false,
+        lsp: false,
+        spec: false,
+        memory: false,
+        session: false,
+        dynamicDiscovery: false,
+        pluginResources: false,
+      };
+
+      expect(toggles.pluginResources).toBe(false);
+    });
+
+    it('T202: should include pluginResources in complete IntegrationToggles', () => {
+      const toggles: IntegrationToggles = {
+        git: true,
+        lsp: true,
+        spec: true,
+        memory: true,
+        session: true,
+        dynamicDiscovery: true,
+        pluginResources: true,
+      };
+
+      // Verify all 7 fields are present
+      const keys = Object.keys(toggles);
+      expect(keys).toContain('git');
+      expect(keys).toContain('lsp');
+      expect(keys).toContain('spec');
+      expect(keys).toContain('memory');
+      expect(keys).toContain('session');
+      expect(keys).toContain('dynamicDiscovery');
+      expect(keys).toContain('pluginResources');
+      expect(keys).toHaveLength(7);
     });
   });
 

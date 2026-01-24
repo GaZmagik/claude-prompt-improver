@@ -27,6 +27,11 @@ export interface CommandInfo {
   description: string;
 }
 
+export interface OutputStyleInfo {
+  name: string;
+  description: string;
+}
+
 export interface PluginInfo {
   name: string;
   version: string;
@@ -34,6 +39,7 @@ export interface PluginInfo {
   skills: SkillInfo[];
   agents: AgentInfo[];
   commands: CommandInfo[];
+  outputStyles: OutputStyleInfo[];
 }
 
 export interface McpServerInfo {
@@ -94,6 +100,78 @@ function parseFrontmatter(content: string): Record<string, string> {
     result[key] = value;
   }
   return result;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Path Normalisation (with security validation)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Normalises a single component path with security validation
+ * Returns null if path is invalid (absolute or contains parent traversal)
+ */
+export function normaliseComponentPath(path: string): string | null {
+  if (!path || typeof path !== 'string') {
+    return null;
+  }
+
+  // Reject absolute paths
+  if (path.startsWith('/') || /^[A-Za-z]:/.test(path)) {
+    return null;
+  }
+
+  // Reject parent directory traversal
+  if (path.includes('..')) {
+    return null;
+  }
+
+  // Normalise ./ prefix
+  if (path.startsWith('./')) {
+    return path.slice(2);
+  }
+
+  return path;
+}
+
+/**
+ * Normalises component paths from plugin.json
+ * Supports both string and array formats per Claude Code specification
+ * IMPORTANT: Custom paths SUPPLEMENT default directories - they don't replace them
+ * Returns array with default path first, followed by any valid custom paths (deduplicated)
+ */
+export function normaliseComponentPaths(pathValue: unknown, defaultPath: string): string[] {
+  // Always start with the default path
+  const paths = new Set<string>([defaultPath]);
+
+  // Handle undefined/null - just return default
+  if (pathValue === undefined || pathValue === null) {
+    return [defaultPath];
+  }
+
+  // Handle string input - add to default
+  if (typeof pathValue === 'string') {
+    const normalised = normaliseComponentPath(pathValue);
+    if (normalised) {
+      paths.add(normalised);
+    }
+    return [...paths];
+  }
+
+  // Handle array input - add all valid paths to default
+  if (Array.isArray(pathValue)) {
+    for (const p of pathValue) {
+      if (typeof p === 'string') {
+        const normalised = normaliseComponentPath(p);
+        if (normalised) {
+          paths.add(normalised);
+        }
+      }
+    }
+    return [...paths];
+  }
+
+  // Unknown type - return default
+  return [defaultPath];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -191,6 +269,27 @@ function scanPluginCommands(pluginPath: string): CommandInfo[] {
   return commands;
 }
 
+function scanPluginOutputStyles(pluginPath: string): OutputStyleInfo[] {
+  const outputStylesDir = join(pluginPath, 'output-styles');
+  if (!existsSync(outputStylesDir)) return [];
+
+  const outputStyles: OutputStyleInfo[] = [];
+  for (const entry of readdirSync(outputStylesDir).filter((f) => f.endsWith('.md'))) {
+    try {
+      const fm = parseFrontmatter(readFileSync(join(outputStylesDir, entry), 'utf-8'));
+      outputStyles.push({
+        name: fm.name || basename(entry, '.md'),
+        description: fm.description || '',
+      });
+    } catch (error) {
+      if (process.env.DEBUG) {
+        console.warn(`[plugin-scanner] Failed to parse output style at ${join(outputStylesDir, entry)}:`, error);
+      }
+    }
+  }
+  return outputStyles;
+}
+
 export async function scanEnhancePlugins(enhanceDir?: string): Promise<PluginInfo[]> {
   const dir = enhanceDir || join(homedir(), '.claude', 'plugins', 'cache', 'enhance');
   if (!existsSync(dir)) return [];
@@ -226,6 +325,7 @@ export async function scanEnhancePlugins(enhanceDir?: string): Promise<PluginInf
         skills: scanPluginSkills(versionDir, name),
         agents: scanPluginAgents(versionDir),
         commands: scanPluginCommands(versionDir),
+        outputStyles: scanPluginOutputStyles(versionDir),
       });
     } catch (error) {
       if (process.env.DEBUG) {

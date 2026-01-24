@@ -4,13 +4,14 @@ title: Retro - Stubbed implementations masquerade as completed features
 type: gotcha
 scope: project
 created: "2026-01-23T20:29:43.401Z"
-updated: "2026-01-23T20:29:43.401Z"
+updated: "2026-01-24T14:01:35.671Z"
 tags:
   - retrospective
   - process
   - quality
   - implementation
   - project
+  - resolved
 severity: high
 ---
 

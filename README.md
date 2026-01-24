@@ -77,6 +77,8 @@ integrations:
   spec: true
   memory: true
   session: true
+  dynamicDiscovery: true
+  pluginResources: true
 
 logging:
   enabled: true
@@ -106,6 +108,7 @@ Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settin
 | `integrations.memory` | boolean | `true` | Enable memory plugin integration |
 | `integrations.session` | boolean | `true` | Enable session context |
 | `integrations.dynamicDiscovery` | boolean | `true` | Enable dynamic discovery of skills, agents, commands, and output styles |
+| `integrations.pluginResources` | boolean | `true` | Enable plugin resource scanning (skills, agents, commands, output styles from installed plugins) |
 | `logging.enabled` | boolean | `true` | Enable logging |
 | `logging.logFilePath` | string | `.claude/logs/...` | Log file location |
 | `logging.logLevel` | string | `INFO` | Log level: ERROR, INFO, or DEBUG |

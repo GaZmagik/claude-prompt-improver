@@ -20,6 +20,7 @@ export interface ImprovementContext {
   readonly memory?: string;
   readonly session?: string;
   readonly dynamicDiscovery?: string;
+  readonly pluginResources?: string;
 }
 
 /**
@@ -78,6 +79,7 @@ function getContextSources(context?: ImprovementContext): ContextSource[] {
   if (context.memory) sources.push('memory');
   if (context.session) sources.push('session');
   if (context.dynamicDiscovery) sources.push('dynamicDiscovery');
+  if (context.pluginResources) sources.push('pluginResources');
 
   return sources;
 }

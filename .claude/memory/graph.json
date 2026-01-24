@@ -1318,6 +1318,42 @@
     {
       "id": "decision-session-scoped-caching-opportunity-for-plugin-scans",
       "type": "decision"
+    },
+    {
+      "id": "gotcha-v160-pluginresources-feature-incomplete-wiring-gap-investigation",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-multi-agent-deliberation-reveals-architectural-issues-unit-analysis-misses",
+      "type": "learning"
+    },
+    {
+      "id": "decision-pluginresources-feature-incomplete-until-wiring-to-improve-promptts",
+      "type": "decision"
+    },
+    {
+      "id": "gotcha-retro-integration-test-parity-critical-for-orchestration-features",
+      "type": "gotcha"
+    },
+    {
+      "id": "decision-modular-features-need-orchestration-glue-to-work-end-to-end",
+      "type": "decision"
+    },
+    {
+      "id": "decision-changelog-test-count-should-reflect-actual-new-tests-not-total-tests-in-modified-files",
+      "type": "decision"
+    },
+    {
+      "id": "learning-retro-end-to-end-feature-validation-catches-issues-tests-miss",
+      "type": "learning"
+    },
+    {
+      "id": "decision-memory-plugin-output-styles-discovery-uses-processcwd-instead-of-plugin-install-path",
+      "type": "decision"
+    },
+    {
+      "id": "decision-multi-agent-deliberation-pattern-for-wiring-gap-investigation",
+      "type": "decision"
     }
   ],
   "edges": [

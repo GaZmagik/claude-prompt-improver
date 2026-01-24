@@ -18,7 +18,8 @@ export type ContextSource =
   | 'spec'
   | 'memory'
   | 'session'
-  | 'dynamicDiscovery';
+  | 'dynamicDiscovery'
+  | 'pluginResources';
 
 // Reasons why a prompt may be bypassed
 export type BypassReason =
@@ -97,6 +98,7 @@ export interface IntegrationToggles {
   readonly memory: boolean;
   readonly session: boolean;
   readonly dynamicDiscovery: boolean;
+  readonly pluginResources: boolean;
 }
 
 /**
