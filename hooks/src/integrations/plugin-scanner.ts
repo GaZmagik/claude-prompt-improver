@@ -136,27 +136,38 @@ export function normaliseComponentPath(path: string): string | null {
 /**
  * Normalises component paths from plugin.json
  * Supports both string and array formats per Claude Code specification
- * Returns array of valid paths, falling back to default if none valid
+ * IMPORTANT: Custom paths SUPPLEMENT default directories - they don't replace them
+ * Returns array with default path first, followed by any valid custom paths (deduplicated)
  */
 export function normaliseComponentPaths(pathValue: unknown, defaultPath: string): string[] {
-  // Handle undefined/null
+  // Always start with the default path
+  const paths = new Set<string>([defaultPath]);
+
+  // Handle undefined/null - just return default
   if (pathValue === undefined || pathValue === null) {
     return [defaultPath];
   }
 
-  // Handle string input
+  // Handle string input - add to default
   if (typeof pathValue === 'string') {
     const normalised = normaliseComponentPath(pathValue);
-    return normalised ? [normalised] : [defaultPath];
+    if (normalised) {
+      paths.add(normalised);
+    }
+    return [...paths];
   }
 
-  // Handle array input
+  // Handle array input - add all valid paths to default
   if (Array.isArray(pathValue)) {
-    const validPaths = pathValue
-      .map((p) => (typeof p === 'string' ? normaliseComponentPath(p) : null))
-      .filter((p): p is string => p !== null);
-
-    return validPaths.length > 0 ? validPaths : [defaultPath];
+    for (const p of pathValue) {
+      if (typeof p === 'string') {
+        const normalised = normaliseComponentPath(p);
+        if (normalised) {
+          paths.add(normalised);
+        }
+      }
+    }
+    return [...paths];
   }
 
   // Unknown type - return default

@@ -124,36 +124,51 @@ describe('plugin-scanner', () => {
     });
   });
 
-  describe('T206: normaliseComponentPaths array handling', () => {
-    it('T206.1: should handle string input', () => {
+  describe('T206: normaliseComponentPaths - custom paths supplement defaults', () => {
+    it('T206.1: should include default AND custom path for string input', () => {
       const result = normaliseComponentPaths('./custom-skills', 'skills');
-      expect(result).toEqual(['custom-skills']);
+      expect(result).toContain('skills'); // default always included
+      expect(result).toContain('custom-skills'); // custom added
+      expect(result).toHaveLength(2);
     });
 
-    it('T206.2: should handle array input', () => {
+    it('T206.2: should include default AND custom paths for array input', () => {
+      const result = normaliseComponentPaths(['./extra', 'custom/skills'], 'skills');
+      expect(result).toContain('skills'); // default first
+      expect(result).toContain('extra');
+      expect(result).toContain('custom/skills');
+      expect(result).toHaveLength(3);
+    });
+
+    it('T206.3: should deduplicate when custom path equals default', () => {
       const result = normaliseComponentPaths(['./skills', 'custom/skills'], 'skills');
-      expect(result).toEqual(['skills', 'custom/skills']);
+      expect(result).toContain('skills');
+      expect(result).toContain('custom/skills');
+      expect(result).toHaveLength(2); // 'skills' not duplicated
     });
 
-    it('T206.3: should filter out invalid paths from array', () => {
-      const result = normaliseComponentPaths(['./valid', '../invalid', '/absolute'], 'default');
-      expect(result).toEqual(['valid']);
-    });
-
-    it('T206.4: should return default when input is undefined', () => {
+    it('T206.4: should return only default when input is undefined', () => {
       const result = normaliseComponentPaths(undefined, 'skills');
       expect(result).toEqual(['skills']);
     });
 
-    it('T206.5: should return default when all paths are invalid', () => {
+    it('T206.5: should return only default when all custom paths are invalid', () => {
       const result = normaliseComponentPaths(['../invalid', '/absolute'], 'skills');
       expect(result).toEqual(['skills']);
+    });
+
+    it('T206.6: should filter invalid and keep default plus valid customs', () => {
+      const result = normaliseComponentPaths(['./valid', '../invalid', '/absolute'], 'default');
+      expect(result).toContain('default');
+      expect(result).toContain('valid');
+      expect(result).toHaveLength(2);
     });
   });
 
   describe('T207: normaliseComponentPaths edge cases', () => {
-    it('T207.1: should handle empty string in array', () => {
+    it('T207.1: should include default and valid when array has empty string', () => {
       const result = normaliseComponentPaths(['', 'valid'], 'default');
+      expect(result).toContain('default');
       expect(result).toContain('valid');
     });
 
@@ -162,7 +177,7 @@ describe('plugin-scanner', () => {
       expect(result).toEqual(['default']);
     });
 
-    it('T207.3: should handle empty array', () => {
+    it('T207.3: should return only default for empty array', () => {
       const result = normaliseComponentPaths([], 'default');
       expect(result).toEqual(['default']);
     });

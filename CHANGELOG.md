@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Component path security validation** - Secure path handling for plugin components
   - New `normaliseComponentPath()` rejects absolute paths and parent traversal (`..`)
   - New `normaliseComponentPaths()` handles string and array formats per Claude Code spec
+  - Custom paths SUPPLEMENT default directories (don't replace them)
   - Falls back to defaults when all paths are invalid
 
 - **Plugin manifest hooks field** - Declares hook location in plugin.json
