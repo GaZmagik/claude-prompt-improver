@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-24T00:52:42.080Z",
+  "lastUpdated": "2026-01-24T10:07:19.004Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -4159,20 +4159,47 @@
       "relativePath": "permanent/artifact-memory-curation-session-20260124.md"
     },
     {
+      "id": "learning-claude-code-hooks-dont-receive-sessionid-in-stdin",
+      "type": "learning",
+      "title": "Claude Code hooks don't receive session_id in stdin",
+      "tags": [
+        "hooks",
+        "session-identification",
+        "claude-code",
+        "project"
+      ],
+      "created": "2026-01-24T10:07:11.398Z",
+      "updated": "2026-01-24T10:07:11.398Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-claude-code-hooks-dont-receive-sessionid-in-stdin.md"
+    },
+    {
+      "id": "gotcha-mtime-based-cache-file-lookup-causes-cross-session-pollution",
+      "type": "gotcha",
+      "title": "Mtime-based cache file lookup causes cross-session pollution",
+      "tags": [
+        "caching",
+        "concurrency",
+        "session-isolation",
+        "project"
+      ],
+      "created": "2026-01-24T10:07:14.732Z",
+      "updated": "2026-01-24T10:07:14.732Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-mtime-based-cache-file-lookup-causes-cross-session-pollution.md"
+    },
+    {
       "id": "learning-use-claudecodesseport-for-session-specific-hook-caching",
       "type": "learning",
       "title": "Use CLAUDE_CODE_SSE_PORT for session-specific hook caching",
       "tags": [
         "hooks",
-        "context",
         "caching",
-        "statusline",
-        "sse-port",
-        "session",
+        "session-isolation",
         "project"
       ],
-      "created": "2026-01-24T00:52:32.024Z",
-      "updated": "2026-01-24T00:52:32.024Z",
+      "created": "2026-01-24T10:07:18.999Z",
+      "updated": "2026-01-24T10:07:18.999Z",
       "scope": "project",
       "relativePath": "permanent/learning-use-claudecodesseport-for-session-specific-hook-caching.md"
     }

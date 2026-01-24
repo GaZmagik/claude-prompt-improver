@@ -54,10 +54,12 @@ hooks/
 
 ## Configuration
 
-Configuration is **optional** - the plugin works with sensible defaults. To customise:
+Configuration is **optional** - the plugin works with sensible defaults.
+
+On installation, the plugin creates `.claude/prompt-improver.example.md` with documented defaults. To customise:
 
 ```bash
-cp .claude/prompt-improver.example.md .claude/prompt-improver.local.md
+mv .claude/prompt-improver.example.md .claude/prompt-improver.local.md
 ```
 
 The configuration uses markdown with YAML frontmatter:
@@ -88,37 +90,6 @@ logging:
 ```
 
 Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settings private.
-
-### Legacy JSON Configuration (Backwards Compatibility)
-
-For backwards compatibility, the plugin also supports JSON configuration at `.claude/prompt-improver-config.json`:
-
-```json
-{
-  "enabled": true,
-  "shortPromptThreshold": 10,
-  "compactionThreshold": 5,
-  "improverModel": "haiku",
-  "integrations": {
-    "git": true,
-    "lsp": true,
-    "spec": true,
-    "memory": true,
-    "session": true
-  },
-  "logging": {
-    "enabled": true,
-    "logFilePath": ".claude/logs/prompt-improver-latest.log",
-    "logLevel": "INFO",
-    "maxLogSizeMB": 10,
-    "maxLogAgeDays": 7,
-    "displayImprovedPrompt": true,
-    "useTimestampedLogs": false
-  }
-}
-```
-
-**Note**: The markdown format (`.local.md`) is recommended as it allows inline documentation alongside configuration.
 
 ### Configuration Options
 

@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-01-24
+
+### Added
+
+- **Structured resource discovery** - Plugin scanning infrastructure for prompt improvement
+  - New `plugin-scanner.ts` module scans `~/.claude/plugins/cache/enhance/` for installed plugins
+  - Extracts skills, agents, and commands with YAML frontmatter parsing
+  - MCP server discovery from `.mcp.json` files (user, project, and plugin levels)
+  - New `resource-formatter.ts` module formats resources as structured XML sections
+
+- **XML resource sections in improved prompts** - Provides explicit resource context
+  - `<skills>` - Available skills with plugin:name format and descriptions
+  - `<agents>` - Available agents with model, capabilities, spawn conditions
+  - `<commands>` - Available /commands with descriptions and triggers
+  - `<mcp>` - MCP servers and their capabilities
+  - `<memory>` - Memory skill recommendations (deliberation, gotcha checks)
+  - `<lsp>` - LSP operations when TypeScript/JavaScript detected
+  - `<speckit>` - Specification status when .specify/ directory exists
+
+- **Memory skill integration** - Special handling for claude-memory-plugin
+  - Detects deliberation keywords (brainstorm, pros/cons, trade-offs, decide)
+  - Suggests `memory think` workflow for deliberation prompts
+  - Recommends gotcha checks before significant work
+
+- **Language detection** - Detects project language from config files
+  - TypeScript (tsconfig.json), JavaScript (package.json)
+  - Python (pyproject.toml), Rust (Cargo.toml), Go (go.mod), etc.
+  - Enables LSP capability suggestions for detected languages
+
+### Removed
+
+- **Legacy JSON configuration** - Removed backwards compatibility for `.claude/prompt-improver-config.json`
+  - Use `.claude/prompt-improver.local.md` (markdown with YAML frontmatter) instead
+
+### Technical Details
+
+- Added 50 new tests for plugin scanning and resource formatting
+- YAML frontmatter parser handles malformed files gracefully
+- XML escaping for special characters in resource descriptions
+
 ## [1.5.2] - 2026-01-23
 
 ### Fixed

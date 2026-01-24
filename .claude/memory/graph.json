@@ -1286,6 +1286,14 @@
     {
       "id": "learning-use-claudecodesseport-for-session-specific-hook-caching",
       "type": "learning"
+    },
+    {
+      "id": "learning-claude-code-hooks-dont-receive-sessionid-in-stdin",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-mtime-based-cache-file-lookup-causes-cross-session-pollution",
+      "type": "gotcha"
     }
   ],
   "edges": [
