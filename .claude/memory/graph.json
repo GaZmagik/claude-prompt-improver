@@ -1354,6 +1354,34 @@
     {
       "id": "decision-multi-agent-deliberation-pattern-for-wiring-gap-investigation",
       "type": "decision"
+    },
+    {
+      "id": "learning-tdd-catches-integration-wiring-gaps-early",
+      "type": "learning"
+    },
+    {
+      "id": "learning-custom-component-paths-should-supplement-defaults-not-replace",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-memory-activation-at-session-start-surfaces-architectural-gaps",
+      "type": "learning"
+    },
+    {
+      "id": "gotcha-memory-files-from-other-projects-can-mislead-review-interpretation",
+      "type": "gotcha"
+    },
+    {
+      "id": "learning-retro-tdd-test-first-approach-catches-architecture-misunderstandings-before-implementation",
+      "type": "learning"
+    },
+    {
+      "id": "learning-retro-type-casting-repetition-indicates-abstraction-gap",
+      "type": "learning"
+    },
+    {
+      "id": "decision-six-phase-tdd-implementation-plan-for-wiring-incomplete-features",
+      "type": "decision"
     }
   ],
   "edges": [
@@ -2220,6 +2248,66 @@
     {
       "source": "learning-session-restore-with-parallel-agents-improves-memory-graph-health-efficiently",
       "target": "learning-session-restoration-with-parallel-agents-improves-memory-curation",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-six-phase-tdd-implementation-plan-for-wiring-incomplete-features",
+      "target": "gotcha-v160-pluginresources-feature-incomplete-wiring-gap-investigation",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-six-phase-tdd-implementation-plan-for-wiring-incomplete-features",
+      "target": "learning-custom-component-paths-should-supplement-defaults-not-replace",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-tdd-test-first-approach-catches-architecture-misunderstandings-before-implementation",
+      "target": "decision-six-phase-tdd-implementation-plan-for-wiring-incomplete-features",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-memory-activation-at-session-start-surfaces-architectural-gaps",
+      "target": "decision-six-phase-tdd-implementation-plan-for-wiring-incomplete-features",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-tdd-catches-integration-wiring-gaps-early",
+      "target": "decision-six-phase-tdd-implementation-plan-for-wiring-incomplete-features",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-memory-files-from-other-projects-can-mislead-review-interpretation",
+      "target": "learning-retro-memory-activation-at-session-start-surfaces-architectural-gaps",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-type-casting-repetition-indicates-abstraction-gap",
+      "target": "decision-six-phase-tdd-implementation-plan-for-wiring-incomplete-features",
+      "label": "relates-to"
+    },
+    {
+      "source": "learning-retro-multi-agent-deliberation-reveals-architectural-issues-unit-analysis-misses",
+      "target": "decision-multi-agent-deliberation-pattern-for-wiring-gap-investigation",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-multi-agent-deliberation-pattern-for-wiring-gap-investigation",
+      "target": "decision-six-phase-tdd-implementation-plan-for-wiring-incomplete-features",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-pluginresources-feature-incomplete-until-wiring-to-improve-promptts",
+      "target": "decision-six-phase-tdd-implementation-plan-for-wiring-incomplete-features",
+      "label": "relates-to"
+    },
+    {
+      "source": "gotcha-retro-integration-test-parity-critical-for-orchestration-features",
+      "target": "decision-six-phase-tdd-implementation-plan-for-wiring-incomplete-features",
+      "label": "relates-to"
+    },
+    {
+      "source": "decision-changelog-test-count-should-reflect-actual-new-tests-not-total-tests-in-modified-files",
+      "target": "gotcha-changelog-claims-features-not-yet-implemented-in-pr",
       "label": "relates-to"
     }
   ]
