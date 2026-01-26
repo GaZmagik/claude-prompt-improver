@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-24T14:01:35.676Z",
+  "lastUpdated": "2026-01-24T19:02:23.482Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -4439,6 +4439,118 @@
       "scope": "project",
       "relativePath": "permanent/gotcha-retro-stubbed-implementations-masquerade-as-completed-features.md",
       "severity": "high"
+    },
+    {
+      "id": "learning-tdd-catches-integration-wiring-gaps-early",
+      "type": "learning",
+      "title": "TDD catches integration wiring gaps early",
+      "tags": [
+        "tdd",
+        "integration",
+        "testing",
+        "project"
+      ],
+      "created": "2026-01-24T19:02:04.225Z",
+      "updated": "2026-01-24T19:02:04.225Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-tdd-catches-integration-wiring-gaps-early.md"
+    },
+    {
+      "id": "learning-custom-component-paths-should-supplement-defaults-not-replace",
+      "type": "learning",
+      "title": "Custom component paths should supplement defaults, not replace",
+      "tags": [
+        "plugins",
+        "design",
+        "component-discovery",
+        "project"
+      ],
+      "created": "2026-01-24T19:02:09.299Z",
+      "updated": "2026-01-24T19:02:09.299Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-custom-component-paths-should-supplement-defaults-not-replace.md"
+    },
+    {
+      "id": "learning-retro-memory-activation-at-session-start-surfaces-architectural-gaps",
+      "type": "learning",
+      "title": "Retro - Memory activation at session start surfaces architectural gaps",
+      "tags": [
+        "retrospective",
+        "process",
+        "memory-skill",
+        "architecture",
+        "project"
+      ],
+      "created": "2026-01-24T19:02:09.968Z",
+      "updated": "2026-01-24T19:02:09.968Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-memory-activation-at-session-start-surfaces-architectural-gaps.md",
+      "severity": "high"
+    },
+    {
+      "id": "gotcha-memory-files-from-other-projects-can-mislead-review-interpretation",
+      "type": "gotcha",
+      "title": "Memory files from other projects can mislead review interpretation",
+      "tags": [
+        "review",
+        "integration",
+        "memory",
+        "project"
+      ],
+      "created": "2026-01-24T19:02:14.371Z",
+      "updated": "2026-01-24T19:02:14.371Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-memory-files-from-other-projects-can-mislead-review-interpretation.md"
+    },
+    {
+      "id": "learning-retro-tdd-test-first-approach-catches-architecture-misunderstandings-before-implementation",
+      "type": "learning",
+      "title": "Retro - TDD test-first approach catches architecture misunderstandings before implementation",
+      "tags": [
+        "retrospective",
+        "process",
+        "tdd",
+        "testing",
+        "project"
+      ],
+      "created": "2026-01-24T19:02:14.527Z",
+      "updated": "2026-01-24T19:02:14.527Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-tdd-test-first-approach-catches-architecture-misunderstandings-before-implementation.md",
+      "severity": "high"
+    },
+    {
+      "id": "learning-retro-type-casting-repetition-indicates-abstraction-gap",
+      "type": "learning",
+      "title": "Retro - Type casting repetition indicates abstraction gap",
+      "tags": [
+        "retrospective",
+        "process",
+        "refactoring",
+        "types",
+        "project"
+      ],
+      "created": "2026-01-24T19:02:18.979Z",
+      "updated": "2026-01-24T19:02:18.979Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-retro-type-casting-repetition-indicates-abstraction-gap.md",
+      "severity": "medium"
+    },
+    {
+      "id": "decision-six-phase-tdd-implementation-plan-for-wiring-incomplete-features",
+      "type": "decision",
+      "title": "Six-phase TDD plan for wiring incomplete features",
+      "tags": [
+        "tdd",
+        "planning",
+        "integration",
+        "architecture",
+        "project"
+      ],
+      "created": "2026-01-24T19:02:23.477Z",
+      "updated": "2026-01-24T19:02:23.477Z",
+      "scope": "project",
+      "relativePath": "permanent/decision-six-phase-tdd-implementation-plan-for-wiring-incomplete-features.md"
     }
   ]
 }
