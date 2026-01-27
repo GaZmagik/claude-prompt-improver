@@ -172,6 +172,9 @@ function buildContextSection(context?: ImprovementContext): string {
   if (context.dynamicDiscovery) {
     sections.push(`<discovered_resources>\n${escapeXmlContent(context.dynamicDiscovery)}\n</discovered_resources>`);
   }
+  if (context.pluginResources) {
+    sections.push(`<plugin_resources>\n${escapeXmlContent(context.pluginResources)}\n</plugin_resources>`);
+  }
 
   return sections.length > 0 ? sections.join('\n\n') : '';
 }
@@ -210,6 +213,7 @@ Improvement guidelines:
 3. ADD clarity by specifying what's ambiguous
 4. Structure the output using XML tags (e.g., <task>, <context>, <constraints>)
 5. Make reasonable assumptions based on available context
+6. Reference relevant tools, skills, or agents from your system prompt when they could help the user's task
 
 Output ONLY the improved prompt wrapped in XML tags. No preamble. No explanation.`;
 
