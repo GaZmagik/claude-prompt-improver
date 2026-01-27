@@ -445,4 +445,29 @@ This is expanded with lots of detail and context information.`,
       expect(result.summary).toBeUndefined();
     });
   });
+
+  describe('T220: pluginResources context injection', () => {
+    it('should include pluginResources in improvement prompt context', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+        context: {
+          pluginResources: '<project-context><language>typescript</language></project-context>',
+        },
+      });
+
+      expect(prompt).toContain('<plugin_resources>');
+      expect(prompt).toContain('typescript');
+    });
+  });
+
+  describe('T221: improvement template tool/skill/agent awareness', () => {
+    it('should instruct agent to reference relevant tools/skills/agents', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      // Template should mention leveraging available tools/skills/agents
+      expect(prompt).toMatch(/tool|skill|agent/i);
+    });
+  });
 });

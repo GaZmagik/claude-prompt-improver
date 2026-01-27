@@ -1,6 +1,6 @@
 {
   "name": "claude-prompt-improver",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "description": "Automatically improves prompts for better Claude responses with configurable AI models",
   "author": {
     "name": "Gareth Williams",

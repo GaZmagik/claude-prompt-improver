@@ -23,8 +23,9 @@ describe('T210-T213: Plugin Manifest', () => {
       expect(pluginJson.name).toBe('claude-prompt-improver');
     });
 
-    it('T210.2: should have version 1.7.0', () => {
-      expect(pluginJson.version).toBe('1.7.0');
+    it('T210.2: should have valid semver version', () => {
+      expect(typeof pluginJson.version).toBe('string');
+      expect(pluginJson.version).toMatch(/^\d+\.\d+\.\d+$/);
     });
 
     it('T210.3: should have description field', () => {
@@ -44,14 +45,16 @@ describe('T210-T213: Plugin Manifest', () => {
     });
   });
 
-  describe('T212: Hooks field', () => {
-    it('T212.1: should have hooks field pointing to hooks.json', () => {
-      expect(pluginJson.hooks).toBe('./hooks/hooks.json');
-    });
-
-    it('T212.2: hooks.json file should exist', () => {
+  describe('T212: Hooks configuration', () => {
+    it('T212.1: hooks.json should exist in default location', () => {
+      // Hooks field removed in v1.7.1 - uses default location instead
       const hooksJsonPath = join(projectRoot, 'hooks', 'hooks.json');
       expect(existsSync(hooksJsonPath)).toBe(true);
+    });
+
+    it('T212.2: should not have redundant hooks field (uses default location)', () => {
+      // v1.7.1 removed hooks field as it caused "Duplicate hooks file detected" error
+      expect(pluginJson.hooks).toBeUndefined();
     });
   });
 
