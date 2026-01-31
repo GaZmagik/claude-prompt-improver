@@ -77,6 +77,9 @@ export function buildClaudeCommand(options: ClaudeClientOptions): ClaudeCommandA
   // This allows the improver to understand terms/acronyms defined earlier in the conversation
   if (sessionId) {
     args.push('--resume', sessionId, '--fork-session');
+    // CRITICAL: Disable all tools in forked sessions to prevent child process spawning
+    // Prompt improvement doesn't need Bash, LSP, git, or other tools that spawn processes
+    args.push('--tools', '');
   }
 
   // Prompt must be last argument
@@ -190,6 +193,15 @@ export async function executeClaudeCommand(
     // Guaranteed cleanup - no race condition possible
     if (timeoutId !== undefined) {
       clearTimeout(timeoutId);
+    }
+
+    // CRITICAL: Kill the process and its children to prevent orphaned processes
+    // Forked Claude sessions spawn child processes (LSP, git, chrome-devtools)
+    // that don't exit when the parent completes. Explicit kill prevents leaks.
+    try {
+      proc.kill();
+    } catch {
+      // Process may have already exited naturally - ignore errors
     }
   }
 }
