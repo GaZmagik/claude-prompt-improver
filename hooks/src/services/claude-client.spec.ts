@@ -72,6 +72,25 @@ describe('Claude Client', () => {
       expect(args).toContain('session-123');
     });
 
+    it('should disable all tools in forked sessions to prevent child process spawning', () => {
+      const options: ClaudeClientOptions = {
+        prompt: 'Test prompt',
+        model: 'haiku',
+        sessionId: 'session-123',
+      };
+
+      const { args } = buildClaudeCommand(options);
+
+      // CRITICAL: Tools must be disabled to prevent LSP, git, chrome-devtools spawning
+      expect(args).toContain('--tools');
+      expect(args).toContain('');
+
+      // Verify they appear after --fork-session
+      const forkIndex = args.indexOf('--fork-session');
+      const toolsIndex = args.indexOf('--tools');
+      expect(toolsIndex).toBeGreaterThan(forkIndex);
+    });
+
     it('should include the prompt in the command args', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Classify this prompt',

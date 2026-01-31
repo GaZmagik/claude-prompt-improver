@@ -46,7 +46,7 @@ function getModelIdentifier(model: ClaudeModel): string {
  * Command arguments for array-based spawn (no shell interpretation)
  */
 export interface ClaudeCommandArgs {
-  readonly args: string[]; // Mutable for Bun.spawn compatibility
+  readonly args: string[]; // readonly reference, but array contents are mutable for Bun.spawn
   readonly cwd: string;
 }
 
@@ -79,6 +79,7 @@ export function buildClaudeCommand(options: ClaudeClientOptions): ClaudeCommandA
     args.push('--resume', sessionId, '--fork-session');
     // CRITICAL: Disable all tools in forked sessions to prevent child process spawning
     // Prompt improvement doesn't need Bash, LSP, git, or other tools that spawn processes
+    // NOTE: --tools "" is the correct syntax to disable all tools (verified via Claude CLI help)
     args.push('--tools', '');
   }
 
@@ -198,6 +199,8 @@ export async function executeClaudeCommand(
     // CRITICAL: Kill the process and its children to prevent orphaned processes
     // Forked Claude sessions spawn child processes (LSP, git, chrome-devtools)
     // that don't exit when the parent completes. Explicit kill prevents leaks.
+    // NOTE: In timeout scenarios, proc.kill() is called twice (once in timeout handler,
+    // once here). The try-catch ensures the second call fails gracefully.
     try {
       proc.kill();
     } catch {
