@@ -57,7 +57,7 @@ describe('Claude Client', () => {
       expect(args).not.toContain('json');
     });
 
-    it('should build command with --fork-session when sessionId is available', () => {
+    it('should NOT use fork-session even when sessionId is available', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
         model: 'haiku',
@@ -66,13 +66,14 @@ describe('Claude Client', () => {
 
       const { args } = buildClaudeCommand(options);
 
-      // Fork-session allows improver to access conversation context
-      expect(args).toContain('--fork-session');
-      expect(args).toContain('--resume');
-      expect(args).toContain('session-123');
+      // Fork-session is disabled due to fundamental issues in UserPromptSubmit hooks
+      // See: gotcha-userpromptsubmit-fork-session-confirmed-broken
+      expect(args).not.toContain('--fork-session');
+      expect(args).not.toContain('--resume');
+      expect(args).not.toContain('session-123');
     });
 
-    it('should disable all tools in forked sessions to prevent child process spawning', () => {
+    it('should not include session-related arguments when sessionId is provided', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
         model: 'haiku',
@@ -81,14 +82,10 @@ describe('Claude Client', () => {
 
       const { args } = buildClaudeCommand(options);
 
-      // CRITICAL: Tools must be disabled to prevent LSP, git, chrome-devtools spawning
-      expect(args).toContain('--tools');
-      expect(args).toContain('');
-
-      // Verify they appear after --fork-session
-      const forkIndex = args.indexOf('--fork-session');
-      const toolsIndex = args.indexOf('--tools');
-      expect(toolsIndex).toBeGreaterThan(forkIndex);
+      // No session-related arguments should be present
+      expect(args).not.toContain('--tools');
+      expect(args).not.toContain('--resume');
+      expect(args).not.toContain('--fork-session');
     });
 
     it('should include the prompt in the command args', () => {

@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.4] - 2026-01-31
+
+### Fixed
+
+- **Disabled fork-session in UserPromptSubmit hooks** - Fork-session is fundamentally broken when used in UserPromptSubmit hooks, causing session hangs and zombie processes
+  - Removed `--resume <sessionId> --fork-session` from claude-client command builder
+  - UserPromptSubmit fires BEFORE prompt processing, so forked session context is always one message behind
+  - During session resume (`claude -r`), fork-session fails with "No conversation found" errors and 30-second timeouts
+  - This caused 99% CPU usage and zombie processes that blocked Claude Code startup
+  - Plugin now improves prompts without conversation context (fork-session feature removed)
+  - Updated tests to verify fork-session arguments are NOT included
+  - References: `gotcha-userpromptsubmit-fork-session-confirmed-broken`, `gotcha-retro-userpromptsubmit-hooks-should-not-use-fork-session`
+
 ## [1.7.3] - 2026-01-31
 
 ### Fixed
