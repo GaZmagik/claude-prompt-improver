@@ -4,7 +4,7 @@ A Claude Code plugin that automatically enhances and improves your prompts befor
 
 ## Features
 
-- **Automatic Improvement**: Enhances all prompts over 10 tokens with configurable AI models (haiku, sonnet, or opus)
+- **Opt-In or Automatic Improvement**: Choose between opt-in mode (add `#improve` tag) or automatic improvement for all prompts
 - **Smart Model Selection**: Configure your preferred model (haiku for speed, sonnet for balance, opus for quality)
 - **Context Injection**: Enriches prompts with relevant context from multiple sources:
   - Available tools and capabilities
@@ -99,6 +99,7 @@ Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settin
 |--------|------|---------|-------------|
 | `enabled` | boolean | `true` | Enable/disable the plugin globally |
 | `forceImprove` | boolean | `false` | Bypass all heuristic checks (for testing) |
+| `defaultImprove` | boolean | `false` | Enable automatic improvement by default (when `false`, requires `#improve` tag) |
 | `shortPromptThreshold` | number | `10` | Prompts with fewer tokens bypass improvement |
 | `compactionThreshold` | number | `5` | Skip when context availability is below this % |
 | `improverModel` | string | `haiku` | Model for all improvements: `haiku` (fast), `sonnet` (balanced), or `opus` (highest quality) |
@@ -121,11 +122,33 @@ Both camelCase and snake_case key names are supported (e.g., `shortPromptThresho
 
 ## Usage
 
-The plugin works automatically. Simply type your prompts as usual, and they will be enhanced before reaching Claude.
+### Opt-In Mode (Default)
+
+By default, the plugin operates in **opt-in mode** where improvement only happens when you explicitly add the `#improve` tag to your prompt:
+
+```
+Please help me understand the authentication system #improve
+```
+
+The `#improve` tag is removed before the prompt reaches Claude, so it won't appear in the conversation.
+
+**Why opt-in?** Prompt improvement adds 30-50 seconds of latency per prompt due to Claude API calls. Opt-in mode gives you control over when to wait for enhanced prompts.
+
+### Automatic Mode
+
+To enable automatic improvement for all prompts (original behaviour), set `defaultImprove: true` in your configuration:
+
+```yaml
+---
+defaultImprove: true
+---
+```
+
+With automatic mode enabled, all prompts over 10 tokens will be improved by default.
 
 ### Bypass with #skip
 
-Add `#skip` anywhere in your prompt to bypass improvement:
+Add `#skip` anywhere in your prompt to bypass improvement (works in both modes):
 
 ```
 #skip Just run the tests
@@ -135,7 +158,9 @@ The tag is removed before the prompt is passed through.
 
 ### How It Works
 
-The plugin automatically improves all prompts over 10 tokens (configurable via `shortPromptThreshold`). Short prompts, those tagged with `#skip`, and prompts during low context availability are bypassed.
+**In opt-in mode (default):** Only prompts with the `#improve` tag are enhanced. This prevents unexpected delays.
+
+**In automatic mode:** All prompts over 10 tokens (configurable via `shortPromptThreshold`) are improved. Short prompts, those tagged with `#skip`, and prompts during low context availability are bypassed.
 
 Improvements include:
 - **Clarity enhancement**: Removes ambiguity and adds structure

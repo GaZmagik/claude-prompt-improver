@@ -6,6 +6,9 @@ import { COMPACTION_THRESHOLD_PERCENT, SKIP_TAG } from './constants.ts';
  */
 import type { BypassReason } from './types.ts';
 
+/** Tag that triggers improvement when opt-in mode is enabled */
+const IMPROVE_TAG = '#improve';
+
 /**
  * Input for bypass detection
  */
@@ -15,6 +18,7 @@ export interface BypassCheckInput {
   readonly permissionMode?: string;
   readonly pluginDisabled?: boolean;
   readonly forceImprove?: boolean;
+  readonly defaultImprove?: boolean;
   readonly shortPromptThreshold?: number;
   readonly contextUsage?: {
     readonly used: number;
@@ -41,10 +45,25 @@ function removeSkipTags(prompt: string): string {
 }
 
 /**
+ * Removes #improve tag from prompt and returns cleaned version
+ */
+function removeImproveTags(prompt: string): string {
+  // Remove all occurrences of #improve (case-insensitive, with surrounding whitespace)
+  return prompt.replace(new RegExp(IMPROVE_TAG, 'gi'), '').replace(/\s+/g, ' ').trim();
+}
+
+/**
  * Checks if prompt contains the skip tag
  */
 function hasSkipTag(prompt: string): boolean {
   return prompt.toLowerCase().includes(SKIP_TAG.toLowerCase());
+}
+
+/**
+ * Checks if prompt contains the improve trigger tag
+ */
+function hasImproveTrigger(prompt: string): boolean {
+  return prompt.toLowerCase().includes(IMPROVE_TAG.toLowerCase());
 }
 
 /**
@@ -77,10 +96,11 @@ function getAvailableContextPercent(contextUsage: { used: number; max: number })
  * 2b. improvement_prompt - Prompt is our own improvement template (recursion prevention)
  * 3. low_context - Less than 5% context remaining
  * 4. skip_tag - Prompt contains #skip tag
- * 5. short_prompt - Prompt is ≤10 tokens
+ * 5. opt_in_required - No #improve tag and defaultImprove is false (opt-in mode)
+ * 6. short_prompt - Prompt is ≤10 tokens
  */
 export function detectBypass(input: BypassCheckInput): BypassCheckResult {
-  const { prompt, permissionMode, pluginDisabled, forceImprove, shortPromptThreshold, contextUsage } = input;
+  const { prompt, permissionMode, pluginDisabled, forceImprove, defaultImprove, shortPromptThreshold, contextUsage } = input;
 
   // Priority 0: Force improve bypasses ALL checks except plugin_disabled
   if (forceImprove === true && pluginDisabled !== true) {
@@ -135,7 +155,18 @@ export function detectBypass(input: BypassCheckInput): BypassCheckResult {
     };
   }
 
-  // Priority 5: Short prompt
+  // Priority 5: Opt-in required (no #improve tag and defaultImprove is false)
+  const hasImproveTag = hasImproveTrigger(prompt);
+  const shouldImproveByDefault = defaultImprove ?? false;
+
+  if (!hasImproveTag && !shouldImproveByDefault) {
+    return {
+      shouldBypass: true,
+      reason: 'opt_in_required',
+    };
+  }
+
+  // Priority 6: Short prompt
   if (isShortPrompt(prompt, shortPromptThreshold)) {
     return {
       shouldBypass: true,
@@ -143,7 +174,15 @@ export function detectBypass(input: BypassCheckInput): BypassCheckResult {
     };
   }
 
-  // No bypass condition met
+  // No bypass condition met - strip #improve tag if present
+  // (similar to how #skip is stripped when bypassing)
+  if (hasImproveTag) {
+    return {
+      shouldBypass: false,
+      cleanedPrompt: removeImproveTags(prompt),
+    };
+  }
+
   return {
     shouldBypass: false,
   };

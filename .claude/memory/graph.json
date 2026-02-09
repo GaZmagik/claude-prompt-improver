@@ -1382,6 +1382,24 @@
     {
       "id": "decision-six-phase-tdd-implementation-plan-for-wiring-incomplete-features",
       "type": "decision"
+    },
+    {
+      "id": "gotcha-prompt-improver-userpromptsubmit-hook-times-out-due-to-slow-cli",
+      "type": "gotcha",
+      "title": "prompt-improver-userpromptsubmit-hook-times-out-due-to-slow-cli",
+      "scope": "project"
+    },
+    {
+      "id": "learning-anthropic-sdk-direct-api-faster-than-cli",
+      "type": "learning",
+      "title": "anthropic-sdk-direct-api-faster-than-cli",
+      "scope": "project"
+    },
+    {
+      "id": "learning-prompt-improver-context-gathering-overhead-quantified",
+      "type": "learning",
+      "title": "prompt-improver-context-gathering-overhead-quantified",
+      "scope": "project"
     }
   ],
   "edges": [

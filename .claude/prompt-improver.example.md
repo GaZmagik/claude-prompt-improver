@@ -4,6 +4,7 @@
 
 enabled: true
 forceImprove: false
+defaultImprove: false
 shortPromptThreshold: 10
 compactionThreshold: 5
 improverModel: haiku
@@ -47,6 +48,7 @@ Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settin
 |--------|------|---------|-------------|
 | `enabled` | boolean | `true` | Enable/disable the plugin globally |
 | `forceImprove` | boolean | `false` | Bypass all heuristic checks (for testing) |
+| `defaultImprove` | boolean | `false` | Enable automatic improvement by default (when `false`, requires `#improve` tag) |
 | `shortPromptThreshold` | number | `10` | Prompts with fewer tokens bypass improvement |
 | `compactionThreshold` | number | `5` | Skip when context availability is below this % |
 | `improverModel` | string | `haiku` | Model for improvements (haiku, sonnet, or opus) |
@@ -83,14 +85,31 @@ shortPromptThreshold: 10
 short_prompt_threshold: 10
 ```
 
+## Usage Modes
+
+### Opt-In Mode (Default)
+
+By default (`defaultImprove: false`), improvement only happens when you add `#improve` to your prompt:
+
+```
+Please help me with authentication #improve
+```
+
+This prevents unexpected 30-50 second delays on every prompt.
+
+### Automatic Mode
+
+Set `defaultImprove: true` to improve all prompts automatically (original behaviour).
+
 ## Bypass Mechanisms
 
 The plugin automatically bypasses processing when:
 
-1. **Short prompts**: Fewer than `shortPromptThreshold` tokens
-2. **Skip tag**: Prompt contains `#skip`
-3. **Low context**: Context availability below `compactionThreshold`%
-4. **Forked sessions**: Running in a forked Claude session
+1. **Opt-in required**: No `#improve` tag when `defaultImprove: false`
+2. **Short prompts**: Fewer than `shortPromptThreshold` tokens
+3. **Skip tag**: Prompt contains `#skip`
+4. **Low context**: Context availability below `compactionThreshold`%
+5. **Forked sessions**: Running in a forked Claude session
 
 ## Troubleshooting
 

@@ -19,6 +19,7 @@ describe('Bypass Detector', () => {
       const input: BypassCheckInput = {
         prompt: 'fix it',
         sessionId: 'session-123',
+        defaultImprove: true, // Enable improvement by default for this test
       };
 
       const result = detectBypass(input);
@@ -32,6 +33,7 @@ describe('Bypass Detector', () => {
         prompt:
           'Please help me understand how the authentication module works and identify any potential security issues',
         sessionId: 'session-123',
+        defaultImprove: true, // Enable improvement by default for this test
       };
 
       const result = detectBypass(input);
@@ -43,6 +45,7 @@ describe('Bypass Detector', () => {
       const input: BypassCheckInput = {
         prompt: '',
         sessionId: 'session-123',
+        defaultImprove: true, // Enable improvement by default for this test
       };
 
       const result = detectBypass(input);
@@ -411,6 +414,7 @@ describe('Bypass Detector', () => {
         prompt: 'fix',
         sessionId: 'session-123',
         forceImprove: false,
+        defaultImprove: true, // Enable improvement by default so short_prompt check is reached
       };
 
       const result = detectBypass(input);
@@ -423,6 +427,7 @@ describe('Bypass Detector', () => {
       const input: BypassCheckInput = {
         prompt: 'help',
         sessionId: 'session-123',
+        defaultImprove: true, // Enable improvement by default so short_prompt check is reached
       };
 
       const result = detectBypass(input);
@@ -468,6 +473,108 @@ describe('Bypass Detector', () => {
       // plugin_disabled has absolute priority
       expect(result.shouldBypass).toBe(true);
       expect(result.reason).toBe('plugin_disabled');
+    });
+  });
+
+  describe('T059: detectBypass - opt-in mode with #improve tag', () => {
+    it('should bypass when no #improve tag and defaultImprove is false', () => {
+      const input: BypassCheckInput = {
+        prompt: 'Please help me fix this bug',
+        sessionId: 'session-123',
+        defaultImprove: false,
+      };
+
+      const result = detectBypass(input);
+
+      expect(result.shouldBypass).toBe(true);
+      expect(result.reason).toBe('opt_in_required');
+    });
+
+    it('should bypass when no #improve tag and defaultImprove is undefined (defaults to false)', () => {
+      const input: BypassCheckInput = {
+        prompt: 'Please help me fix this bug',
+        sessionId: 'session-123',
+      };
+
+      const result = detectBypass(input);
+
+      expect(result.shouldBypass).toBe(true);
+      expect(result.reason).toBe('opt_in_required');
+    });
+
+    it('should not bypass when #improve tag is present', () => {
+      const input: BypassCheckInput = {
+        prompt: 'Please help me understand the authentication module and fix any security issues #improve',
+        sessionId: 'session-123',
+        defaultImprove: false,
+      };
+
+      const result = detectBypass(input);
+
+      expect(result.shouldBypass).toBe(false);
+    });
+
+    it('should not bypass when defaultImprove is true', () => {
+      const input: BypassCheckInput = {
+        prompt: 'Please help me understand how the authentication system works and identify security issues',
+        sessionId: 'session-123',
+        defaultImprove: true,
+      };
+
+      const result = detectBypass(input);
+
+      expect(result.shouldBypass).toBe(false);
+    });
+
+    it('should strip #improve tag from prompt when improving', () => {
+      const input: BypassCheckInput = {
+        prompt: 'Please help me understand the authentication module and #improve fix any security issues that you find',
+        sessionId: 'session-123',
+        defaultImprove: false,
+      };
+
+      const result = detectBypass(input);
+
+      expect(result.shouldBypass).toBe(false);
+      expect(result.cleanedPrompt).toBe('Please help me understand the authentication module and fix any security issues that you find');
+    });
+
+    it('should handle #improve tag case-insensitively', () => {
+      const input: BypassCheckInput = {
+        prompt: 'Please help me understand the authentication system and fix the security issues #IMPROVE',
+        sessionId: 'session-123',
+        defaultImprove: false,
+      };
+
+      const result = detectBypass(input);
+
+      expect(result.shouldBypass).toBe(false);
+      expect(result.cleanedPrompt).toBe('Please help me understand the authentication system and fix the security issues');
+    });
+
+    it('should handle multiple #improve tags', () => {
+      const input: BypassCheckInput = {
+        prompt: '#improve Please help me understand how this authentication module works #improve',
+        sessionId: 'session-123',
+      };
+
+      const result = detectBypass(input);
+
+      expect(result.shouldBypass).toBe(false);
+      expect(result.cleanedPrompt).toBe('Please help me understand how this authentication module works');
+    });
+
+    it('should prioritize #skip over opt-in check', () => {
+      const input: BypassCheckInput = {
+        prompt: '#skip fix this bug',
+        sessionId: 'session-123',
+        defaultImprove: false,
+      };
+
+      const result = detectBypass(input);
+
+      expect(result.shouldBypass).toBe(true);
+      expect(result.reason).toBe('skip_tag');
     });
   });
 });

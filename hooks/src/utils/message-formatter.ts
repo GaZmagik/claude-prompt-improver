@@ -52,6 +52,8 @@ function getBypassReasonText(reason?: BypassReason): string {
       return 'classification failed';
     case 'improvement_failed':
       return 'improvement failed';
+    case 'opt_in_required':
+      return 'add #improve tag to enable';
     default:
       return 'not improved';
   }

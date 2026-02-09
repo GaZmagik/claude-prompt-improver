@@ -57,9 +57,9 @@ export interface ImprovementResult {
  */
 function getTimeoutForModel(model: ClaudeModel): number {
   switch (model) {
-    case 'opus': return 90_000;  // 90s
-    case 'sonnet': return 60_000; // 60s
-    case 'haiku': return 30_000;  // 30s
+    case 'opus': return 300_000;  // 5 minutes - testing
+    case 'sonnet': return 300_000; // 5 minutes - testing
+    case 'haiku': return 300_000;  // 5 minutes - testing
   }
 }
 

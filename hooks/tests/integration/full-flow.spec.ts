@@ -73,6 +73,7 @@ describe('Integration Tests - Full Flow', () => {
       const result = detectBypass({
         prompt: input.prompt,
         sessionId: input.context.conversation_id,
+        defaultImprove: true, // Enable improvement by default for this test
         ...(input.context.context_usage && { contextUsage: input.context.context_usage }),
       });
 
@@ -133,6 +134,7 @@ describe('Integration Tests - Full Flow', () => {
       const result = detectBypass({
         prompt: input.prompt,
         sessionId: input.context.conversation_id,
+        defaultImprove: true, // Enable improvement by default for this test
         ...(input.context.context_usage && { contextUsage: input.context.context_usage }),
       });
 
