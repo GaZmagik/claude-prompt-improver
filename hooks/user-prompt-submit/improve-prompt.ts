@@ -184,6 +184,7 @@ export interface ProcessPromptOptions {
   readonly permissionMode?: string;
   readonly pluginDisabled?: boolean;
   readonly forceImprove?: boolean;
+  readonly defaultImprove?: boolean;
   readonly shortPromptThreshold?: number;
   readonly contextUsage?: {
     readonly used: number;
@@ -225,7 +226,7 @@ export type ProcessPromptResult =
  * Builds bypass check input from process options
  */
 function buildBypassCheckInput(options: ProcessPromptOptions): BypassCheckInput {
-  const { prompt, sessionId, permissionMode, pluginDisabled, forceImprove, shortPromptThreshold, contextUsage } = options;
+  const { prompt, sessionId, permissionMode, pluginDisabled, forceImprove, defaultImprove, shortPromptThreshold, contextUsage } = options;
 
   const bypassInput: BypassCheckInput = { prompt, sessionId };
 
@@ -237,6 +238,9 @@ function buildBypassCheckInput(options: ProcessPromptOptions): BypassCheckInput 
   }
   if (forceImprove !== undefined) {
     (bypassInput as { forceImprove?: boolean }).forceImprove = forceImprove;
+  }
+  if (defaultImprove !== undefined) {
+    (bypassInput as { defaultImprove?: boolean }).defaultImprove = defaultImprove;
   }
   if (shortPromptThreshold !== undefined) {
     (bypassInput as { shortPromptThreshold?: number }).shortPromptThreshold = shortPromptThreshold;
@@ -403,8 +407,11 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
       : { type: 'passthrough' };
   }
 
+  // Use cleaned prompt if tags were stripped (e.g., #improve tag removal)
+  const promptToImprove = bypassResult.cleanedPrompt ?? prompt;
+
   // Build context from available sources (tools, skills, agents, git, lsp, spec, memory, session)
-  const contextOptions: BuildImprovementContextOptions = { prompt };
+  const contextOptions: BuildImprovementContextOptions = { prompt: promptToImprove };
   if (availableTools) {
     (contextOptions as { availableTools?: readonly string[] }).availableTools = availableTools;
   }
@@ -425,11 +432,11 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
   // Load config for model selection
   const config = await loadConfigFromStandardPaths();
 
-  // Count tokens before improvement
+  // Count tokens before improvement (use original prompt for accurate before count)
   const tokensBefore = countTokens(prompt);
 
-  // Build improve options with mocks and context
-  const improveOptions = buildImproveOptions(prompt, sessionId, config, improvementContext, cwd, _mockImprovement, _mockClassification);
+  // Build improve options with mocks and context (use cleaned prompt)
+  const improveOptions = buildImproveOptions(promptToImprove, sessionId, config, improvementContext, cwd, _mockImprovement, _mockClassification);
 
   // Improve the prompt with consistent error handling
   let improvement;
@@ -502,6 +509,10 @@ async function main(): Promise<void> {
     forceImprove: config.forceImprove,
     shortPromptThreshold: config.shortPromptThreshold,
   };
+
+  if (config.defaultImprove !== undefined) {
+    (processOptions as { defaultImprove?: boolean }).defaultImprove = config.defaultImprove;
+  }
 
   if (context.permission_mode) {
     (processOptions as { permissionMode?: string }).permissionMode = context.permission_mode;

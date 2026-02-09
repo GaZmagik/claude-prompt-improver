@@ -5,6 +5,67 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-02-09
+
+### Added
+
+- **#improve tag opt-in mode** - User-controlled prompt improvement to prevent 30-50 second latency
+  - Add `#improve` tag to prompt to enable improvement with full context
+  - Default behaviour: Skip improvement (instant, no delay)
+  - Opt-in behaviour: `#improve` tag triggers improvement with 30-50s API latency
+  - New `defaultImprove` config option (defaults to `false` for opt-in mode)
+  - Set `defaultImprove: true` to restore v1.7 automatic improvement behaviour
+  - New `opt_in_required` bypass reason with user-friendly message
+  - Case-insensitive tag detection: `#improve`, `#IMPROVE`, `#Improve` all work
+  - Tag stripping: `#improve` removed before sending to Claude API
+
+### Changed
+
+- **Bypass priority order updated** - Opt-in check now runs before short prompt check
+  - Priority 5: Opt-in required (no `#improve` tag and `defaultImprove` is false)
+  - Priority 6: Short prompt (previously priority 5)
+  - `#skip` tag still takes precedence (priority 4)
+
+### Fixed
+
+- **Prompt improvement latency issue** - Plugin was too slow for practical use
+  - Context gathering: 2-5 seconds (acceptable, already optimised)
+  - Claude API call: 30-50 seconds (unavoidable - same for CLI, direct API, or forked session)
+  - Total delay: Blocked every user prompt for 30-50 seconds
+  - Solution: Made improvement opt-in by default, users control when to wait
+
+### Technical Details
+
+- Added 8 new test cases for `#improve` tag functionality
+- Updated 29 existing tests to account for new opt-in logic
+- All 839 tests passing
+- `forceImprove: true` still bypasses all checks except `plugin_disabled`
+- Comprehensive documentation in README and example config
+
+### Migration Guide
+
+For users who want the old automatic improvement behaviour:
+
+```yaml
+# .claude/prompt-improver.local.md
+---
+defaultImprove: true  # Enable automatic improvement (v1.7 behaviour)
+---
+```
+
+## [1.7.4] - 2026-01-31
+
+### Fixed
+
+- **Disabled fork-session in UserPromptSubmit hooks** - Fork-session is fundamentally broken when used in UserPromptSubmit hooks, causing session hangs and zombie processes
+  - Removed `--resume <sessionId> --fork-session` from claude-client command builder
+  - UserPromptSubmit fires BEFORE prompt processing, so forked session context is always one message behind
+  - During session resume (`claude -r`), fork-session fails with "No conversation found" errors and 30-second timeouts
+  - This caused 99% CPU usage and zombie processes that blocked Claude Code startup
+  - Plugin now improves prompts without conversation context (fork-session feature removed)
+  - Updated tests to verify fork-session arguments are NOT included
+  - References: `gotcha-userpromptsubmit-fork-session-confirmed-broken`, `gotcha-retro-userpromptsubmit-hooks-should-not-use-fork-session`
+
 ## [1.7.3] - 2026-01-31
 
 ### Fixed

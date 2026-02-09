@@ -29,7 +29,8 @@ export type BypassReason =
   | 'forked_session'
   | 'plugin_disabled'
   | 'classification_failed'
-  | 'improvement_failed';
+  | 'improvement_failed'
+  | 'opt_in_required';
 
 // Valid XML tags for structured prompts
 export type XmlTag = 'task' | 'context' | 'constraints' | 'output_format' | 'examples';
@@ -120,6 +121,7 @@ export interface LoggingConfig {
 export interface Configuration {
   readonly enabled: boolean;
   readonly forceImprove: boolean;
+  readonly defaultImprove?: boolean;
   readonly shortPromptThreshold: number;
   readonly compactionThreshold: number;
 

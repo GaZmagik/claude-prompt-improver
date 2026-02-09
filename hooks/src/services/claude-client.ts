@@ -56,7 +56,7 @@ export interface ClaudeCommandArgs {
  * Uses array-based approach to prevent shell injection
  */
 export function buildClaudeCommand(options: ClaudeClientOptions): ClaudeCommandArgs {
-  const { prompt, model, sessionId, cwd } = options;
+  const { prompt, model, cwd } = options;
   const modelId = getModelIdentifier(model);
 
   // Array-based arguments prevent shell injection
@@ -73,15 +73,21 @@ export function buildClaudeCommand(options: ClaudeClientOptions): ClaudeCommandA
     modelId,
   ];
 
-  // When sessionId is available, fork the session to access conversation context
-  // This allows the improver to understand terms/acronyms defined earlier in the conversation
-  if (sessionId) {
-    args.push('--resume', sessionId, '--fork-session');
-    // CRITICAL: Disable all tools in forked sessions to prevent child process spawning
-    // Prompt improvement doesn't need Bash, LSP, git, or other tools that spawn processes
-    // NOTE: --tools "" is the correct syntax to disable all tools (verified via Claude CLI help)
-    args.push('--tools', '');
-  }
+  // DISABLED: fork-session is fundamentally broken in UserPromptSubmit hooks
+  // See gotcha-userpromptsubmit-fork-session-confirmed-broken
+  // See gotcha-retro-userpromptsubmit-hooks-should-not-use-fork-session
+  //
+  // The issue: UserPromptSubmit fires BEFORE prompt processing, so forking gives
+  // context up to the PREVIOUS message. During session resume, the session isn't
+  // fully loaded, causing "No conversation found" errors and 30-second timeouts.
+  //
+  // Future fix: Use PostToolUse hook instead, or implement conversation context
+  // via transcript file parsing rather than fork-session.
+  //
+  // if (sessionId) {
+  //   args.push('--resume', sessionId, '--fork-session');
+  //   args.push('--tools', '');
+  // }
 
   // Prompt must be last argument
   args.push(prompt);

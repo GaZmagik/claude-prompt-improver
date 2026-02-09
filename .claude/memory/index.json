@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-24T19:02:23.482Z",
+  "lastUpdated": "2026-02-08T23:29:36.719Z",
   "memories": [
     {
       "id": "learning-configuration-caching-with-mtime-invalidation",
@@ -4551,6 +4551,57 @@
       "updated": "2026-01-24T19:02:23.477Z",
       "scope": "project",
       "relativePath": "permanent/decision-six-phase-tdd-implementation-plan-for-wiring-incomplete-features.md"
+    },
+    {
+      "id": "gotcha-prompt-improver-userpromptsubmit-hook-times-out-due-to-slow-cli",
+      "type": "gotcha",
+      "title": "prompt-improver-userpromptsubmit-hook-times-out-due-to-slow-cli",
+      "tags": [
+        "prompt-improver",
+        "userpromptsubmit",
+        "timeout",
+        "performance",
+        "cli",
+        "project"
+      ],
+      "created": "2026-02-08T23:29:21.528Z",
+      "updated": "2026-02-08T23:29:21.528Z",
+      "scope": "project",
+      "relativePath": "permanent/gotcha-prompt-improver-userpromptsubmit-hook-times-out-due-to-slow-cli.md"
+    },
+    {
+      "id": "learning-anthropic-sdk-direct-api-faster-than-cli",
+      "type": "learning",
+      "title": "anthropic-sdk-direct-api-faster-than-cli",
+      "tags": [
+        "anthropic-sdk",
+        "performance",
+        "api",
+        "prompt-improver",
+        "optimization",
+        "project"
+      ],
+      "created": "2026-02-08T23:29:28.439Z",
+      "updated": "2026-02-08T23:29:28.439Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-anthropic-sdk-direct-api-faster-than-cli.md"
+    },
+    {
+      "id": "learning-prompt-improver-context-gathering-overhead-quantified",
+      "type": "learning",
+      "title": "prompt-improver-context-gathering-overhead-quantified",
+      "tags": [
+        "prompt-improver",
+        "context",
+        "performance",
+        "latency",
+        "measurement",
+        "project"
+      ],
+      "created": "2026-02-08T23:29:36.667Z",
+      "updated": "2026-02-08T23:29:36.667Z",
+      "scope": "project",
+      "relativePath": "permanent/learning-prompt-improver-context-gathering-overhead-quantified.md"
     }
   ]
 }

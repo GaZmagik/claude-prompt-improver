@@ -1,6 +1,6 @@
 {
   "name": "claude-prompt-improver",
-  "version": "1.7.3",
+  "version": "1.8.0",
   "description": "Claude Code plugin that automatically improves prompts based on classification and context",
   "type": "module",
   "scripts": {
@@ -30,5 +30,8 @@
     "plugin",
     "prompt-engineering",
     "prompt-improvement"
-  ]
+  ],
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.74.0"
+  }
 }

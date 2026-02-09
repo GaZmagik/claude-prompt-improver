@@ -243,6 +243,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'I need some help with testing the application but I am not sure where to start',
         sessionId: 'session-123',
+        defaultImprove: true,
         _mockImprovement: 'Help me write unit tests for the authentication module',
       });
 
@@ -256,6 +257,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'There is a bug somewhere in the code and it is causing issues with the user interface',
         sessionId: 'session-456',
+        defaultImprove: true,
         _mockClassification: 'COMPLEX: Very vague, no specifics',
         _mockImprovement: '<task>Investigate and fix the authentication bug</task>',
       });
@@ -270,6 +272,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'This is a longer prompt that would normally be processed by the improvement engine',
         sessionId: 'session-789',
+        defaultImprove: true,
         permissionMode: 'fork',
         _mockClassification: 'COMPLEX: Would normally be improved',
       });
@@ -285,6 +288,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'This is a test prompt that is long enough to pass the short prompt threshold check',
         sessionId: 'session-error',
+        defaultImprove: true,
         _mockClassification: null, // Simulates timeout/error
       });
 
@@ -295,6 +299,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'This is a vague prompt about something that needs to be fixed but without specifics',
         sessionId: 'session-error',
+        defaultImprove: true,
         _mockClassification: 'COMPLEX: Very vague',
         _mockImprovement: null, // Simulates timeout/error
       });
@@ -310,6 +315,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'fix it',
         sessionId: 'session-123',
+        defaultImprove: true,
         _mockClassification: 'COMPLEX: Would be classified if not bypassed',
       });
 
@@ -325,6 +331,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'Help me read the config file and write a new version with updated settings please',
         sessionId: 'session-ctx',
+        defaultImprove: true,
         availableTools: ['Read', 'Write', 'Edit', 'Grep', 'Glob', 'Bash'],
         _mockClassification: 'SIMPLE: Clear but could use structure',
         _mockImprovement: 'Read config.json and update the settings',
@@ -337,6 +344,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'Help me commit my changes to the repository with a proper message please',
         sessionId: 'session-skills',
+        defaultImprove: true,
         skillRules: [
           { name: 'commit', keywords: ['commit', 'git'], description: 'Git commit workflow' },
         ],
@@ -351,6 +359,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'Help me with complex TypeScript generics and type inference issues in this code',
         sessionId: 'session-agents',
+        defaultImprove: true,
         agentDefinitions: [
           {
             name: 'typescript-expert',
@@ -370,6 +379,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'Help me commit TypeScript code changes with proper type checking and validation',
         sessionId: 'session-multi',
+        defaultImprove: true,
         availableTools: ['Read', 'Write'],
         skillRules: [
           { name: 'commit', keywords: ['commit'], description: 'Git commit' },
@@ -393,6 +403,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'Please help me understand how this authentication module works in detail',
         sessionId: 'session-no-ctx',
+        defaultImprove: true,
         // No availableTools, skillRules, or agentDefinitions
         _mockClassification: 'SIMPLE: Clear question',
         _mockImprovement: 'Explain authentication module',
@@ -502,6 +513,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'fix',
         sessionId: 'session-bypass',
+        defaultImprove: true,
         _mockClassification: null, // Triggers bypass
       });
 
@@ -513,6 +525,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'Please help me understand how the authentication module works in detail',
         sessionId: 'session-success',
+        defaultImprove: true,
         _mockClassification: 'COMPLEX: Technical question',
         _mockImprovement: '<task>Explain authentication module</task>',
       });
@@ -525,6 +538,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'Please help me understand how the authentication module works in detail',
         sessionId: 'session-fail',
+        defaultImprove: true,
         _mockClassification: null, // Simulates classification failure
       });
 
@@ -539,6 +553,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'fix',
         sessionId: 'session-force',
+        defaultImprove: true,
         forceImprove: true,
         _mockClassification: 'SIMPLE: Short but forced',
         _mockImprovement: '<task>Fix the issue</task>',
@@ -552,6 +567,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'fix the bug',
         sessionId: 'session-disabled',
+        defaultImprove: true,
         forceImprove: true,
         pluginDisabled: true,
       });
@@ -564,6 +580,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'fix',
         sessionId: 'session-normal',
+        defaultImprove: true,
         forceImprove: false,
       });
 
@@ -578,6 +595,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'Please help me understand how the authentication module works in detail',
         sessionId: 'session-timestamp',
+        defaultImprove: true,
         _mockClassification: 'COMPLEX: Question',
         _mockImprovement: '<task>Explain authentication</task>',
       });
@@ -590,6 +608,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'Please help me understand how the authentication module works in detail',
         sessionId: 'session-no-timestamp',
+        defaultImprove: true,
         _mockClassification: 'COMPLEX: Question',
         _mockImprovement: '<task>Explain authentication</task>',
       });
@@ -605,6 +624,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'Please help me understand how the authentication module works in detail',
         sessionId: 'session-error-level',
+        defaultImprove: true,
         _mockClassification: 'COMPLEX: Question',
         _mockImprovement: '<task>Explain authentication</task>',
       });
@@ -617,6 +637,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'Please help me understand how the authentication module works in detail',
         sessionId: 'session-info-level',
+        defaultImprove: true,
         _mockClassification: 'COMPLEX: Question',
         _mockImprovement: '<task>Explain authentication</task>',
       });
@@ -629,6 +650,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'Please help me understand how the authentication module works in detail',
         sessionId: 'session-debug-level',
+        defaultImprove: true,
         _mockClassification: 'COMPLEX: Question',
         _mockImprovement: '<task>Explain authentication</task>',
       });
@@ -644,6 +666,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'Help me understand what plugins are available and how to use their features',
         sessionId: 'session-plugin-resources',
+        defaultImprove: true,
         integrations: {
           git: false,
           lsp: false,
@@ -664,6 +687,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'What plugins can help me with this task and what features do they provide',
         sessionId: 'session-plugin-only',
+        defaultImprove: true,
         integrations: {
           git: false,
           lsp: false,
@@ -684,6 +708,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'Help me with a task that is long enough to pass the threshold check please',
         sessionId: 'session-no-plugins',
+        defaultImprove: true,
         integrations: {
           git: false,
           lsp: false,
@@ -704,6 +729,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'Help me commit my changes using the available plugins and git integration',
         sessionId: 'session-multi-integrations',
+        defaultImprove: true,
         integrations: {
           git: true,
           lsp: false,
@@ -724,6 +750,7 @@ describe('Hook Input/Output', () => {
       const result = await processPrompt({
         prompt: 'Scan for plugins in the current directory and show me what is available',
         sessionId: 'session-cwd-test',
+        defaultImprove: true,
         integrations: {
           git: false,
           lsp: false,
