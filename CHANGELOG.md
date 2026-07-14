@@ -10,9 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Few-shot examples in improvement prompt** - Three worked original/improved pairs now guide the improver model
-  - Simple structuring example (vague bug report → task/context/constraints)
-  - Subagent fan-out example (broad audit → per-module subagents, findings only in main session)
+  - Simple structuring example (vague bug report → goal, approach, and test requirement in prose)
+  - Deep investigation example (broad audit → scoped mission, numbered report items, file:line citations, explicit verdict, per-module subagent fan-out)
   - Workflow opt-in example (codebase-wide migration → explicit "use a workflow" phrasing)
+- **Investigation depth guidance** - Improved prompts for audits/investigations now demand evidence (file:line with excerpts) and a closing verdict or recommendation, with a proportionality guard so simple prompts stay short
 - **Subagent and workflow awareness** - New improvement guidelines teach the improver about current Claude Code orchestration
   - Suggests subagent fan-out for noisy or parallelisable investigation
   - Adds explicit workflow opt-in phrasing for large multi-agent tasks (Claude Code only runs workflows when asked)
@@ -21,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Prose-first output replaces mandatory XML structuring** - Improved prompts are now written as natural prose (goal and rationale first, then scope/constraints, numbered questions for multi-part work, explicit deliverable); XML tags are only kept if the original prompt used them. Modern Claude models no longer need XML ceremony for readable prompts
+- **Summary detection updated** - "Added structure" now also recognises prose structure (numbered lists), not just XML tags
 - **Model aliases instead of dated model IDs** - `--model haiku|sonnet|opus` now passes CLI aliases, so the Claude CLI resolves each tier to its latest model (previously pinned to late-2025 snapshots such as `claude-sonnet-4-5-20250929`)
 - **Improvement prompt restructured** - Guidelines and examples now precede the original prompt, which sits last for recency
 

@@ -530,6 +530,45 @@ This is expanded with lots of detail and context information.`,
     });
   });
 
+  describe('T225: improvement template prose-first output', () => {
+    it('should not mandate XML-wrapped output', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).not.toContain('wrapped in XML tags');
+    });
+
+    it('should instruct prose structure with numbered questions and an explicit deliverable', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toMatch(/prose/i);
+      expect(prompt).toMatch(/numbered/i);
+      expect(prompt).toMatch(/deliverable|verdict/i);
+    });
+
+    it('should instruct evidence citations for investigation prompts', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toContain('file:line');
+    });
+  });
+
+  describe('T226: summary detects prose structure', () => {
+    it('should report added structure when a numbered list is introduced', () => {
+      const summary = generateImprovementSummary(
+        'check the endpoints',
+        'Audit every API endpoint for auth checks. Report:\n1. Unprotected routes with file:line.\n2. Inconsistent auth schemes between modules.\nGive a clear verdict.'
+      );
+
+      expect(summary.some((s) => s.toLowerCase().includes('structure'))).toBe(true);
+    });
+  });
+
   describe('T223: improvement template subagent and workflow awareness', () => {
     it('should instruct the improver to suggest subagents for parallelisable work', () => {
       const prompt = buildImprovementPrompt({

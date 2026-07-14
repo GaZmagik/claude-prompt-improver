@@ -104,13 +104,15 @@ export function generateImprovementSummary(
 ): readonly string[] {
   const changes: string[] = [];
 
-  // Detect XML structuring added
-  const hasXmlTags = /<(task|context|constraints|output_format|examples)>/.test(improvedPrompt);
-  const originalHasXmlTags = /<(task|context|constraints|output_format|examples)>/.test(
-    originalPrompt
-  );
-  if (hasXmlTags && !originalHasXmlTags) {
-    changes.push('Added XML structure');
+  // Detect structuring added - XML tags or prose structure (numbered lists)
+  const xmlTagPattern = /<(task|context|constraints|output_format|examples)>/;
+  const numberedListPattern = /^\s*\d+\.\s/m;
+  const hasStructure =
+    xmlTagPattern.test(improvedPrompt) || numberedListPattern.test(improvedPrompt);
+  const originalHasStructure =
+    xmlTagPattern.test(originalPrompt) || numberedListPattern.test(originalPrompt);
+  if (hasStructure && !originalHasStructure) {
+    changes.push('Added structure');
   }
 
   // Detect context injection (both specific and generic context tags)
@@ -213,13 +215,15 @@ CRITICAL BOUNDARIES:
 Improvement guidelines:
 1. PRESERVE the original intent - the user's goal must remain unchanged
 2. PRESERVE the original tone - formal/informal, concise/detailed
-3. ADD clarity by specifying what's ambiguous
-4. Structure the output using XML tags (e.g., <task>, <context>, <constraints>)
-5. Make reasonable assumptions based on available context
-6. Reference relevant tools, skills, or agents from your system prompt when they could help the user's task
-7. For noisy or parallelisable investigation (broad searches, audits across many files), add a constraint suggesting Claude fan the work out to subagents and keep only the findings in the main session
-8. For large multi-agent tasks (codebase-wide migrations, exhaustive reviews, multi-source research), add an explicit opt-in to orchestration, e.g. "use a workflow for this" - Claude Code only runs workflows when the prompt asks for one
-9. Do NOT suggest subagents or workflows for simple, single-file, or conversational requests - orchestration overhead must be proportionate to the task
+3. ADD clarity and specificity - name concrete files, functions, symbols, and branches from the available context; never invent paths or symbols the context does not support
+4. Write the improved prompt as natural prose, not XML. Open with the goal and why it matters, then state scope and constraints. For multi-part work, enumerate the specific questions or steps as a numbered list. Only keep XML tags if the original prompt already used them
+5. Always specify the expected deliverable: what the report, verdict, or output should contain and what shape it should take
+6. For investigation or audit prompts, require evidence: cite file:line with short excerpts, and demand an explicit verdict or recommendation at the end rather than an open-ended summary
+7. Make reasonable assumptions based on available context
+8. Reference relevant tools, skills, or agents from your system prompt when they could help the user's task
+9. For noisy or parallelisable investigation (broad searches, audits across many files), add a constraint suggesting Claude fan the work out to subagents and keep only the findings in the main session
+10. For large multi-agent tasks (codebase-wide migrations, exhaustive reviews, multi-source research), add an explicit opt-in to orchestration, e.g. "use a workflow for this" - Claude Code only runs workflows when the prompt asks for one
+11. Do NOT suggest subagents or workflows for simple, single-file, or conversational requests, and do not pad simple prompts with ceremony - depth must be proportionate to the task
 
 Worked examples of the expected transformation:
 
@@ -228,9 +232,7 @@ Worked examples of the expected transformation:
 fix the login bug
 </example_original>
 <example_improved>
-<task>Investigate and fix the login bug.</task>
-<context>Start from the authentication flow; check recent changes to login-related files first.</context>
-<constraints>Reproduce the bug before fixing it. Add or update a test that fails before the fix and passes after.</constraints>
+Investigate and fix the login bug. Start from the authentication flow and check recent changes to login-related files first. Reproduce the bug before fixing it, and add or update a test that fails before the fix and passes after. Report the root cause, the fix, and the test that covers it.
 </example_improved>
 </example>
 
@@ -239,9 +241,14 @@ fix the login bug
 check all our api endpoints have auth
 </example_original>
 <example_improved>
-<task>Audit every API endpoint for missing or inconsistent authentication checks.</task>
-<constraints>Fan the audit out to subagents (one per module or route group) so the main session only receives findings, not file dumps. Report each unprotected endpoint with file path and line number.</constraints>
-<output_format>A table of endpoints: path, HTTP method, auth status, severity.</output_format>
+Audit every API endpoint for missing or inconsistent authentication checks, so we know the exposure before the next release. Read-only; be thorough and cite file:line with short excerpts. Fan the audit out to subagents, one per module or route group, so the main session receives only findings.
+
+Report:
+1. Every route registration and whether an auth middleware guards it, with file:line.
+2. Endpoints that bypass the shared middleware (inline handlers, websockets, static mounts) and why.
+3. Inconsistencies between modules - different auth schemes, mixed session/token checks.
+
+Give a clear verdict: a table of unprotected endpoints (path, method, severity) and the single most likely systemic cause.
 </example_improved>
 </example>
 
@@ -250,9 +257,7 @@ check all our api endpoints have auth
 migrate everything from moment to date-fns
 </example_original>
 <example_improved>
-<task>Migrate the entire codebase from moment to date-fns.</task>
-<context>This is a codebase-wide mechanical migration touching many files independently.</context>
-<constraints>Use a workflow for this: discover all moment usages first, then transform each file in parallel, then verify with the test suite. Do not change behaviour, only the date library.</constraints>
+Migrate the entire codebase from moment to date-fns. This is a mechanical, codebase-wide migration touching many files independently, so use a workflow for this: discover every moment usage first, then transform each file in parallel, then verify with the full test suite. Do not change behaviour, only the date library. Report any call sites with no direct date-fns equivalent instead of guessing at a replacement.
 </example_improved>
 </example>
 
@@ -263,7 +268,7 @@ Original prompt to improve:
 {ORIGINAL_PROMPT}
 </original_prompt>
 
-Output ONLY the improved prompt wrapped in XML tags. No preamble. No explanation.`;
+Output ONLY the improved prompt. No preamble. No explanation.`;
 
 /**
  * Builds the improvement prompt with context
