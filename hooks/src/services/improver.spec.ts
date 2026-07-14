@@ -470,4 +470,81 @@ This is expanded with lots of detail and context information.`,
       expect(prompt).toMatch(/tool|skill|agent/i);
     });
   });
+
+  describe('T224: code fence stripping from improver output', () => {
+    it('should strip a wrapping markdown code fence from the improved prompt', async () => {
+      const result = await improvePrompt({
+        originalPrompt: 'fix the bug',
+        sessionId: 'session-123',
+        config: mockConfig,
+        _mockClaudeResponse: '```xml\n<task>Fix the bug</task>\n```',
+      });
+
+      expect(result.improvedPrompt).toBe('<task>Fix the bug</task>');
+    });
+
+    it('should leave unfenced output untouched', async () => {
+      const result = await improvePrompt({
+        originalPrompt: 'fix the bug',
+        sessionId: 'session-123',
+        config: mockConfig,
+        _mockClaudeResponse: '<task>Fix the bug</task>',
+      });
+
+      expect(result.improvedPrompt).toBe('<task>Fix the bug</task>');
+    });
+
+    it('should not strip fences that appear inside the prompt body', async () => {
+      const body = '<task>Explain this snippet</task>\n<context>```js\nfoo()\n```</context>';
+      const result = await improvePrompt({
+        originalPrompt: 'explain snippet',
+        sessionId: 'session-123',
+        config: mockConfig,
+        _mockClaudeResponse: body,
+      });
+
+      expect(result.improvedPrompt).toBe(body);
+    });
+  });
+
+  describe('T222: improvement template few-shot examples', () => {
+    it('should include worked examples with original and improved pairs', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toContain('<example>');
+      expect(prompt).toContain('<example_original>');
+      expect(prompt).toContain('<example_improved>');
+    });
+
+    it('should place examples before the original prompt so they read as instructions', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'my unique test prompt xyz',
+      });
+
+      const exampleIndex = prompt.indexOf('<example>');
+      const originalIndex = prompt.indexOf('my unique test prompt xyz');
+      expect(exampleIndex).toBeGreaterThan(-1);
+      expect(exampleIndex).toBeLessThan(originalIndex);
+    });
+  });
+
+  describe('T223: improvement template subagent and workflow awareness', () => {
+    it('should instruct the improver to suggest subagents for parallelisable work', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toMatch(/subagent/i);
+    });
+
+    it('should instruct the improver to suggest workflows for large multi-agent tasks', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toMatch(/workflow/i);
+    });
+  });
 });

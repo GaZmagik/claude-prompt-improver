@@ -249,7 +249,7 @@ describe('Claude Client', () => {
       expect(args.some((arg) => /sonnet/i.test(arg))).toBe(true);
     });
 
-    it('should use correct model name format for Claude CLI', () => {
+    it('should use CLI model aliases so the latest model version is resolved by Claude Code', () => {
       const haikuOptions: ClaudeClientOptions = {
         prompt: 'Test',
         model: 'haiku',
@@ -262,12 +262,20 @@ describe('Claude Client', () => {
         sessionId: 'session-123',
       };
 
+      const opusOptions: ClaudeClientOptions = {
+        prompt: 'Test',
+        model: 'opus',
+        sessionId: 'session-123',
+      };
+
       const { args: haikuArgs } = buildClaudeCommand(haikuOptions);
       const { args: sonnetArgs } = buildClaudeCommand(sonnetOptions);
+      const { args: opusArgs } = buildClaudeCommand(opusOptions);
 
-      // Claude CLI uses claude-3-5-haiku and claude-sonnet-4-5 format
-      expect(haikuArgs.some((arg) => /haiku/i.test(arg))).toBe(true);
-      expect(sonnetArgs.some((arg) => /sonnet/i.test(arg))).toBe(true);
+      // Aliases avoid pinning dated model IDs that go stale (e.g. claude-sonnet-4-5-20250929)
+      expect(haikuArgs[haikuArgs.indexOf('--model') + 1]).toBe('haiku');
+      expect(sonnetArgs[sonnetArgs.indexOf('--model') + 1]).toBe('sonnet');
+      expect(opusArgs[opusArgs.indexOf('--model') + 1]).toBe('opus');
     });
   });
 

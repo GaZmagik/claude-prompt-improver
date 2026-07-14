@@ -85,6 +85,16 @@ function getContextSources(context?: ImprovementContext): ContextSource[] {
 }
 
 /**
+ * Strips a markdown code fence that wraps the entire improver output
+ * Models sometimes fence their response (e.g. \`\`\`xml ... \`\`\`) despite
+ * instructions; fences inside the prompt body are left intact
+ */
+export function stripWrappingCodeFence(output: string): string {
+  const fenceMatch = output.match(/^```[a-z]*\n([\s\S]*)\n```$/);
+  return fenceMatch?.[1] ?? output;
+}
+
+/**
  * Generate improvement summary by detecting changes
  * Returns max 3 bullets describing what changed
  */
@@ -200,13 +210,6 @@ CRITICAL BOUNDARIES:
 - DO NOT reference what was previously discussed
 - Output ONLY the improved prompt, nothing else
 
-Original prompt to improve:
-<original_prompt>
-{ORIGINAL_PROMPT}
-</original_prompt>
-
-{CONTEXT_SECTION}
-
 Improvement guidelines:
 1. PRESERVE the original intent - the user's goal must remain unchanged
 2. PRESERVE the original tone - formal/informal, concise/detailed
@@ -214,6 +217,51 @@ Improvement guidelines:
 4. Structure the output using XML tags (e.g., <task>, <context>, <constraints>)
 5. Make reasonable assumptions based on available context
 6. Reference relevant tools, skills, or agents from your system prompt when they could help the user's task
+7. For noisy or parallelisable investigation (broad searches, audits across many files), add a constraint suggesting Claude fan the work out to subagents and keep only the findings in the main session
+8. For large multi-agent tasks (codebase-wide migrations, exhaustive reviews, multi-source research), add an explicit opt-in to orchestration, e.g. "use a workflow for this" - Claude Code only runs workflows when the prompt asks for one
+9. Do NOT suggest subagents or workflows for simple, single-file, or conversational requests - orchestration overhead must be proportionate to the task
+
+Worked examples of the expected transformation:
+
+<example>
+<example_original>
+fix the login bug
+</example_original>
+<example_improved>
+<task>Investigate and fix the login bug.</task>
+<context>Start from the authentication flow; check recent changes to login-related files first.</context>
+<constraints>Reproduce the bug before fixing it. Add or update a test that fails before the fix and passes after.</constraints>
+</example_improved>
+</example>
+
+<example>
+<example_original>
+check all our api endpoints have auth
+</example_original>
+<example_improved>
+<task>Audit every API endpoint for missing or inconsistent authentication checks.</task>
+<constraints>Fan the audit out to subagents (one per module or route group) so the main session only receives findings, not file dumps. Report each unprotected endpoint with file path and line number.</constraints>
+<output_format>A table of endpoints: path, HTTP method, auth status, severity.</output_format>
+</example_improved>
+</example>
+
+<example>
+<example_original>
+migrate everything from moment to date-fns
+</example_original>
+<example_improved>
+<task>Migrate the entire codebase from moment to date-fns.</task>
+<context>This is a codebase-wide mechanical migration touching many files independently.</context>
+<constraints>Use a workflow for this: discover all moment usages first, then transform each file in parallel, then verify with the test suite. Do not change behaviour, only the date library.</constraints>
+</example_improved>
+</example>
+
+{CONTEXT_SECTION}
+
+Original prompt to improve:
+<original_prompt>
+{ORIGINAL_PROMPT}
+</original_prompt>
 
 Output ONLY the improved prompt wrapped in XML tags. No preamble. No explanation.`;
 
@@ -262,11 +310,12 @@ export async function improvePrompt(options: ImprovePromptOptions): Promise<Impr
       };
     }
 
-    const summary = generateImprovementSummary(originalPrompt, _mockClaudeResponse);
+    const mockImproved = stripWrappingCodeFence(_mockClaudeResponse);
+    const summary = generateImprovementSummary(originalPrompt, mockImproved);
 
     return {
       success: true,
-      improvedPrompt: _mockClaudeResponse,
+      improvedPrompt: mockImproved,
       fallbackToOriginal: false,
       modelUsed: model,
       latencyMs,
@@ -303,11 +352,12 @@ export async function improvePrompt(options: ImprovePromptOptions): Promise<Impr
     };
   }
 
-  const summary = generateImprovementSummary(originalPrompt, result.output);
+  const improved = stripWrappingCodeFence(result.output);
+  const summary = generateImprovementSummary(originalPrompt, improved);
 
   return {
     success: true,
-    improvedPrompt: result.output,
+    improvedPrompt: improved,
     fallbackToOriginal: false,
     modelUsed: model,
     latencyMs,

@@ -30,15 +30,17 @@ export interface ClaudeCommandResult {
 
 /**
  * Maps our model names to Claude CLI model identifiers
+ * Uses CLI aliases rather than dated model IDs - the CLI resolves each alias
+ * to the latest model of that tier, so the plugin never pins a stale snapshot
  */
 function getModelIdentifier(model: ClaudeModel): string {
   switch (model) {
     case 'haiku':
-      return 'claude-haiku-4-5-20251001';
+      return 'haiku';
     case 'sonnet':
-      return 'claude-sonnet-4-5-20250929';
+      return 'sonnet';
     case 'opus':
-      return 'claude-opus-4-5-20251101';
+      return 'opus';
   }
 }
 
