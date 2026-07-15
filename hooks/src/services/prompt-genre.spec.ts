@@ -53,6 +53,14 @@ describe('classifyPromptGenre', () => {
       expect(classifyPromptGenre('migrate everything from moment to date-fns')).toBe('build');
       expect(classifyPromptGenre('refactor the ledger builder into modules')).toBe('build');
     });
+
+    it('classifies make/enable/support phrasing as build', () => {
+      expect(
+        classifyPromptGenre('make the scanned statements show up on all four dashboards')
+      ).toBe('build');
+      expect(classifyPromptGenre('enable cross-dashboard recall of scans')).toBe('build');
+      expect(classifyPromptGenre('support tombstone deletes in the sidecar')).toBe('build');
+    });
   });
 
   describe('general genre', () => {

@@ -696,6 +696,47 @@ This is expanded with lots of detail and context information.`,
     });
   });
 
+  describe('T233: build-genre trust, reuse, and boundary guidance', () => {
+    const buildPrompt = 'add the invoice reconciliation tab to the dashboard';
+
+    it('should instruct a trust-this block for verified facts and intentional behaviour', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: buildPrompt,
+      });
+
+      expect(prompt).toMatch(/trust this/i);
+      expect(prompt).toMatch(/intentional/i);
+    });
+
+    it('should instruct copying established in-repo idioms and reuse-before-write', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: buildPrompt,
+      });
+
+      expect(prompt).toMatch(/established (idiom|pattern)/i);
+      expect(prompt).toMatch(/before adding a new one/i);
+    });
+
+    it('should instruct failure-mode guards, precedence rules, and hot-path constraints', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: buildPrompt,
+      });
+
+      expect(prompt).toMatch(/must not throw|degrade gracefully/i);
+      expect(prompt).toMatch(/precedence|wins/i);
+      expect(prompt).toMatch(/hot path/i);
+    });
+
+    it('should instruct lane boundaries and surfaced assumptions in the report', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: buildPrompt,
+      });
+
+      expect(prompt).toMatch(/lane|do NOT (run|build)/);
+      expect(prompt).toMatch(/assumptions? (it |they )?made/i);
+    });
+  });
+
   describe('T229: improvement template implementation-brief guidance', () => {
     const buildPrompt = 'add the invoice reconciliation tab to the dashboard';
 

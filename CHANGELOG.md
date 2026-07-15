@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-07-15
+
+### Added
+
+- **Build-genre trust and boundary guidance** - Distilled from a real cross-dashboard implementation brief:
+  - "Already verified - trust this" background blocks so handed-over facts are not re-derived; deliberate behaviour marked intentional so it is not "fixed"
+  - Copy-the-idiom mandates ("reuse the pattern in <file>") and reuse-before-write (check for an existing helper first)
+  - Precise failure-mode and precedence specs: graceful-degradation guards ("must not throw"), which side wins on overlapping data, hot path constraints (no synchronous I/O in render paths)
+  - Lane boundaries ("author files only; do NOT run the build") and assumptions surfaced in the report
+
+### Changed
+
+- **Genre classifier** - make/enable/support phrasing now classifies as build (previously fell through to general)
+
+### Technical Details
+
+- Added 5 new test cases (trust/idiom/guards/lane assertions, classifier coverage)
+
 ## [1.9.0] - 2026-07-15
 
 ### Added

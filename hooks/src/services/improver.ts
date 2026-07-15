@@ -259,6 +259,10 @@ const GENRE_GUIDELINES: Record<PromptGenre, string> = {
 - Point at proven prior results to reproduce rather than re-derive
 - Turn acceptance criteria into assertable invariants the build must check ("assert X and warn - never silently drop data"), and include a concrete worked example to sanity-check the result end to end; where the stakes justify it, require tests to prove themselves by going red on a broken build
 - State non-goals explicitly with their rationale ("do NOT do X - [reason]"), and where known pitfalls exist in the context, quantify their concrete cost so they cannot be shrugged off
+- Hand over pre-verified facts in a background block marked "already verified - trust this" so they are not re-derived or second-guessed, and mark deliberate existing behaviour as intentional ("X is intentional - do NOT change it") so it is not "fixed"
+- Point at an established idiom in the repo to copy exactly ("reuse the pattern in <file>"), and instruct reuse-before-write: check for an existing helper before adding a new one
+- Specify failure-mode behaviour and precedence precisely: guards that degrade gracefully ("if X is missing, fall back to Y - must not throw"), which side wins when data overlaps, and hot path constraints ("no synchronous I/O in render paths")
+- State the agent's lane when a wider process owns the rest ("author files only; do NOT run the build - the orchestrator does that"), and require the report to surface any assumptions made (e.g. concurrency, how a handle was obtained)
 - For codebase-wide mechanical changes (migrations, sweeping renames), add an explicit workflow opt-in ("use a workflow for this") - Claude Code only runs workflows when the prompt asks for one`,
   general: '',
 };
