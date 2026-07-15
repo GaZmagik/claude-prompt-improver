@@ -246,6 +246,9 @@ const GENRE_GUIDELINES: Record<PromptGenre, string> = {
 - When the output will feed further processing, specify a strict output contract: the exact fields or format (e.g. a JSON array of {file, line, summary}), any caps, and "return ONLY the [format], nothing else"
 - Where it sharpens focus, open with a role or angle assignment, name the concrete first actions or commands to run, and seed specific hypotheses to check rather than leaving questions abstract
 - State scope and output discipline: where to work (directory, branch), read-only if applicable, and conclusions in the final message rather than raw file dumps
+- When the investigation stems from user reports or requests, quote each verbatim, instruct interpretation against the code ("work out what they mean - is the control missing, or hidden in this branch?"), and structure findings per request
+- When behaviour may differ between branches, modes, or views, demand a side-by-side comparison ("exactly what renders in X vs Y"), not a description of one path
+- When the investigation precedes implementation, require code anchors sufficient to implement next (exact functions to modify, where new code hooks in) plus the clarifying questions to take back to the user on anything ambiguous; seed literal symbols or search terms to grep when the context names them
 - For broad sweeps across many files, add a constraint to fan the work out to subagents and keep only the findings in the main session`,
   research: `This prompt is external research or fact-checking. Additionally:
 - Demand epistemic discipline: verbatim quotes with source links, findings separated into VERIFIED (actually read from a doc/repo) versus inferred, and a verdict per claim (e.g. CONFIRMED / PARTLY RIGHT / WRONG / OUTDATED)
@@ -259,6 +262,10 @@ const GENRE_GUIDELINES: Record<PromptGenre, string> = {
 - Point at proven prior results to reproduce rather than re-derive
 - Turn acceptance criteria into assertable invariants the build must check ("assert X and warn - never silently drop data"), and include a concrete worked example to sanity-check the result end to end; where the stakes justify it, require tests to prove themselves by going red on a broken build
 - State non-goals explicitly with their rationale ("do NOT do X - [reason]"), and where known pitfalls exist in the context, quantify their concrete cost so they cannot be shrugged off
+- Hand over pre-verified facts in a background block marked "already verified - trust this" so they are not re-derived or second-guessed, and mark deliberate existing behaviour as intentional ("X is intentional - do NOT change it") so it is not "fixed"
+- Point at an established idiom in the repo to copy exactly ("reuse the pattern in [file]"), and instruct reuse-before-write: check for an existing helper before adding a new one
+- Specify failure-mode behaviour and precedence precisely: guards that degrade gracefully ("if X is missing, fall back to Y - must not throw"), which side wins when data overlaps, and hot path constraints ("no synchronous I/O in render paths")
+- State the agent's lane when a wider process owns the rest ("author files only; do NOT run the build - the orchestrator does that"), and require the report to surface any assumptions made (e.g. concurrency, how a handle was obtained)
 - For codebase-wide mechanical changes (migrations, sweeping renames), add an explicit workflow opt-in ("use a workflow for this") - Claude Code only runs workflows when the prompt asks for one`,
   general: '',
 };
