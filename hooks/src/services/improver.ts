@@ -56,10 +56,11 @@ export interface ImprovementResult {
  * Returns the appropriate timeout for the model
  */
 function getTimeoutForModel(model: ClaudeModel): number {
+  // Must stay under the 120s hook budget in hooks/hooks.json
   switch (model) {
-    case 'opus': return 300_000;  // 5 minutes - testing
-    case 'sonnet': return 300_000; // 5 minutes - testing
-    case 'haiku': return 300_000;  // 5 minutes - testing
+    case 'opus': return 100_000;
+    case 'sonnet': return 90_000;
+    case 'haiku': return 60_000;
   }
 }
 
@@ -90,7 +91,7 @@ function getContextSources(context?: ImprovementContext): ContextSource[] {
  * instructions; fences inside the prompt body are left intact
  */
 export function stripWrappingCodeFence(output: string): string {
-  const fenceMatch = output.match(/^```[a-z]*\n([\s\S]*)\n```$/);
+  const fenceMatch = output.trim().match(/^```\w*\r?\n([\s\S]*?)\r?\n```$/);
   return fenceMatch?.[1] ?? output;
 }
 
@@ -106,7 +107,7 @@ export function generateImprovementSummary(
 
   // Detect structuring added - XML tags or prose structure (numbered lists)
   const xmlTagPattern = /<(task|context|constraints|output_format|examples)>/;
-  const numberedListPattern = /^\s*\d+\.\s/m;
+  const numberedListPattern = /^\s*\d+[.)]\s/m;
   const hasStructure =
     xmlTagPattern.test(improvedPrompt) || numberedListPattern.test(improvedPrompt);
   const originalHasStructure =

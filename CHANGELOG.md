@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.9.0] - 2026-07-14
+## [1.9.0] - 2026-07-15
 
 ### Added
 
@@ -29,7 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Prose-first output replaces mandatory XML structuring** - Improved prompts are now written as natural prose (goal and rationale first, then scope/constraints, numbered questions for multi-part work, explicit deliverable); XML tags are only kept if the original prompt used them. Modern Claude models no longer need XML ceremony for readable prompts
+- **Prose-first output replaces mandatory XML structuring** - Improved prompts are now written as natural prose (goal and rationale first, then scope/constraints, numbered questions for multi-part work, explicit deliverable); XML tags are only kept if the original prompt used them. This deliberately reverses the v1.2.0 "mandatory XML" decision: that fix addressed inconsistent output from vague "if helpful" instructions on 2025-era models, and the prescriptive prose shape solves the same consistency problem without markup on current models (see the updated memory notes in .claude/memory/permanent/)
+- **Improvement timeouts fixed** - Per-model timeouts were leftover 300s testing values exceeding the 120s hook budget; now 60s (haiku), 90s (sonnet), 100s (opus)
 - **Summary detection updated** - "Added structure" now also recognises prose structure (numbered lists), not just XML tags
 - **Model aliases instead of dated model IDs** - `--model haiku|sonnet|opus` now passes CLI aliases, so the Claude CLI resolves each tier to its latest model (previously pinned to late-2025 snapshots such as `claude-sonnet-4-5-20250929`)
 - **Improvement prompt restructured** - Guidelines and examples now precede the original prompt, which sits last for recency
@@ -37,7 +38,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Technical Details
 
 - Verified against Claude Code 2.1.209: UserPromptSubmit hook schema, plugin hooks.json format, and all CLI flags (`--print`, `--no-session-persistence`, `--debug`, `--model`) remain supported
-- Added 8 new test cases (few-shot examples, subagent/workflow guidance, fence stripping, alias assertions)
+- Added 16 new test cases (few-shot examples, prose-first output, research guidance, subagent/workflow guidance, fence stripping incl. CRLF/uppercase fences, alias assertions, prose structure detection)
+- README updated: prose-first structuring, research/orchestration features, corrected timeout table
 
 ## [1.8.0] - 2026-02-09
 

@@ -1,6 +1,6 @@
 # Claude Prompt Improver Plugin
 
-A Claude Code plugin that automatically enhances and improves your prompts before they reach Claude. The plugin analyses prompt clarity, adds relevant context, and structures complex requests using XML tags for better AI understanding.
+A Claude Code plugin that automatically enhances and improves your prompts before they reach Claude. The plugin analyses prompt clarity, adds relevant context, and rewrites complex requests as deep, prose-first prompts: goal and rationale up front, scoped constraints, numbered questions for multi-part work, and an explicit deliverable.
 
 ## Features
 
@@ -14,7 +14,9 @@ A Claude Code plugin that automatically enhances and improves your prompts befor
   - Specification awareness (.specify/ directory)
   - Memory plugin integration
 - **Bypass Mechanisms**: Skips processing for short prompts, #skip tagged prompts, low context, or forked sessions
-- **XML Structuring**: Applies semantic XML tags (task, context, constraints) to complex prompts
+- **Prose-First Structuring**: Rewrites complex prompts as natural prose (goal, scope, numbered questions, explicit deliverable); XML tags are kept only if the original prompt used them
+- **Investigation & Research Depth**: Audit prompts demand file:line evidence and a closing verdict; research prompts demand verbatim quotes, VERIFIED-vs-inferred separation, and honest negative results
+- **Agent & Workflow Awareness**: Suggests subagent fan-out for parallelisable investigation and explicit workflow opt-in for large multi-agent tasks, proportionate to the request
 
 ## Requirements
 
@@ -165,7 +167,8 @@ The tag is removed before the prompt is passed through.
 Improvements include:
 - **Clarity enhancement**: Removes ambiguity and adds structure
 - **Context enrichment**: Injects relevant git, LSP, spec, and memory context
-- **XML structuring**: Applies semantic tags (task, context, constraints) when helpful
+- **Prose-first structuring**: Goal and rationale first, then scope, numbered questions, and an explicit deliverable; investigation and research prompts gain evidence and verdict requirements
+- **Orchestration suggestions**: Subagent fan-out or workflow opt-in phrasing where the task warrants it
 
 The `improverModel` config field controls which Claude model performs the improvement:
 - **haiku**: Fastest, most cost-effective (default)
@@ -194,10 +197,10 @@ The plugin uses the following hardcoded timeouts:
 
 | Operation | Timeout | Description |
 |-----------|---------|-------------|
-| Hook total | 90s | Maximum time for entire hook execution |
-| Haiku improvement | 30s | Prompt improvement using Haiku model |
-| Sonnet improvement | 60s | Prompt improvement using Sonnet model |
-| Opus improvement | 90s | Prompt improvement using Opus model |
+| Hook total | 120s | Maximum time for entire hook execution (hooks.json) |
+| Haiku improvement | 60s | Prompt improvement using Haiku model |
+| Sonnet improvement | 90s | Prompt improvement using Sonnet model |
+| Opus improvement | 100s | Prompt improvement using Opus model |
 | Context gathering | 2s | Per-source timeout (git, LSP, spec, memory) |
 | Git commands | 2s | Per git command (status, log, diff) |
 

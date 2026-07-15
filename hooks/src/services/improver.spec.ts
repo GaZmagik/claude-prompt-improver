@@ -211,8 +211,8 @@ describe('Improver', () => {
       expect(result.success).toBe(true);
       expect(result.modelUsed).toBe('opus');
       expect(result.improvedPrompt).toContain('architectural');
-      // Opus timeout is 90s (90_000ms) - verify it completes within reasonable time
-      expect(result.latencyMs).toBeLessThan(90_000);
+      // Opus timeout is 100s (100_000ms) - verify it completes within reasonable time
+      expect(result.latencyMs).toBeLessThan(100_000);
     });
 
     it('should use correct model based on classification', async () => {
@@ -494,6 +494,17 @@ This is expanded with lots of detail and context information.`,
       expect(result.improvedPrompt).toBe('<task>Fix the bug</task>');
     });
 
+    it('should strip fences with uppercase language tags and trailing whitespace', async () => {
+      const result = await improvePrompt({
+        originalPrompt: 'fix the bug',
+        sessionId: 'session-123',
+        config: mockConfig,
+        _mockClaudeResponse: '```XML\r\n<task>Fix the bug</task>\r\n```\n',
+      });
+
+      expect(result.improvedPrompt).toBe('<task>Fix the bug</task>');
+    });
+
     it('should not strip fences that appear inside the prompt body', async () => {
       const body = '<task>Explain this snippet</task>\n<context>```js\nfoo()\n```</context>';
       const result = await improvePrompt({
@@ -595,6 +606,16 @@ This is expanded with lots of detail and context information.`,
       );
 
       expect(summary.some((s) => s.toLowerCase().includes('structure'))).toBe(true);
+    });
+
+    it('should recognise parenthesis-style numbering in the original prompt', () => {
+      const summary = generateImprovementSummary(
+        'check these:\n1) auth\n2) logging',
+        'Check the following:\n1. Authentication coverage.\n2. Logging consistency.'
+      );
+
+      // Original was already structured, so no 'Added structure' bullet
+      expect(summary.some((s) => s.toLowerCase().includes('structure'))).toBe(false);
     });
   });
 

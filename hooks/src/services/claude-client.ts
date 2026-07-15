@@ -29,22 +29,6 @@ export interface ClaudeCommandResult {
 }
 
 /**
- * Maps our model names to Claude CLI model identifiers
- * Uses CLI aliases rather than dated model IDs - the CLI resolves each alias
- * to the latest model of that tier, so the plugin never pins a stale snapshot
- */
-function getModelIdentifier(model: ClaudeModel): string {
-  switch (model) {
-    case 'haiku':
-      return 'haiku';
-    case 'sonnet':
-      return 'sonnet';
-    case 'opus':
-      return 'opus';
-  }
-}
-
-/**
  * Command arguments for array-based spawn (no shell interpretation)
  */
 export interface ClaudeCommandArgs {
@@ -59,20 +43,21 @@ export interface ClaudeCommandArgs {
  */
 export function buildClaudeCommand(options: ClaudeClientOptions): ClaudeCommandArgs {
   const { prompt, model, cwd } = options;
-  const modelId = getModelIdentifier(model);
 
   // Array-based arguments prevent shell injection
   // Arguments are passed directly to process, not through shell
   // CRITICAL: --no-session-persistence required to avoid EROFS errors in Claude Code sandbox
   // CRITICAL: --debug required due to CLI bug where commands hang without it
   // NOTE: --output-format json causes hangs with fork-session, so we use plain text output
+  // ClaudeModel values are Claude CLI aliases; the CLI resolves each to the
+  // latest model of that tier, so the plugin never pins a stale snapshot
   const args = [
     'claude',
     '--debug',
     '--print',
     '--no-session-persistence',
     '--model',
-    modelId,
+    model,
   ];
 
   // DISABLED: fork-session is fundamentally broken in UserPromptSubmit hooks
