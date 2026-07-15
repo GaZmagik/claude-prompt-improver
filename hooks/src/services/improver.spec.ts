@@ -558,6 +558,35 @@ This is expanded with lots of detail and context information.`,
     });
   });
 
+  describe('T227: improvement template research and fact-checking guidance', () => {
+    it('should instruct separation of verified findings from inference', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toMatch(/VERIFIED/);
+      expect(prompt).toMatch(/inferred/i);
+    });
+
+    it('should instruct per-item verdicts and verbatim quotes for research prompts', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toMatch(/verbatim|quote/i);
+      expect(prompt).toMatch(/each/i);
+    });
+
+    it('should instruct honest negative results and output discipline', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toMatch(/say so plainly/i);
+      expect(prompt).toMatch(/not raw file dumps|no file dumps/i);
+    });
+  });
+
   describe('T226: summary detects prose structure', () => {
     it('should report added structure when a numbered list is introduced', () => {
       const summary = generateImprovementSummary(

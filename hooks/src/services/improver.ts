@@ -219,11 +219,15 @@ Improvement guidelines:
 4. Write the improved prompt as natural prose, not XML. Open with the goal and why it matters, then state scope and constraints. For multi-part work, enumerate the specific questions or steps as a numbered list. Only keep XML tags if the original prompt already used them
 5. Always specify the expected deliverable: what the report, verdict, or output should contain and what shape it should take
 6. For investigation or audit prompts, require evidence: cite file:line with short excerpts, and demand an explicit verdict or recommendation at the end rather than an open-ended summary
-7. Make reasonable assumptions based on available context
-8. Reference relevant tools, skills, or agents from your system prompt when they could help the user's task
-9. For noisy or parallelisable investigation (broad searches, audits across many files), add a constraint suggesting Claude fan the work out to subagents and keep only the findings in the main session
-10. For large multi-agent tasks (codebase-wide migrations, exhaustive reviews, multi-source research), add an explicit opt-in to orchestration, e.g. "use a workflow for this" - Claude Code only runs workflows when the prompt asks for one
-11. Do NOT suggest subagents or workflows for simple, single-file, or conversational requests, and do not pad simple prompts with ceremony - depth must be proportionate to the task
+7. For research or fact-checking prompts, demand epistemic discipline: verbatim quotes with source links, findings separated into VERIFIED (actually read from a doc/repo) versus inferred, and a verdict per claim (e.g. CONFIRMED / PARTLY RIGHT / WRONG / OUTDATED). Instruct honest negative results: if the answer is "nobody has built this" or "the evidence does not exist", say so plainly instead of hedging
+8. When the same questions apply to multiple items (repos, claims, files, endpoints), instruct that EACH item gets the full question set answered precisely, not a blended overview
+9. Name the concrete tools, sources, or even literal search queries and URLs to use when the context supports them; if key terms could be confused, add a short disambiguation up front
+10. State scope and output discipline explicitly where relevant: where to work (directory, branch), what NOT to do (e.g. read-only, no file writes), and that the deliverable is the conclusion in the final message, not raw file dumps
+11. Make reasonable assumptions based on available context
+12. Reference relevant tools, skills, or agents from your system prompt when they could help the user's task
+13. For noisy or parallelisable investigation (broad searches, audits across many files), add a constraint suggesting Claude fan the work out to subagents and keep only the findings in the main session
+14. For large multi-agent tasks (codebase-wide migrations, exhaustive reviews, multi-source research), add an explicit opt-in to orchestration, e.g. "use a workflow for this" - Claude Code only runs workflows when the prompt asks for one
+15. Do NOT suggest subagents or workflows for simple, single-file, or conversational requests, and do not pad simple prompts with ceremony - depth must be proportionate to the task
 
 Worked examples of the expected transformation:
 
@@ -249,6 +253,23 @@ Report:
 3. Inconsistencies between modules - different auth schemes, mixed session/token checks.
 
 Give a clear verdict: a table of unprotected endpoints (path, method, severity) and the single most likely systemic cause.
+</example_improved>
+</example>
+
+<example>
+<example_original>
+is anyone still maintaining left-pad-utils? can we keep using it
+</example_original>
+<example_improved>
+Research task: determine whether left-pad-utils is still maintained and safe to keep as a dependency. Search the web and GitHub (WebSearch, WebFetch, gh CLI) - try "left-pad-utils maintained", "left-pad-utils deprecation", and the repo's commit/issue activity directly.
+
+Report with quotes and links:
+1. Last release and last non-trivial commit, with dates.
+2. Open security advisories or unpatched CVEs.
+3. Maintainer statements about the project's future (README notices, pinned issues, deprecation warnings).
+4. Actively maintained alternatives, and whether migration would be mechanical for our usage.
+
+Separate VERIFIED findings (read from the repo, registry, or advisory database - quote them) from inferred ones. If the project is abandoned, say so plainly. Give a clear verdict: keep, replace, or vendor - with the single strongest piece of evidence. Do not write any files; return findings as your final message.
 </example_improved>
 </example>
 

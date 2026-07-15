@@ -14,6 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Deep investigation example (broad audit → scoped mission, numbered report items, file:line citations, explicit verdict, per-module subagent fan-out)
   - Workflow opt-in example (codebase-wide migration → explicit "use a workflow" phrasing)
 - **Investigation depth guidance** - Improved prompts for audits/investigations now demand evidence (file:line with excerpts) and a closing verdict or recommendation, with a proportionality guard so simple prompts stay short
+- **Research and fact-checking guidance** - Improved research prompts now demand epistemic discipline modelled on real hand-crafted research briefs:
+  - VERIFIED (actually read, with verbatim quotes and links) separated from inferred findings
+  - Per-claim verdicts (CONFIRMED / PARTLY RIGHT / WRONG / OUTDATED) and per-item question sets ("for EACH repo...")
+  - Honest negative results ("if nobody has built this, say so plainly")
+  - Concrete tools, literal search queries, and upfront disambiguation of confusable terms
+  - Output discipline: scope pinning (directory/branch), read-only constraints, conclusions in the final message rather than file dumps
+  - New worked example: dependency-maintenance research brief
 - **Subagent and workflow awareness** - New improvement guidelines teach the improver about current Claude Code orchestration
   - Suggests subagent fan-out for noisy or parallelisable investigation
   - Adds explicit workflow opt-in phrasing for large multi-agent tasks (Claude Code only runs workflows when asked)
