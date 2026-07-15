@@ -696,6 +696,37 @@ This is expanded with lots of detail and context information.`,
     });
   });
 
+  describe('T234: investigate-genre user-report and implementation-readiness guidance', () => {
+    const investigatePrompt = 'audit the codebase for hardcoded secrets';
+
+    it('should instruct verbatim user-report anchoring and interpretation', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: investigatePrompt,
+      });
+
+      expect(prompt).toMatch(/user report|user request/i);
+      expect(prompt).toMatch(/work out what they mean/i);
+    });
+
+    it('should instruct side-by-side comparison when behaviour differs between branches', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: investigatePrompt,
+      });
+
+      expect(prompt).toMatch(/side-by-side/i);
+    });
+
+    it('should instruct implementation-ready anchors, clarifying questions, and symbol seeds', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: investigatePrompt,
+      });
+
+      expect(prompt).toMatch(/enough to implement|sufficient to implement/i);
+      expect(prompt).toMatch(/clarifying questions/i);
+      expect(prompt).toMatch(/symbols? or search terms/i);
+    });
+  });
+
   describe('T233: build-genre trust, reuse, and boundary guidance', () => {
     const buildPrompt = 'add the invoice reconciliation tab to the dashboard';
 

@@ -246,6 +246,9 @@ const GENRE_GUIDELINES: Record<PromptGenre, string> = {
 - When the output will feed further processing, specify a strict output contract: the exact fields or format (e.g. a JSON array of {file, line, summary}), any caps, and "return ONLY the [format], nothing else"
 - Where it sharpens focus, open with a role or angle assignment, name the concrete first actions or commands to run, and seed specific hypotheses to check rather than leaving questions abstract
 - State scope and output discipline: where to work (directory, branch), read-only if applicable, and conclusions in the final message rather than raw file dumps
+- When the investigation stems from user reports or requests, quote each verbatim, instruct interpretation against the code ("work out what they mean - is the control missing, or hidden in this branch?"), and structure findings per request
+- When behaviour may differ between branches, modes, or views, demand a side-by-side comparison ("exactly what renders in X vs Y"), not a description of one path
+- When the investigation precedes implementation, require code anchors sufficient to implement next (exact functions to modify, where new code hooks in) plus the clarifying questions to take back to the user on anything ambiguous; seed literal symbols or search terms to grep when the context names them
 - For broad sweeps across many files, add a constraint to fan the work out to subagents and keep only the findings in the main session`,
   research: `This prompt is external research or fact-checking. Additionally:
 - Demand epistemic discipline: verbatim quotes with source links, findings separated into VERIFIED (actually read from a doc/repo) versus inferred, and a verdict per claim (e.g. CONFIRMED / PARTLY RIGHT / WRONG / OUTDATED)
