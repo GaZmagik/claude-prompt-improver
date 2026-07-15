@@ -14,6 +14,9 @@ integrations:
   spec: true
   memory: true
   session: true
+  dynamicDiscovery: true
+  pluginResources: true
+  projectShape: true
 
 logging:
   enabled: true
@@ -60,6 +63,9 @@ Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settin
 | `integrations.spec` | boolean | `true` | Enable specification awareness |
 | `integrations.memory` | boolean | `true` | Enable memory plugin integration |
 | `integrations.session` | boolean | `true` | Enable session context |
+| `integrations.dynamicDiscovery` | boolean | `true` | Enable dynamic resource discovery |
+| `integrations.pluginResources` | boolean | `true` | Enable plugin/MCP resource context |
+| `integrations.projectShape` | boolean | `true` | Enable project shape context (directories, scripts, test framework, recently modified files) |
 
 ### Logging Settings
 
@@ -111,3 +117,21 @@ If `forceImprove: true` is set, all bypass checks except "Disabled" are skipped 
 - **LSP**: Requires language server configured for file types
 - **Spec**: Requires `.specify/` directory with spec files
 - **Memory**: Requires claude-memory-plugin installed
+- **Project shape**: Recently-modified files require a git repository
+
+## Exemplars (optional)
+
+Teach the improver your own prompting style. Add sections below headed
+`## Exemplar: <genre>` where genre is one of `fix`, `investigate`, `research`,
+`build`, or `general`. The section body is a gold-standard prompt in your own
+style; when a prompt of that genre is improved, your exemplar replaces the
+built-in worked example.
+
+For instance (remove the > quoting to activate):
+
+> ## Exemplar: investigate
+>
+> Audit every API endpoint for missing auth checks. Read-only; cite file:line
+> with short excerpts. Fan the audit out to subagents, one per module. Report
+> each unprotected endpoint and give a clear verdict with the most likely
+> systemic cause.

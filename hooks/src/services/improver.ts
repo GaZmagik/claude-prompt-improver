@@ -3,9 +3,10 @@
  * Prompt improver for enhancing user prompts
  * Uses config-driven model selection for all improvements
  */
-import type { ClaudeModel, Configuration, ContextSource } from '../core/types.ts';
+import type { ClaudeModel, Configuration, ContextSource, PromptGenre } from '../core/types.ts';
 import { escapeXmlContent } from '../utils/xml-builder.ts';
 import { executeClaudeCommand } from './claude-client.ts';
+import { classifyPromptGenre } from './prompt-genre.ts';
 
 /**
  * Context gathered from various sources
@@ -21,6 +22,7 @@ export interface ImprovementContext {
   readonly session?: string;
   readonly dynamicDiscovery?: string;
   readonly pluginResources?: string;
+  readonly projectShape?: string;
 }
 
 /**
@@ -48,6 +50,8 @@ export interface ImprovementResult {
   readonly latencyMs: number;
   readonly contextSources: readonly ContextSource[];
   readonly summary?: readonly string[];
+  /** Genre the prompt was classified as (drives template specialisation) */
+  readonly genre?: PromptGenre;
   /** Error message when improvement fails (for debugging) */
   readonly error?: string;
 }
@@ -81,6 +85,7 @@ function getContextSources(context?: ImprovementContext): ContextSource[] {
   if (context.session) sources.push('session');
   if (context.dynamicDiscovery) sources.push('dynamicDiscovery');
   if (context.pluginResources) sources.push('pluginResources');
+  if (context.projectShape) sources.push('projectShape');
 
   return sources;
 }
@@ -188,6 +193,9 @@ function buildContextSection(context?: ImprovementContext): string {
   if (context.pluginResources) {
     sections.push(`<plugin_resources>\n${escapeXmlContent(context.pluginResources)}\n</plugin_resources>`);
   }
+  if (context.projectShape) {
+    sections.push(`<project_shape>\n${escapeXmlContent(context.projectShape)}\n</project_shape>`);
+  }
 
   return sections.length > 0 ? sections.join('\n\n') : '';
 }
@@ -200,7 +208,7 @@ function buildContextSection(context?: ImprovementContext): string {
  * continuation of the previous conversation. Without explicit boundaries, the model
  * may respond to prior conversation context instead of performing the improvement.
  */
-const IMPROVEMENT_PROMPT_TEMPLATE = `[FORKED SESSION - PROMPT IMPROVEMENT AGENT]
+const TEMPLATE_HEADER = `[FORKED SESSION - PROMPT IMPROVEMENT AGENT]
 
 You are running in a FORKED SESSION as a specialised prompt improvement agent.
 You are NOT the assistant from the previous conversation.
@@ -211,32 +219,53 @@ CRITICAL BOUNDARIES:
 - DO NOT ask questions or request clarification
 - DO NOT explain your reasoning or add commentary
 - DO NOT reference what was previously discussed
-- Output ONLY the improved prompt, nothing else
+- Output ONLY the improved prompt, nothing else`;
 
-Improvement guidelines:
+/** Guidelines applied to every genre */
+const CORE_GUIDELINES = `Improvement guidelines:
 1. PRESERVE the original intent - the user's goal must remain unchanged
 2. PRESERVE the original tone - formal/informal, concise/detailed
 3. ADD clarity and specificity - name concrete files, functions, symbols, and branches from the available context; never invent paths or symbols the context does not support
 4. Write the improved prompt as natural prose, not XML. Open with the goal and why it matters, then state scope and constraints. For multi-part work, enumerate the specific questions or steps as a numbered list. Only keep XML tags if the original prompt already used them
 5. Always specify the expected deliverable: what the report, verdict, or output should contain and what shape it should take
-6. For investigation or audit prompts, require evidence: cite file:line with short excerpts, and demand an explicit verdict or recommendation at the end rather than an open-ended summary
-7. For research or fact-checking prompts, demand epistemic discipline: verbatim quotes with source links, findings separated into VERIFIED (actually read from a doc/repo) versus inferred, and a verdict per claim (e.g. CONFIRMED / PARTLY RIGHT / WRONG / OUTDATED). Instruct honest negative results: if the answer is "nobody has built this" or "the evidence does not exist", say so plainly instead of hedging
-8. When the same questions apply to multiple items (repos, claims, files, endpoints), instruct that EACH item gets the full question set answered precisely, not a blended overview
-9. Name the concrete tools, sources, or even literal search queries and URLs to use when the context supports them; if key terms could be confused, add a short disambiguation up front
-10. State scope and output discipline explicitly where relevant: where to work (directory, branch), what NOT to do (e.g. read-only, no file writes), and that the deliverable is the conclusion in the final message, not raw file dumps
-11. For scan, review, or finder tasks, add noise guards so precision beats volume: "only flag X if [concrete cost/evidence criterion]", a cap on results ("up to N findings"), and a requirement to quote the exact rule or line behind each finding
-12. When the output will feed further processing or comparison, specify a strict output contract: the exact fields or format (e.g. a JSON array of {file, line, summary}), any caps, and "return ONLY the [format], nothing else"
-13. Where it sharpens focus, open with a role or angle assignment ("You are auditing X for Y"), name the concrete first actions or commands to run, and seed specific hypotheses or candidate examples to check rather than leaving questions abstract
-14. For implementation or build prompts, when the context supports it: list required reading first in priority order, marking which sources are authoritative and which are superseded; state the domain concept or mental model the work depends on; and point at proven prior results to reproduce rather than re-derive
-15. Turn acceptance criteria into assertable invariants the build must check ("assert X and warn - never silently drop data"), and include a concrete worked example to sanity-check the result end to end; where the stakes justify it, require tests to prove themselves by going red on a broken build
-16. State non-goals explicitly with their rationale ("do NOT do X - [reason]"), and where known pitfalls exist in the context, quantify their concrete cost so they cannot be shrugged off
-17. Make reasonable assumptions based on available context
-18. Reference relevant tools, skills, or agents from your system prompt when they could help the user's task
-19. For noisy or parallelisable investigation (broad searches, audits across many files), add a constraint suggesting Claude fan the work out to subagents and keep only the findings in the main session
-20. For large multi-agent tasks (codebase-wide migrations, exhaustive reviews, multi-source research), add an explicit opt-in to orchestration, e.g. "use a workflow for this" - Claude Code only runs workflows when the prompt asks for one
-21. Do NOT suggest subagents or workflows for simple, single-file, or conversational requests, and do not pad simple prompts with ceremony - depth must be proportionate to the task
+6. End non-trivial task prompts by naming how to VERIFY the work: what to run, what to observe, and what evidence to report back
+7. For advice or design questions, instruct candour: state plainly if the approach is a mistake, and flag any assumptions being disagreed with rather than silently accepting them
+8. Make reasonable assumptions based on available context
+9. Reference relevant tools, skills, or agents from your system prompt when they could help the user's task
+10. Do not pad simple prompts with ceremony, and do not suggest subagents or workflows for simple, single-file, or conversational requests - depth must be proportionate to the task`;
 
-Worked examples of the expected transformation:
+/** Genre-specific guideline blocks - only the matching block is included */
+const GENRE_GUIDELINES: Record<PromptGenre, string> = {
+  fix: `This prompt is a bug fix. Additionally:
+- Require reproduction before fixing, and a test that fails before the fix and passes after
+- Ask for the root cause, the fix, and the covering test in the report`,
+  investigate: `This prompt is a code investigation or audit. Additionally:
+- Require evidence: cite file:line with short excerpts, and demand an explicit verdict or recommendation at the end rather than an open-ended summary
+- When the same questions apply to multiple items (repos, claims, files, endpoints), instruct that EACH item gets the full question set answered precisely, not a blended overview
+- Add noise guards so precision beats volume: "only flag X if [concrete cost/evidence criterion]", a cap on results ("up to N findings"), and a requirement to quote the exact rule or line behind each finding
+- When the output will feed further processing, specify a strict output contract: the exact fields or format (e.g. a JSON array of {file, line, summary}), any caps, and "return ONLY the [format], nothing else"
+- Where it sharpens focus, open with a role or angle assignment, name the concrete first actions or commands to run, and seed specific hypotheses to check rather than leaving questions abstract
+- State scope and output discipline: where to work (directory, branch), read-only if applicable, and conclusions in the final message rather than raw file dumps
+- For broad sweeps across many files, add a constraint to fan the work out to subagents and keep only the findings in the main session`,
+  research: `This prompt is external research or fact-checking. Additionally:
+- Demand epistemic discipline: verbatim quotes with source links, findings separated into VERIFIED (actually read from a doc/repo) versus inferred, and a verdict per claim (e.g. CONFIRMED / PARTLY RIGHT / WRONG / OUTDATED)
+- Instruct honest negative results: if the answer is "nobody has built this" or "the evidence does not exist", say so plainly instead of hedging
+- Name the concrete tools, sources, or literal search queries and URLs to use when the context supports them; if key terms could be confused, add a short disambiguation up front
+- Apply the full question set to EACH item (repos, claims, vendors) when the prompt spans several
+- State output discipline: no file writes, findings returned in the final message, not raw file dumps
+- For multi-source sweeps, suggest subagent fan-out, or an explicit workflow opt-in ("use a workflow for this") for exhaustive research - Claude Code only runs workflows when asked`,
+  build: `This prompt is implementation work. Additionally:
+- When the context supports it, list required reading first in priority order, marking which sources are authoritative and which are superseded, and state the domain concept or mental model the work depends on
+- Point at proven prior results to reproduce rather than re-derive
+- Turn acceptance criteria into assertable invariants the build must check ("assert X and warn - never silently drop data"), and include a concrete worked example to sanity-check the result end to end; where the stakes justify it, require tests to prove themselves by going red on a broken build
+- State non-goals explicitly with their rationale ("do NOT do X - [reason]"), and where known pitfalls exist in the context, quantify their concrete cost so they cannot be shrugged off
+- For codebase-wide mechanical changes (migrations, sweeping renames), add an explicit workflow opt-in ("use a workflow for this") - Claude Code only runs workflows when the prompt asks for one`,
+  general: '',
+};
+
+/** Built-in worked examples per genre - replaced by a user exemplar when configured */
+const GENRE_EXAMPLES: Record<PromptGenre, string> = {
+  fix: `Worked example of the expected transformation:
 
 <example>
 <example_original>
@@ -245,7 +274,8 @@ fix the login bug
 <example_improved>
 Investigate and fix the login bug. Start from the authentication flow and check recent changes to login-related files first. Reproduce the bug before fixing it, and add or update a test that fails before the fix and passes after. Report the root cause, the fix, and the test that covers it.
 </example_improved>
-</example>
+</example>`,
+  investigate: `Worked example of the expected transformation:
 
 <example>
 <example_original>
@@ -261,7 +291,8 @@ Report:
 
 Give a clear verdict: a table of unprotected endpoints (path, method, severity) and the single most likely systemic cause.
 </example_improved>
-</example>
+</example>`,
+  research: `Worked example of the expected transformation:
 
 <example>
 <example_original>
@@ -278,7 +309,8 @@ Report with quotes and links:
 
 Separate VERIFIED findings (read from the repo, registry, or advisory database - quote them) from inferred ones. If the project is abandoned, say so plainly. Give a clear verdict: keep, replace, or vendor - with the single strongest piece of evidence. Do not write any files; return findings as your final message.
 </example_improved>
-</example>
+</example>`,
+  build: `Worked example of the expected transformation:
 
 <example>
 <example_original>
@@ -287,33 +319,64 @@ migrate everything from moment to date-fns
 <example_improved>
 Migrate the entire codebase from moment to date-fns. This is a mechanical, codebase-wide migration touching many files independently, so use a workflow for this: discover every moment usage first, then transform each file in parallel, then verify with the full test suite. Do not change behaviour, only the date library. Report any call sites with no direct date-fns equivalent instead of guessing at a replacement.
 </example_improved>
-</example>
+</example>`,
+  general: '',
+};
 
-{CONTEXT_SECTION}
+/**
+ * Builds the worked-example section for a genre, preferring a user exemplar
+ * User exemplars are gold-standard prompts supplied via configuration
+ */
+function buildExampleSection(
+  genre: PromptGenre,
+  exemplars?: Partial<Record<PromptGenre, string>>
+): string {
+  const exemplar = exemplars?.[genre];
+  if (exemplar) {
+    return `Gold-standard example of the target style (from the user's own prompt library):
 
-Original prompt to improve:
-<original_prompt>
-{ORIGINAL_PROMPT}
-</original_prompt>
-
-Output ONLY the improved prompt. No preamble. No explanation.`;
+<example>
+<example_improved>
+${exemplar}
+</example_improved>
+</example>`;
+  }
+  return GENRE_EXAMPLES[genre];
+}
 
 /**
  * Builds the improvement prompt with context
+ * The template is genre-conditional: core guidelines always apply, and the
+ * matching genre's guideline block and worked example are appended
  * User content is escaped to prevent XML/prompt injection
  */
 export function buildImprovementPrompt(options: {
   originalPrompt: string;
   context?: ImprovementContext;
+  genre?: PromptGenre;
+  exemplars?: Partial<Record<PromptGenre, string>>;
 }): string {
-  const { originalPrompt, context } = options;
+  const { originalPrompt, context, exemplars } = options;
+  const genre = options.genre ?? classifyPromptGenre(originalPrompt);
   const contextSection = buildContextSection(context);
 
   // Escape user prompt to prevent XML/prompt injection
   const escapedPrompt = escapeXmlContent(originalPrompt);
 
-  return IMPROVEMENT_PROMPT_TEMPLATE.replace('{ORIGINAL_PROMPT}', escapedPrompt)
-    .replace('{CONTEXT_SECTION}', contextSection ? `Available context:\n${contextSection}` : '');
+  const sections = [
+    TEMPLATE_HEADER,
+    CORE_GUIDELINES,
+    GENRE_GUIDELINES[genre],
+    buildExampleSection(genre, exemplars),
+    contextSection ? `Available context:\n${contextSection}` : '',
+    `Original prompt to improve:
+<original_prompt>
+${escapedPrompt}
+</original_prompt>`,
+    'Output ONLY the improved prompt. No preamble. No explanation.',
+  ];
+
+  return sections.filter((s) => s.length > 0).join('\n\n');
 }
 
 /**
@@ -327,6 +390,7 @@ export async function improvePrompt(options: ImprovePromptOptions): Promise<Impr
   // Get model from config
   const model = config.improverModel;
   const contextSources = getContextSources(context);
+  const genre = classifyPromptGenre(originalPrompt);
 
   // Handle mock response for testing
   if (_mockClaudeResponse !== undefined) {
@@ -340,6 +404,7 @@ export async function improvePrompt(options: ImprovePromptOptions): Promise<Impr
         modelUsed: model,
         latencyMs,
         contextSources,
+        genre,
       };
     }
 
@@ -354,14 +419,17 @@ export async function improvePrompt(options: ImprovePromptOptions): Promise<Impr
       latencyMs,
       contextSources,
       summary,
+      genre,
     };
   }
 
   // Real improvement via Claude
-  const promptOptions = context
-    ? { originalPrompt, context }
-    : { originalPrompt };
-  const improvementPrompt = buildImprovementPrompt(promptOptions);
+  const improvementPrompt = buildImprovementPrompt({
+    originalPrompt,
+    genre,
+    ...(context && { context }),
+    ...(config.exemplars && { exemplars: config.exemplars }),
+  });
 
   const result = await executeClaudeCommand({
     prompt: improvementPrompt,
@@ -382,6 +450,7 @@ export async function improvePrompt(options: ImprovePromptOptions): Promise<Impr
       latencyMs,
       contextSources,
       error: result.error ?? 'No output from Claude CLI',
+      genre,
     };
   }
 
@@ -396,5 +465,6 @@ export async function improvePrompt(options: ImprovePromptOptions): Promise<Impr
     latencyMs,
     contextSources,
     summary,
+    genre,
   };
 }

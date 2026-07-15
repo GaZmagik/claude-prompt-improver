@@ -17,6 +17,7 @@ import {
   ensureConfigSetup,
   loadConfig,
   loadConfigFromStandardPaths,
+  parseExemplarsFromBody,
   parseYamlFrontmatter,
   validateConfig,
 } from './config-loader.ts';
@@ -889,6 +890,81 @@ enabled: true
       // Verify the paths are correct
       expect(CONFIG_PATHS[0]).toBe('.claude/prompt-improver.local.md');
       expect(EXAMPLE_CONFIG_PATH).toBe('.claude/prompt-improver.example.md');
+    });
+  });
+
+  describe('parseExemplarsFromBody', () => {
+    it('parses exemplar sections by genre heading', () => {
+      const body = `---
+enabled: true
+---
+
+# My config
+
+## Exemplar: research
+
+Research task: determine whether X is maintained.
+Report with quotes and links.
+
+## Exemplar: fix
+
+Reproduce the bug first, then fix with a covering test.
+`;
+      const exemplars = parseExemplarsFromBody(body);
+
+      expect(exemplars.research).toContain('determine whether X is maintained');
+      expect(exemplars.fix).toContain('Reproduce the bug first');
+    });
+
+    it('accepts case-insensitive and colon-less heading variants', () => {
+      const body = '## exemplar research\n\nSome research exemplar.\n';
+      const exemplars = parseExemplarsFromBody(body);
+
+      expect(exemplars.research).toBe('Some research exemplar.');
+    });
+
+    it('ignores unknown genres and non-exemplar headings', () => {
+      const body = `## Exemplar: poetry
+
+Roses are red.
+
+## Notes
+
+Not an exemplar.
+`;
+      const exemplars = parseExemplarsFromBody(body);
+
+      expect(Object.keys(exemplars)).toHaveLength(0);
+    });
+
+    it('returns empty object for body without exemplar sections', () => {
+      expect(Object.keys(parseExemplarsFromBody('# Just docs\n\nText.'))).toHaveLength(0);
+      expect(Object.keys(parseExemplarsFromBody(''))).toHaveLength(0);
+    });
+
+    it('loads exemplars through loadConfig from a markdown config file', async () => {
+      const dir = join(tmpdir(), `pi-exemplar-test-${Date.now()}`);
+      const configDir = join(dir, '.claude');
+      mkdirSync(configDir, { recursive: true });
+      const configPath = join(configDir, 'prompt-improver.local.md');
+      writeFileSync(
+        configPath,
+        `---
+enabled: true
+---
+
+## Exemplar: build
+
+Build brief with invariants and non-goals.
+`
+      );
+
+      try {
+        const config = await loadConfig(configPath);
+        expect(config.exemplars?.build).toContain('invariants and non-goals');
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
     });
   });
 });

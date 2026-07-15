@@ -29,6 +29,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Guards against suggesting orchestration for simple or conversational prompts
 - **Code fence stripping** - Wrapping markdown fences (e.g. ```` ```xml ````) are removed from improver output; fences inside the prompt body are preserved
 
+- **Genre-conditional improvement template** - A keyword classifier (`prompt-genre.ts`, no extra API call) types each prompt as fix / investigate / research / build / general; the improver receives the core guidelines plus only the matching genre block and worked example, shrinking the metaprompt and sharpening compliance
+- **Verification and candour core guidelines** - Non-trivial improved prompts end by naming how to verify the work (run what, observe what, report what evidence); advice/design prompts instruct candour ("state plainly if the approach is a mistake")
+- **Personal exemplar library** - `## Exemplar: <genre>` sections in `.claude/prompt-improver.local.md` replace the built-in worked example for that genre, so the improver learns the user's own prompting style
+- **Project shape context integration** - New `projectShape` integration (default on) injects top-level directories, package.json scripts, detected test framework, and recently modified files (git) so improved prompts can cite real files and commands
+
 ### Changed
 
 - **Prose-first output replaces mandatory XML structuring** - Improved prompts are now written as natural prose (goal and rationale first, then scope/constraints, numbered questions for multi-part work, explicit deliverable); XML tags are only kept if the original prompt used them. This deliberately reverses the v1.2.0 "mandatory XML" decision: that fix addressed inconsistent output from vague "if helpful" instructions on 2025-era models, and the prescriptive prose shape solves the same consistency problem without markup on current models (see the updated memory notes in .claude/memory/permanent/)
@@ -40,7 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Technical Details
 
 - Verified against Claude Code 2.1.209: UserPromptSubmit hook schema, plugin hooks.json format, and all CLI flags (`--print`, `--no-session-persistence`, `--debug`, `--model`) remain supported
-- Added 22 new test cases (few-shot examples, prose-first output, research guidance, subagent/workflow guidance, fence stripping incl. CRLF/uppercase fences, alias assertions, prose structure detection)
+- Fixed config parsing gap: `integrations.pluginResources` was never read from YAML config (toggle silently ignored); example config template re-synced with all integration defaults
+- Added 49 new test cases (few-shot examples, prose-first output, research guidance, subagent/workflow guidance, fence stripping incl. CRLF/uppercase fences, alias assertions, prose structure detection)
 - README updated: prose-first structuring, research/orchestration features, corrected timeout table
 
 ## [1.8.0] - 2026-02-09

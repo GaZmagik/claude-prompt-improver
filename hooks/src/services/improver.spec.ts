@@ -29,6 +29,7 @@ const mockConfig: Configuration = {
     session: false,
     dynamicDiscovery: false,
     pluginResources: false,
+    projectShape: false,
   },
   logging: {
     enabled: false,
@@ -521,7 +522,7 @@ This is expanded with lots of detail and context information.`,
   describe('T222: improvement template few-shot examples', () => {
     it('should include worked examples with original and improved pairs', () => {
       const prompt = buildImprovementPrompt({
-        originalPrompt: 'test prompt',
+        originalPrompt: 'fix the login bug',
       });
 
       expect(prompt).toContain('<example>');
@@ -531,11 +532,11 @@ This is expanded with lots of detail and context information.`,
 
     it('should place examples before the original prompt so they read as instructions', () => {
       const prompt = buildImprovementPrompt({
-        originalPrompt: 'my unique test prompt xyz',
+        originalPrompt: 'fix my unique broken thing xyz',
       });
 
       const exampleIndex = prompt.indexOf('<example>');
-      const originalIndex = prompt.indexOf('my unique test prompt xyz');
+      const originalIndex = prompt.indexOf('fix my unique broken thing xyz');
       expect(exampleIndex).toBeGreaterThan(-1);
       expect(exampleIndex).toBeLessThan(originalIndex);
     });
@@ -562,7 +563,7 @@ This is expanded with lots of detail and context information.`,
 
     it('should instruct evidence citations for investigation prompts', () => {
       const prompt = buildImprovementPrompt({
-        originalPrompt: 'test prompt',
+        originalPrompt: 'audit the codebase for hardcoded secrets',
       });
 
       expect(prompt).toContain('file:line');
@@ -570,9 +571,11 @@ This is expanded with lots of detail and context information.`,
   });
 
   describe('T227: improvement template research and fact-checking guidance', () => {
+    const researchPrompt = 'find out if anyone still maintains left-pad-utils';
+
     it('should instruct separation of verified findings from inference', () => {
       const prompt = buildImprovementPrompt({
-        originalPrompt: 'test prompt',
+        originalPrompt: researchPrompt,
       });
 
       expect(prompt).toMatch(/VERIFIED/);
@@ -581,7 +584,7 @@ This is expanded with lots of detail and context information.`,
 
     it('should instruct per-item verdicts and verbatim quotes for research prompts', () => {
       const prompt = buildImprovementPrompt({
-        originalPrompt: 'test prompt',
+        originalPrompt: researchPrompt,
       });
 
       expect(prompt).toMatch(/verbatim|quote/i);
@@ -590,7 +593,7 @@ This is expanded with lots of detail and context information.`,
 
     it('should instruct honest negative results and output discipline', () => {
       const prompt = buildImprovementPrompt({
-        originalPrompt: 'test prompt',
+        originalPrompt: researchPrompt,
       });
 
       expect(prompt).toMatch(/say so plainly/i);
@@ -598,10 +601,107 @@ This is expanded with lots of detail and context information.`,
     });
   });
 
+  describe('T230: genre-conditional template', () => {
+    it('should omit genre blocks and examples for general prompts', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'what do you think about this approach?',
+      });
+
+      expect(prompt).not.toMatch(/VERIFIED/);
+      expect(prompt).not.toMatch(/required reading/i);
+      expect(prompt).not.toContain('<example>');
+    });
+
+    it('should not leak research guidance into investigate prompts', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'audit the codebase for hardcoded secrets',
+      });
+
+      expect(prompt).not.toMatch(/required reading/i);
+      expect(prompt).toMatch(/file:line/);
+    });
+
+    it('should respect an explicit genre override', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'what do you think?',
+        genre: 'research',
+      });
+
+      expect(prompt).toMatch(/VERIFIED/);
+    });
+
+    it('should report the classified genre in the improvement result', async () => {
+      const result = await improvePrompt({
+        config: mockConfig,
+        originalPrompt: 'fix the login bug',
+        sessionId: 'session-123',
+        _mockClaudeResponse: 'Improved prompt',
+      });
+
+      expect(result.genre).toBe('fix');
+    });
+  });
+
+  describe('T231: verification and candour core guidelines', () => {
+    it('should instruct naming how to verify the work for all genres', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'what do you think about this approach?',
+      });
+
+      expect(prompt).toMatch(/VERIFY/);
+    });
+
+    it('should instruct candour for advice and design questions', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'what do you think about this approach?',
+      });
+
+      expect(prompt).toMatch(/candour/i);
+      expect(prompt).toMatch(/state plainly if the approach is a mistake/i);
+    });
+  });
+
+  describe('T232: user exemplar library', () => {
+    it('should replace the built-in example with a user exemplar for the genre', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'fix the login bug',
+        exemplars: { fix: 'My gold standard fix prompt with reproduction steps.' },
+      });
+
+      expect(prompt).toContain('My gold standard fix prompt with reproduction steps.');
+      expect(prompt).toContain('own prompt library');
+      expect(prompt).not.toContain('Investigate and fix the login bug.');
+    });
+
+    it('should fall back to the built-in example when no exemplar matches the genre', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'fix the login bug',
+        exemplars: { research: 'A research exemplar.' },
+      });
+
+      expect(prompt).not.toContain('A research exemplar.');
+      expect(prompt).toContain('Investigate and fix the login bug.');
+    });
+
+    it('should pass config exemplars through improvePrompt', async () => {
+      const result = await improvePrompt({
+        config: { ...mockConfig, exemplars: { fix: 'Config exemplar.' } },
+        originalPrompt: 'fix the login bug',
+        sessionId: 'session-123',
+        _mockClaudeResponse: 'Improved prompt',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.genre).toBe('fix');
+    });
+  });
+
   describe('T229: improvement template implementation-brief guidance', () => {
+    const buildPrompt = 'add the invoice reconciliation tab to the dashboard';
+
     it('should instruct required reading with authority markers and reuse of proven results', () => {
       const prompt = buildImprovementPrompt({
-        originalPrompt: 'test prompt',
+        originalPrompt: buildPrompt,
       });
 
       expect(prompt).toMatch(/required reading|read first/i);
@@ -612,7 +712,7 @@ This is expanded with lots of detail and context information.`,
 
     it('should instruct assertable invariants and worked acceptance examples', () => {
       const prompt = buildImprovementPrompt({
-        originalPrompt: 'test prompt',
+        originalPrompt: buildPrompt,
       });
 
       expect(prompt).toMatch(/invariant/i);
@@ -621,7 +721,7 @@ This is expanded with lots of detail and context information.`,
 
     it('should instruct explicit non-goals and quantified pitfalls', () => {
       const prompt = buildImprovementPrompt({
-        originalPrompt: 'test prompt',
+        originalPrompt: buildPrompt,
       });
 
       expect(prompt).toMatch(/non-goals/i);
@@ -630,9 +730,11 @@ This is expanded with lots of detail and context information.`,
   });
 
   describe('T228: improvement template precision and output-contract guidance', () => {
+    const investigatePrompt = 'audit the codebase for hardcoded secrets';
+
     it('should instruct noise guards for scan/review tasks', () => {
       const prompt = buildImprovementPrompt({
-        originalPrompt: 'test prompt',
+        originalPrompt: investigatePrompt,
       });
 
       expect(prompt).toMatch(/only flag|flag only/i);
@@ -641,7 +743,7 @@ This is expanded with lots of detail and context information.`,
 
     it('should instruct strict output contracts when results feed further processing', () => {
       const prompt = buildImprovementPrompt({
-        originalPrompt: 'test prompt',
+        originalPrompt: investigatePrompt,
       });
 
       expect(prompt).toMatch(/output contract/i);
@@ -649,7 +751,7 @@ This is expanded with lots of detail and context information.`,
 
     it('should instruct role assignment, first actions, and seeded hypotheses', () => {
       const prompt = buildImprovementPrompt({
-        originalPrompt: 'test prompt',
+        originalPrompt: investigatePrompt,
       });
 
       expect(prompt).toMatch(/role or angle/i);

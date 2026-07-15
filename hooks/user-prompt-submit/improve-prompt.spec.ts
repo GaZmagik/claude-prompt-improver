@@ -675,6 +675,7 @@ describe('Hook Input/Output', () => {
           session: false,
           dynamicDiscovery: false,
           pluginResources: true,
+          projectShape: false,
         },
         _mockImprovement: '<task>List available plugins and their capabilities</task>',
       });
@@ -696,6 +697,7 @@ describe('Hook Input/Output', () => {
           session: false,
           dynamicDiscovery: false,
           pluginResources: true,
+          projectShape: false,
         },
         _mockImprovement: '<task>Identify relevant plugins for the task</task>',
       });
@@ -717,6 +719,7 @@ describe('Hook Input/Output', () => {
           session: false,
           dynamicDiscovery: false,
           pluginResources: false,
+          projectShape: false,
         },
         _mockImprovement: '<task>Complete the task</task>',
       });
@@ -738,6 +741,7 @@ describe('Hook Input/Output', () => {
           session: false,
           dynamicDiscovery: false,
           pluginResources: true,
+          projectShape: false,
         },
         cwd: '/tmp/test-project',
         _mockImprovement: '<task>Commit changes with plugin assistance</task>',
@@ -759,6 +763,7 @@ describe('Hook Input/Output', () => {
           session: false,
           dynamicDiscovery: false,
           pluginResources: true,
+          projectShape: false,
         },
         cwd: '/home/test/project',
         _mockImprovement: '<task>Scan and list plugins</task>',

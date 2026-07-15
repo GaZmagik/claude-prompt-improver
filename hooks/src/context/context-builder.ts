@@ -44,6 +44,12 @@ import {
   scanMcpServers,
 } from '../integrations/plugin-scanner.ts';
 import {
+  type ProjectShapeContext,
+  type ProjectShapeOptions,
+  formatProjectShape,
+  gatherProjectShape,
+} from '../integrations/project-shape.ts';
+import {
   type AgentDefinition,
   type SuggestedAgent,
   formatAgentsContext,
@@ -110,7 +116,8 @@ export type ContextSource =
   | 'memory'
   | 'session'
   | 'dynamicDiscovery'
-  | 'pluginResources';
+  | 'pluginResources'
+  | 'projectShape';
 
 /**
  * Input for building context
@@ -135,6 +142,7 @@ export interface ContextBuilderInput {
   readonly sessionOptions?: SessionContextOptions;
   readonly dynamicDiscoveryOptions?: DynamicDiscoveryOptions;
   readonly pluginResourcesOptions?: PluginResourcesOptions;
+  readonly projectShapeOptions?: ProjectShapeOptions;
   readonly timeoutMs?: number;
 }
 
@@ -153,6 +161,7 @@ export interface BuiltContext {
   readonly session?: SessionContext;
   readonly dynamicDiscovery?: DynamicContext;
   readonly pluginResources?: ResourceContext;
+  readonly projectShape?: ProjectShapeContext;
 }
 
 /**
@@ -169,6 +178,7 @@ export interface FormattedContext {
   readonly session?: string;
   readonly dynamicDiscovery?: string;
   readonly pluginResources?: string;
+  readonly projectShape?: string;
 }
 
 /**
@@ -187,6 +197,7 @@ export async function buildContext(input: ContextBuilderInput): Promise<BuiltCon
     sessionOptions,
     dynamicDiscoveryOptions,
     pluginResourcesOptions,
+    projectShapeOptions,
   } = input;
   const sources: ContextSource[] = [];
 
@@ -202,6 +213,7 @@ export async function buildContext(input: ContextBuilderInput): Promise<BuiltCon
     session?: SessionContext;
     dynamicDiscovery?: DynamicContext;
     pluginResources?: ResourceContext;
+    projectShape?: ProjectShapeContext;
   } = {};
 
   // Gather synchronous context
@@ -217,6 +229,7 @@ export async function buildContext(input: ContextBuilderInput): Promise<BuiltCon
     sessionOptions,
     dynamicDiscoveryOptions,
     pluginResourcesOptions,
+    projectShapeOptions,
     sources,
     results
   );
@@ -281,6 +294,7 @@ function buildAsyncTasks(
   sessionOptions: SessionContextOptions | undefined,
   dynamicDiscoveryOptions: DynamicDiscoveryOptions | undefined,
   pluginResourcesOptions: PluginResourcesOptions | undefined,
+  projectShapeOptions: ProjectShapeOptions | undefined,
   sources: ContextSource[],
   results: {
     git?: GitContext;
@@ -290,6 +304,7 @@ function buildAsyncTasks(
     session?: SessionContext;
     dynamicDiscovery?: DynamicContext;
     pluginResources?: ResourceContext;
+    projectShape?: ProjectShapeContext;
   }
 ): Promise<void>[] {
   const tasks: Promise<void>[] = [];
@@ -394,6 +409,18 @@ function buildAsyncTasks(
     );
   }
 
+  if (projectShapeOptions && projectShapeOptions.enabled !== false) {
+    tasks.push(
+      createAsyncTask(
+        () => gatherProjectShape(projectShapeOptions),
+        (ctx) => {
+          results.projectShape = ctx;
+          sources.push('projectShape');
+        }
+      )
+    );
+  }
+
   return tasks;
 }
 
@@ -424,6 +451,7 @@ export function formatContextForInjection(context: BuiltContext): FormattedConte
     'pluginResources',
     formatResourcesXml
   );
+  const projectShape = formatField(context.projectShape, sources, 'projectShape', formatProjectShape);
 
   // Build result with conditional property inclusion (exactOptionalPropertyTypes)
   return {
@@ -437,5 +465,6 @@ export function formatContextForInjection(context: BuiltContext): FormattedConte
     ...(session !== undefined && { session }),
     ...(dynamicDiscovery !== undefined && { dynamicDiscovery }),
     ...(pluginResources !== undefined && { pluginResources }),
+    ...(projectShape !== undefined && { projectShape }),
   };
 }
