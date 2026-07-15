@@ -61,6 +61,11 @@ describe('classifyPromptGenre', () => {
       expect(classifyPromptGenre('enable cross-dashboard recall of scans')).toBe('build');
       expect(classifyPromptGenre('support tombstone deletes in the sidecar')).toBe('build');
     });
+
+    it('does not treat mid-sentence enable/support questions as build', () => {
+      expect(classifyPromptGenre('does the API support pagination?')).not.toBe('build');
+      expect(classifyPromptGenre('is this feature enabled in production?')).not.toBe('build');
+    });
   });
 
   describe('general genre', () => {

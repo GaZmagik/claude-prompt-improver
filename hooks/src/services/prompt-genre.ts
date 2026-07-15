@@ -76,8 +76,9 @@ const GENRE_PATTERNS: readonly (readonly [Exclude<PromptGenre, 'general'>, reado
       /\bset up\b/i,
       /\bwrite (?:a|the|an|some)\b/i,
       /\bmake (?:the|it|them|this|these|a|an)\b/i,
-      /\benable\b/i,
-      /\bsupport\b/i,
+      // Clause-initial only: "enable X" is a build command, "does X support Y" is not
+      /(?:^|[.!?;]\s*)enable\b/im,
+      /(?:^|[.!?;]\s*)support\b/im,
     ],
   ],
 ];
