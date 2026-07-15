@@ -66,6 +66,21 @@ describe('gatherProjectShape', () => {
     }
   });
 
+  it('caps the directory list for large monorepos', async () => {
+    const dir = join(tmpdir(), `project-shape-many-${Date.now()}`);
+    for (let i = 0; i < 30; i++) {
+      mkdirSync(join(dir, `pkg-${String(i).padStart(2, '0')}`), { recursive: true });
+    }
+    try {
+      const result = await gatherProjectShape({ enabled: true, cwd: dir });
+
+      expect(result.success).toBe(true);
+      expect(result.context?.directories.length).toBeLessThanOrEqual(20);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
   it('returns failure for a nonexistent directory instead of throwing', async () => {
     const result = await gatherProjectShape({
       enabled: true,

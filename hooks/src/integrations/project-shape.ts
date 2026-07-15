@@ -30,6 +30,9 @@ const GIT_TIMEOUT_MS = 2_000;
 /** Maximum recently-modified files to include */
 const MAX_RECENT_FILES = 10;
 
+/** Maximum top-level directories to include (bounds token cost on monorepos) */
+const MAX_DIRECTORIES = 20;
+
 /** Options for gathering project shape */
 export interface ProjectShapeOptions {
   readonly enabled?: boolean;
@@ -87,7 +90,7 @@ async function readPackageInfo(cwd: string): Promise<{
  */
 async function readRecentFiles(cwd: string): Promise<string[] | undefined> {
   try {
-    const proc = Bun.spawn(['git', 'log', '--name-only', '--pretty=format:', '-5'], {
+    const proc = Bun.spawn(['git', 'log', '--name-only', '--diff-filter=d', '--pretty=format:', '-5'], {
       cwd,
       stdout: 'pipe',
       stderr: 'ignore',
@@ -136,7 +139,8 @@ export async function gatherProjectShape(
     const directories = entries
       .filter((e) => e.isDirectory() && !IGNORED_DIRECTORIES.has(e.name) && !e.name.startsWith('.'))
       .map((e) => e.name)
-      .sort();
+      .sort()
+      .slice(0, MAX_DIRECTORIES);
 
     const [pkgInfo, recentFiles] = await Promise.all([readPackageInfo(cwd), readRecentFiles(cwd)]);
 
