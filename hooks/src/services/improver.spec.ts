@@ -598,6 +598,37 @@ This is expanded with lots of detail and context information.`,
     });
   });
 
+  describe('T229: improvement template implementation-brief guidance', () => {
+    it('should instruct required reading with authority markers and reuse of proven results', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toMatch(/required reading|read first/i);
+      expect(prompt).toMatch(/superseded|authoritative/i);
+      expect(prompt).toMatch(/reproduce/i);
+      expect(prompt).toMatch(/re-derive/i);
+    });
+
+    it('should instruct assertable invariants and worked acceptance examples', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toMatch(/invariant/i);
+      expect(prompt).toMatch(/worked example|acceptance example/i);
+    });
+
+    it('should instruct explicit non-goals and quantified pitfalls', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toMatch(/non-goals/i);
+      expect(prompt).toMatch(/pitfall/i);
+    });
+  });
+
   describe('T228: improvement template precision and output-contract guidance', () => {
     it('should instruct noise guards for scan/review tasks', () => {
       const prompt = buildImprovementPrompt({

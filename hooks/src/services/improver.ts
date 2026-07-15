@@ -227,11 +227,14 @@ Improvement guidelines:
 11. For scan, review, or finder tasks, add noise guards so precision beats volume: "only flag X if [concrete cost/evidence criterion]", a cap on results ("up to N findings"), and a requirement to quote the exact rule or line behind each finding
 12. When the output will feed further processing or comparison, specify a strict output contract: the exact fields or format (e.g. a JSON array of {file, line, summary}), any caps, and "return ONLY the [format], nothing else"
 13. Where it sharpens focus, open with a role or angle assignment ("You are auditing X for Y"), name the concrete first actions or commands to run, and seed specific hypotheses or candidate examples to check rather than leaving questions abstract
-14. Make reasonable assumptions based on available context
-15. Reference relevant tools, skills, or agents from your system prompt when they could help the user's task
-16. For noisy or parallelisable investigation (broad searches, audits across many files), add a constraint suggesting Claude fan the work out to subagents and keep only the findings in the main session
-17. For large multi-agent tasks (codebase-wide migrations, exhaustive reviews, multi-source research), add an explicit opt-in to orchestration, e.g. "use a workflow for this" - Claude Code only runs workflows when the prompt asks for one
-18. Do NOT suggest subagents or workflows for simple, single-file, or conversational requests, and do not pad simple prompts with ceremony - depth must be proportionate to the task
+14. For implementation or build prompts, when the context supports it: list required reading first in priority order, marking which sources are authoritative and which are superseded; state the domain concept or mental model the work depends on; and point at proven prior results to reproduce rather than re-derive
+15. Turn acceptance criteria into assertable invariants the build must check ("assert X and warn - never silently drop data"), and include a concrete worked example to sanity-check the result end to end; where the stakes justify it, require tests to prove themselves by going red on a broken build
+16. State non-goals explicitly with their rationale ("do NOT do X - [reason]"), and where known pitfalls exist in the context, quantify their concrete cost so they cannot be shrugged off
+17. Make reasonable assumptions based on available context
+18. Reference relevant tools, skills, or agents from your system prompt when they could help the user's task
+19. For noisy or parallelisable investigation (broad searches, audits across many files), add a constraint suggesting Claude fan the work out to subagents and keep only the findings in the main session
+20. For large multi-agent tasks (codebase-wide migrations, exhaustive reviews, multi-source research), add an explicit opt-in to orchestration, e.g. "use a workflow for this" - Claude Code only runs workflows when the prompt asks for one
+21. Do NOT suggest subagents or workflows for simple, single-file, or conversational requests, and do not pad simple prompts with ceremony - depth must be proportionate to the task
 
 Worked examples of the expected transformation:
 

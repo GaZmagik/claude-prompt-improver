@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Concrete tools, literal search queries, and upfront disambiguation of confusable terms
   - Output discipline: scope pinning (directory/branch), read-only constraints, conclusions in the final message rather than file dumps
   - New worked example: dependency-maintenance research brief
+- **Implementation-brief guidance** - For build prompts with supporting context: required reading in priority order with authority/superseded markers, the domain concept stated up front, proven prior results to reproduce rather than re-derive, assertable invariants as acceptance criteria, worked acceptance examples, mutation-proofed tests where stakes justify it, explicit non-goals with rationale, and quantified pitfall costs
 - **Precision and output-contract guidance** - For scan/review/finder tasks: noise guards ("only flag if..."), result caps, and quoted evidence per finding; strict output contracts (exact fields, "return ONLY the format") when results feed further processing; role/angle assignment, concrete first actions, and seeded hypotheses where they sharpen focus
 - **Subagent and workflow awareness** - New improvement guidelines teach the improver about current Claude Code orchestration
   - Suggests subagent fan-out for noisy or parallelisable investigation
@@ -39,7 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Technical Details
 
 - Verified against Claude Code 2.1.209: UserPromptSubmit hook schema, plugin hooks.json format, and all CLI flags (`--print`, `--no-session-persistence`, `--debug`, `--model`) remain supported
-- Added 19 new test cases (few-shot examples, prose-first output, research guidance, subagent/workflow guidance, fence stripping incl. CRLF/uppercase fences, alias assertions, prose structure detection)
+- Added 22 new test cases (few-shot examples, prose-first output, research guidance, subagent/workflow guidance, fence stripping incl. CRLF/uppercase fences, alias assertions, prose structure detection)
 - README updated: prose-first structuring, research/orchestration features, corrected timeout table
 
 ## [1.8.0] - 2026-02-09
