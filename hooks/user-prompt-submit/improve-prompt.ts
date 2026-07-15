@@ -280,6 +280,7 @@ function buildIntegrationOptions(
     ...(integrations.session && { sessionOptions: { enabled: true } }),
     ...(integrations.dynamicDiscovery && { dynamicDiscoveryOptions: { enabled: true, ...cwdOption } }),
     ...(integrations.pluginResources && { pluginResourcesOptions: { enabled: true, ...cwdOption } }),
+    ...(integrations.projectShape && { projectShapeOptions: { enabled: true, ...cwdOption } }),
   };
 }
 
@@ -298,6 +299,7 @@ function mapFormattedToImprovement(formatted: FormattedContext): ImprovementCont
     ...(formatted.session && { session: formatted.session }),
     ...(formatted.dynamicDiscovery && { dynamicDiscovery: formatted.dynamicDiscovery }),
     ...(formatted.pluginResources && { pluginResources: formatted.pluginResources }),
+    ...(formatted.projectShape && { projectShape: formatted.projectShape }),
   };
 }
 
@@ -309,7 +311,7 @@ function hasEnabledIntegrations(integrations?: IntegrationToggles): boolean {
   return !!(
     integrations.git || integrations.lsp || integrations.spec ||
     integrations.memory || integrations.session || integrations.dynamicDiscovery ||
-    integrations.pluginResources
+    integrations.pluginResources || integrations.projectShape
   );
 }
 
@@ -319,7 +321,8 @@ function hasEnabledIntegrations(integrations?: IntegrationToggles): boolean {
 function hasFormattedContent(ctx: FormattedContext): boolean {
   return !!(
     ctx.tools || ctx.skills || ctx.agents || ctx.git || ctx.lsp ||
-    ctx.spec || ctx.memory || ctx.session || ctx.dynamicDiscovery || ctx.pluginResources
+    ctx.spec || ctx.memory || ctx.session || ctx.dynamicDiscovery || ctx.pluginResources ||
+    ctx.projectShape
   );
 }
 

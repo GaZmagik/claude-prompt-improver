@@ -5,7 +5,7 @@
  */
 import { access, mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import type { Configuration, IntegrationToggles, LogLevel, LoggingConfig } from './types.ts';
+import type { Configuration, IntegrationToggles, LogLevel, LoggingConfig, PromptGenre } from './types.ts';
 
 /**
  * Validation error for configuration fields
@@ -34,6 +34,7 @@ const DEFAULT_INTEGRATIONS: IntegrationToggles = {
   session: true,
   dynamicDiscovery: true,
   pluginResources: true,
+  projectShape: true,
 };
 
 /**
@@ -262,6 +263,62 @@ export function parseYamlFrontmatter(content: string): Record<string, unknown> {
   return result;
 }
 
+/** Genres accepted for exemplar sections */
+const EXEMPLAR_GENRES: readonly PromptGenre[] = ['fix', 'investigate', 'research', 'build', 'general'];
+
+/** Matches "## Exemplar: research" / "## exemplar research" style headings */
+const EXEMPLAR_HEADING_PATTERN = /^##\s*exemplar[:\s]\s*(\w+)\s*$/i;
+
+/**
+ * Parses user exemplar sections from a markdown config body
+ * A section starts at "## Exemplar: <genre>" and runs until the next "## " heading
+ * Unknown genres are ignored; content is trimmed
+ */
+export function parseExemplarsFromBody(content: string): Partial<Record<PromptGenre, string>> {
+  const exemplars: Partial<Record<PromptGenre, string>> = {};
+  if (!content) {
+    return exemplars;
+  }
+
+  const lines = content.split('\n');
+  let currentGenre: PromptGenre | null = null;
+  let buffer: string[] = [];
+
+  const flush = (): void => {
+    if (currentGenre) {
+      const text = buffer.join('\n').trim();
+      if (text.length > 0) {
+        exemplars[currentGenre] = text;
+      }
+    }
+    buffer = [];
+  };
+
+  for (const line of lines) {
+    const headingMatch = line.match(EXEMPLAR_HEADING_PATTERN);
+    if (headingMatch?.[1]) {
+      flush();
+      const genre = headingMatch[1].toLowerCase();
+      currentGenre = (EXEMPLAR_GENRES as readonly string[]).includes(genre)
+        ? (genre as PromptGenre)
+        : null;
+      continue;
+    }
+    // Any other "## " heading ends the current exemplar section
+    if (/^##\s/.test(line)) {
+      flush();
+      currentGenre = null;
+      continue;
+    }
+    if (currentGenre) {
+      buffer.push(line);
+    }
+  }
+  flush();
+
+  return exemplars;
+}
+
 /**
  * Parses a YAML value string into appropriate type
  */
@@ -339,6 +396,8 @@ function yamlToConfig(yaml: Record<string, unknown>): Partial<Configuration> {
       memory: typeof src.memory === 'boolean' ? src.memory : undefined,
       session: typeof src.session === 'boolean' ? src.session : undefined,
       dynamicDiscovery: typeof src.dynamicDiscovery === 'boolean' ? src.dynamicDiscovery : undefined,
+      pluginResources: typeof src.pluginResources === 'boolean' ? src.pluginResources : undefined,
+      projectShape: typeof src.projectShape === 'boolean' ? src.projectShape : undefined,
     };
   }
 
@@ -409,6 +468,7 @@ function mergeConfig(defaults: Configuration, partial: Partial<Configuration>): 
       session: partial.integrations?.session ?? defaults.integrations.session,
       dynamicDiscovery: partial.integrations?.dynamicDiscovery ?? defaults.integrations.dynamicDiscovery,
       pluginResources: partial.integrations?.pluginResources ?? defaults.integrations.pluginResources,
+      projectShape: partial.integrations?.projectShape ?? defaults.integrations.projectShape,
     },
     logging: {
       enabled: partial.logging?.enabled ?? defaults.logging.enabled,
@@ -421,6 +481,9 @@ function mergeConfig(defaults: Configuration, partial: Partial<Configuration>): 
       useTimestampedLogs:
         partial.logging?.useTimestampedLogs ?? defaults.logging.useTimestampedLogs,
     },
+    ...((partial.exemplars ?? defaults.exemplars) && {
+      exemplars: partial.exemplars ?? defaults.exemplars,
+    }),
   };
 }
 
@@ -455,7 +518,11 @@ export async function loadConfig(filePath: string): Promise<Configuration> {
       try {
         const yaml = parseYamlFrontmatter(content);
         const partial = yamlToConfig(yaml);
-        config = mergeConfig(DEFAULT_CONFIG, partial);
+        const exemplars = parseExemplarsFromBody(content);
+        config = mergeConfig(DEFAULT_CONFIG, {
+          ...partial,
+          ...(Object.keys(exemplars).length > 0 && { exemplars }),
+        });
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         console.warn(

@@ -178,6 +178,7 @@ describe('Core Types', () => {
           session: false,
           dynamicDiscovery: true,
           pluginResources: true,
+          projectShape: false,
         },
         logging: {
           enabled: true,
@@ -208,6 +209,7 @@ describe('Core Types', () => {
         session: false,
         dynamicDiscovery: true,
         pluginResources: true,
+        projectShape: false,
       };
 
       expect(toggles.pluginResources).toBe(true);
@@ -222,6 +224,7 @@ describe('Core Types', () => {
         session: false,
         dynamicDiscovery: false,
         pluginResources: false,
+        projectShape: false,
       };
 
       expect(toggles.pluginResources).toBe(false);
@@ -236,9 +239,10 @@ describe('Core Types', () => {
         session: true,
         dynamicDiscovery: true,
         pluginResources: true,
+        projectShape: false,
       };
 
-      // Verify all 7 fields are present
+      // Verify all 8 fields are present
       const keys = Object.keys(toggles);
       expect(keys).toContain('git');
       expect(keys).toContain('lsp');
@@ -247,7 +251,8 @@ describe('Core Types', () => {
       expect(keys).toContain('session');
       expect(keys).toContain('dynamicDiscovery');
       expect(keys).toContain('pluginResources');
-      expect(keys).toHaveLength(7);
+      expect(keys).toContain('projectShape');
+      expect(keys).toHaveLength(8);
     });
   });
 

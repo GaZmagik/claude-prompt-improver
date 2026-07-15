@@ -29,6 +29,7 @@ const mockConfig: Configuration = {
     session: false,
     dynamicDiscovery: false,
     pluginResources: false,
+    projectShape: false,
   },
   logging: {
     enabled: false,
@@ -211,8 +212,8 @@ describe('Improver', () => {
       expect(result.success).toBe(true);
       expect(result.modelUsed).toBe('opus');
       expect(result.improvedPrompt).toContain('architectural');
-      // Opus timeout is 90s (90_000ms) - verify it completes within reasonable time
-      expect(result.latencyMs).toBeLessThan(90_000);
+      // Opus timeout is 100s (100_000ms) - verify it completes within reasonable time
+      expect(result.latencyMs).toBeLessThan(100_000);
     });
 
     it('should use correct model based on classification', async () => {
@@ -468,6 +469,333 @@ This is expanded with lots of detail and context information.`,
 
       // Template should mention leveraging available tools/skills/agents
       expect(prompt).toMatch(/tool|skill|agent/i);
+    });
+  });
+
+  describe('T224: code fence stripping from improver output', () => {
+    it('should strip a wrapping markdown code fence from the improved prompt', async () => {
+      const result = await improvePrompt({
+        originalPrompt: 'fix the bug',
+        sessionId: 'session-123',
+        config: mockConfig,
+        _mockClaudeResponse: '```xml\n<task>Fix the bug</task>\n```',
+      });
+
+      expect(result.improvedPrompt).toBe('<task>Fix the bug</task>');
+    });
+
+    it('should leave unfenced output untouched', async () => {
+      const result = await improvePrompt({
+        originalPrompt: 'fix the bug',
+        sessionId: 'session-123',
+        config: mockConfig,
+        _mockClaudeResponse: '<task>Fix the bug</task>',
+      });
+
+      expect(result.improvedPrompt).toBe('<task>Fix the bug</task>');
+    });
+
+    it('should strip fences with uppercase language tags and trailing whitespace', async () => {
+      const result = await improvePrompt({
+        originalPrompt: 'fix the bug',
+        sessionId: 'session-123',
+        config: mockConfig,
+        _mockClaudeResponse: '```XML\r\n<task>Fix the bug</task>\r\n```\n',
+      });
+
+      expect(result.improvedPrompt).toBe('<task>Fix the bug</task>');
+    });
+
+    it('should not strip fences that appear inside the prompt body', async () => {
+      const body = '<task>Explain this snippet</task>\n<context>```js\nfoo()\n```</context>';
+      const result = await improvePrompt({
+        originalPrompt: 'explain snippet',
+        sessionId: 'session-123',
+        config: mockConfig,
+        _mockClaudeResponse: body,
+      });
+
+      expect(result.improvedPrompt).toBe(body);
+    });
+  });
+
+  describe('T222: improvement template few-shot examples', () => {
+    it('should include worked examples with original and improved pairs', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'fix the login bug',
+      });
+
+      expect(prompt).toContain('<example>');
+      expect(prompt).toContain('<example_original>');
+      expect(prompt).toContain('<example_improved>');
+    });
+
+    it('should place examples before the original prompt so they read as instructions', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'fix my unique broken thing xyz',
+      });
+
+      const exampleIndex = prompt.indexOf('<example>');
+      const originalIndex = prompt.indexOf('fix my unique broken thing xyz');
+      expect(exampleIndex).toBeGreaterThan(-1);
+      expect(exampleIndex).toBeLessThan(originalIndex);
+    });
+  });
+
+  describe('T225: improvement template prose-first output', () => {
+    it('should not mandate XML-wrapped output', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).not.toContain('wrapped in XML tags');
+    });
+
+    it('should instruct prose structure with numbered questions and an explicit deliverable', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toMatch(/prose/i);
+      expect(prompt).toMatch(/numbered/i);
+      expect(prompt).toMatch(/deliverable|verdict/i);
+    });
+
+    it('should instruct evidence citations for investigation prompts', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'audit the codebase for hardcoded secrets',
+      });
+
+      expect(prompt).toContain('file:line');
+    });
+  });
+
+  describe('T227: improvement template research and fact-checking guidance', () => {
+    const researchPrompt = 'find out if anyone still maintains left-pad-utils';
+
+    it('should instruct separation of verified findings from inference', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: researchPrompt,
+      });
+
+      expect(prompt).toMatch(/VERIFIED/);
+      expect(prompt).toMatch(/inferred/i);
+    });
+
+    it('should instruct per-item verdicts and verbatim quotes for research prompts', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: researchPrompt,
+      });
+
+      expect(prompt).toMatch(/verbatim|quote/i);
+      expect(prompt).toMatch(/each/i);
+    });
+
+    it('should instruct honest negative results and output discipline', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: researchPrompt,
+      });
+
+      expect(prompt).toMatch(/say so plainly/i);
+      expect(prompt).toMatch(/not raw file dumps|no file dumps/i);
+    });
+  });
+
+  describe('T230: genre-conditional template', () => {
+    it('should omit genre blocks and examples for general prompts', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'what do you think about this approach?',
+      });
+
+      expect(prompt).not.toMatch(/VERIFIED/);
+      expect(prompt).not.toMatch(/required reading/i);
+      expect(prompt).not.toContain('<example>');
+    });
+
+    it('should not leak research guidance into investigate prompts', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'audit the codebase for hardcoded secrets',
+      });
+
+      expect(prompt).not.toMatch(/required reading/i);
+      expect(prompt).toMatch(/file:line/);
+    });
+
+    it('should respect an explicit genre override', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'what do you think?',
+        genre: 'research',
+      });
+
+      expect(prompt).toMatch(/VERIFIED/);
+    });
+
+    it('should report the classified genre in the improvement result', async () => {
+      const result = await improvePrompt({
+        config: mockConfig,
+        originalPrompt: 'fix the login bug',
+        sessionId: 'session-123',
+        _mockClaudeResponse: 'Improved prompt',
+      });
+
+      expect(result.genre).toBe('fix');
+    });
+  });
+
+  describe('T231: verification and candour core guidelines', () => {
+    it('should instruct naming how to verify the work for all genres', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'what do you think about this approach?',
+      });
+
+      expect(prompt).toMatch(/VERIFY/);
+    });
+
+    it('should instruct candour for advice and design questions', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'what do you think about this approach?',
+      });
+
+      expect(prompt).toMatch(/candour/i);
+      expect(prompt).toMatch(/state plainly if the approach is a mistake/i);
+    });
+  });
+
+  describe('T232: user exemplar library', () => {
+    it('should replace the built-in example with a user exemplar for the genre', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'fix the login bug',
+        exemplars: { fix: 'My gold standard fix prompt with reproduction steps.' },
+      });
+
+      expect(prompt).toContain('My gold standard fix prompt with reproduction steps.');
+      expect(prompt).toContain('own prompt library');
+      expect(prompt).not.toContain('Investigate and fix the login bug.');
+    });
+
+    it('should fall back to the built-in example when no exemplar matches the genre', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'fix the login bug',
+        exemplars: { research: 'A research exemplar.' },
+      });
+
+      expect(prompt).not.toContain('A research exemplar.');
+      expect(prompt).toContain('Investigate and fix the login bug.');
+    });
+
+    it('should pass config exemplars through improvePrompt', async () => {
+      const result = await improvePrompt({
+        config: { ...mockConfig, exemplars: { fix: 'Config exemplar.' } },
+        originalPrompt: 'fix the login bug',
+        sessionId: 'session-123',
+        _mockClaudeResponse: 'Improved prompt',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.genre).toBe('fix');
+    });
+  });
+
+  describe('T229: improvement template implementation-brief guidance', () => {
+    const buildPrompt = 'add the invoice reconciliation tab to the dashboard';
+
+    it('should instruct required reading with authority markers and reuse of proven results', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: buildPrompt,
+      });
+
+      expect(prompt).toMatch(/required reading|read first/i);
+      expect(prompt).toMatch(/superseded|authoritative/i);
+      expect(prompt).toMatch(/reproduce/i);
+      expect(prompt).toMatch(/re-derive/i);
+    });
+
+    it('should instruct assertable invariants and worked acceptance examples', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: buildPrompt,
+      });
+
+      expect(prompt).toMatch(/invariant/i);
+      expect(prompt).toMatch(/worked example|acceptance example/i);
+    });
+
+    it('should instruct explicit non-goals and quantified pitfalls', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: buildPrompt,
+      });
+
+      expect(prompt).toMatch(/non-goals/i);
+      expect(prompt).toMatch(/pitfall/i);
+    });
+  });
+
+  describe('T228: improvement template precision and output-contract guidance', () => {
+    const investigatePrompt = 'audit the codebase for hardcoded secrets';
+
+    it('should instruct noise guards for scan/review tasks', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: investigatePrompt,
+      });
+
+      expect(prompt).toMatch(/only flag|flag only/i);
+      expect(prompt).toMatch(/cap|up to/i);
+    });
+
+    it('should instruct strict output contracts when results feed further processing', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: investigatePrompt,
+      });
+
+      expect(prompt).toMatch(/output contract/i);
+    });
+
+    it('should instruct role assignment, first actions, and seeded hypotheses', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: investigatePrompt,
+      });
+
+      expect(prompt).toMatch(/role or angle/i);
+      expect(prompt).toMatch(/first action|first command/i);
+      expect(prompt).toMatch(/hypothes/i);
+    });
+  });
+
+  describe('T226: summary detects prose structure', () => {
+    it('should report added structure when a numbered list is introduced', () => {
+      const summary = generateImprovementSummary(
+        'check the endpoints',
+        'Audit every API endpoint for auth checks. Report:\n1. Unprotected routes with file:line.\n2. Inconsistent auth schemes between modules.\nGive a clear verdict.'
+      );
+
+      expect(summary.some((s) => s.toLowerCase().includes('structure'))).toBe(true);
+    });
+
+    it('should recognise parenthesis-style numbering in the original prompt', () => {
+      const summary = generateImprovementSummary(
+        'check these:\n1) auth\n2) logging',
+        'Check the following:\n1. Authentication coverage.\n2. Logging consistency.'
+      );
+
+      // Original was already structured, so no 'Added structure' bullet
+      expect(summary.some((s) => s.toLowerCase().includes('structure'))).toBe(false);
+    });
+  });
+
+  describe('T223: improvement template subagent and workflow awareness', () => {
+    it('should instruct the improver to suggest subagents for parallelisable work', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toMatch(/subagent/i);
+    });
+
+    it('should instruct the improver to suggest workflows for large multi-agent tasks', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toMatch(/workflow/i);
     });
   });
 });

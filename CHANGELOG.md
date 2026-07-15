@@ -5,6 +5,50 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-07-15
+
+### Added
+
+- **Few-shot examples in improvement prompt** - Three worked original/improved pairs now guide the improver model
+  - Simple structuring example (vague bug report → goal, approach, and test requirement in prose)
+  - Deep investigation example (broad audit → scoped mission, numbered report items, file:line citations, explicit verdict, per-module subagent fan-out)
+  - Workflow opt-in example (codebase-wide migration → explicit "use a workflow" phrasing)
+- **Investigation depth guidance** - Improved prompts for audits/investigations now demand evidence (file:line with excerpts) and a closing verdict or recommendation, with a proportionality guard so simple prompts stay short
+- **Research and fact-checking guidance** - Improved research prompts now demand epistemic discipline modelled on real hand-crafted research briefs:
+  - VERIFIED (actually read, with verbatim quotes and links) separated from inferred findings
+  - Per-claim verdicts (CONFIRMED / PARTLY RIGHT / WRONG / OUTDATED) and per-item question sets ("for EACH repo...")
+  - Honest negative results ("if nobody has built this, say so plainly")
+  - Concrete tools, literal search queries, and upfront disambiguation of confusable terms
+  - Output discipline: scope pinning (directory/branch), read-only constraints, conclusions in the final message rather than file dumps
+  - New worked example: dependency-maintenance research brief
+- **Implementation-brief guidance** - For build prompts with supporting context: required reading in priority order with authority/superseded markers, the domain concept stated up front, proven prior results to reproduce rather than re-derive, assertable invariants as acceptance criteria, worked acceptance examples, mutation-proofed tests where stakes justify it, explicit non-goals with rationale, and quantified pitfall costs
+- **Precision and output-contract guidance** - For scan/review/finder tasks: noise guards ("only flag if..."), result caps, and quoted evidence per finding; strict output contracts (exact fields, "return ONLY the format") when results feed further processing; role/angle assignment, concrete first actions, and seeded hypotheses where they sharpen focus
+- **Subagent and workflow awareness** - New improvement guidelines teach the improver about current Claude Code orchestration
+  - Suggests subagent fan-out for noisy or parallelisable investigation
+  - Adds explicit workflow opt-in phrasing for large multi-agent tasks (Claude Code only runs workflows when asked)
+  - Guards against suggesting orchestration for simple or conversational prompts
+- **Code fence stripping** - Wrapping markdown fences (e.g. ```` ```xml ````) are removed from improver output; fences inside the prompt body are preserved
+
+- **Genre-conditional improvement template** - A keyword classifier (`prompt-genre.ts`, no extra API call) types each prompt as fix / investigate / research / build / general; the improver receives the core guidelines plus only the matching genre block and worked example, shrinking the metaprompt and sharpening compliance
+- **Verification and candour core guidelines** - Non-trivial improved prompts end by naming how to verify the work (run what, observe what, report what evidence); advice/design prompts instruct candour ("state plainly if the approach is a mistake")
+- **Personal exemplar library** - `## Exemplar: <genre>` sections in `.claude/prompt-improver.local.md` replace the built-in worked example for that genre, so the improver learns the user's own prompting style
+- **Project shape context integration** - New `projectShape` integration (default on) injects top-level directories, package.json scripts, detected test framework, and recently modified files (git) so improved prompts can cite real files and commands
+
+### Changed
+
+- **Prose-first output replaces mandatory XML structuring** - Improved prompts are now written as natural prose (goal and rationale first, then scope/constraints, numbered questions for multi-part work, explicit deliverable); XML tags are only kept if the original prompt used them. This deliberately reverses the v1.2.0 "mandatory XML" decision: that fix addressed inconsistent output from vague "if helpful" instructions on 2025-era models, and the prescriptive prose shape solves the same consistency problem without markup on current models (see the updated memory notes in .claude/memory/permanent/)
+- **Improvement timeouts fixed** - Per-model timeouts were leftover 300s testing values exceeding the 120s hook budget; now 60s (haiku), 90s (sonnet), 100s (opus)
+- **Summary detection updated** - "Added structure" now also recognises prose structure (numbered lists), not just XML tags
+- **Model aliases instead of dated model IDs** - `--model haiku|sonnet|opus` now passes CLI aliases, so the Claude CLI resolves each tier to its latest model (previously pinned to late-2025 snapshots such as `claude-sonnet-4-5-20250929`)
+- **Improvement prompt restructured** - Guidelines and examples now precede the original prompt, which sits last for recency
+
+### Technical Details
+
+- Verified against Claude Code 2.1.209: UserPromptSubmit hook schema, plugin hooks.json format, and all CLI flags (`--print`, `--no-session-persistence`, `--debug`, `--model`) remain supported
+- Fixed config parsing gap: `integrations.pluginResources` was never read from YAML config (toggle silently ignored); example config template re-synced with all integration defaults
+- Added 49 new test cases (few-shot examples, prose-first output, research guidance, subagent/workflow guidance, fence stripping incl. CRLF/uppercase fences, alias assertions, prose structure detection)
+- README updated: prose-first structuring, research/orchestration features, corrected timeout table
+
 ## [1.8.0] - 2026-02-09
 
 ### Added

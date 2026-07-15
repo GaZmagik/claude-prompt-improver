@@ -8,6 +8,9 @@
 // Claude model selection
 export type ClaudeModel = 'haiku' | 'sonnet' | 'opus';
 
+/** Genres the improvement template specialises for */
+export type PromptGenre = 'fix' | 'investigate' | 'research' | 'build' | 'general';
+
 // Context sources that can contribute to prompt improvement
 export type ContextSource =
   | 'tools'
@@ -19,7 +22,8 @@ export type ContextSource =
   | 'memory'
   | 'session'
   | 'dynamicDiscovery'
-  | 'pluginResources';
+  | 'pluginResources'
+  | 'projectShape';
 
 // Reasons why a prompt may be bypassed
 export type BypassReason =
@@ -100,6 +104,7 @@ export interface IntegrationToggles {
   readonly session: boolean;
   readonly dynamicDiscovery: boolean;
   readonly pluginResources: boolean;
+  readonly projectShape: boolean;
 }
 
 /**
@@ -135,6 +140,12 @@ export interface Configuration {
 
   readonly integrations: IntegrationToggles;
   readonly logging: LoggingConfig;
+
+  /**
+   * User-supplied gold-standard prompts, keyed by genre. When present, the
+   * matching exemplar replaces the built-in worked example for that genre
+   */
+  readonly exemplars?: Partial<Record<PromptGenre, string>>;
 }
 
 /**

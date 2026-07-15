@@ -1,6 +1,6 @@
 # Claude Prompt Improver Plugin
 
-A Claude Code plugin that automatically enhances and improves your prompts before they reach Claude. The plugin analyses prompt clarity, adds relevant context, and structures complex requests using XML tags for better AI understanding.
+A Claude Code plugin that automatically enhances and improves your prompts before they reach Claude. The plugin analyses prompt clarity, adds relevant context, and rewrites complex requests as deep, prose-first prompts: goal and rationale up front, scoped constraints, numbered questions for multi-part work, and an explicit deliverable.
 
 ## Features
 
@@ -14,7 +14,12 @@ A Claude Code plugin that automatically enhances and improves your prompts befor
   - Specification awareness (.specify/ directory)
   - Memory plugin integration
 - **Bypass Mechanisms**: Skips processing for short prompts, #skip tagged prompts, low context, or forked sessions
-- **XML Structuring**: Applies semantic XML tags (task, context, constraints) to complex prompts
+- **Prose-First Structuring**: Rewrites complex prompts as natural prose (goal, scope, numbered questions, explicit deliverable); XML tags are kept only if the original prompt used them
+- **Genre-Conditional Templates**: A keyword classifier (no extra API call) types each prompt as fix / investigate / research / build / general, and the improver receives only the core guidelines plus that genre's block and worked example
+- **Personal Exemplar Library**: Add `## Exemplar: <genre>` sections to your local config and the improver teaches itself your house style instead of the built-in examples
+- **Project Shape Context**: Injects top-level directories, package scripts, the test framework, and recently modified files so improved prompts cite real targets
+- **Investigation & Research Depth**: Audit prompts demand file:line evidence and a closing verdict; research prompts demand verbatim quotes, VERIFIED-vs-inferred separation, and honest negative results
+- **Agent & Workflow Awareness**: Suggests subagent fan-out for parallelisable investigation and explicit workflow opt-in for large multi-agent tasks, proportionate to the request
 
 ## Requirements
 
@@ -79,6 +84,7 @@ integrations:
   session: true
   dynamicDiscovery: true
   pluginResources: true
+  projectShape: true
 
 logging:
   enabled: true
@@ -110,6 +116,7 @@ Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settin
 | `integrations.session` | boolean | `true` | Enable session context |
 | `integrations.dynamicDiscovery` | boolean | `true` | Enable dynamic discovery of skills, agents, commands, and output styles |
 | `integrations.pluginResources` | boolean | `true` | Enable plugin resource scanning (skills, agents, commands, output styles from installed plugins) |
+| `integrations.projectShape` | boolean | `true` | Enable project shape context (directories, scripts, test framework, recently modified files) |
 | `logging.enabled` | boolean | `true` | Enable logging |
 | `logging.logFilePath` | string | `.claude/logs/...` | Log file location |
 | `logging.logLevel` | string | `INFO` | Log level: ERROR, INFO, or DEBUG |
@@ -119,6 +126,10 @@ Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settin
 | `logging.useTimestampedLogs` | boolean | `false` | Create timestamped log files |
 
 Both camelCase and snake_case key names are supported (e.g., `shortPromptThreshold` or `short_prompt_threshold`).
+
+### Personal Exemplars
+
+Teach the improver your own prompting style: add `## Exemplar: <genre>` sections (genres: `fix`, `investigate`, `research`, `build`, `general`) to the markdown body of `.claude/prompt-improver.local.md`. The section body is a gold-standard prompt in your style, and it replaces the built-in worked example whenever a prompt of that genre is improved.
 
 ## Usage
 
@@ -132,7 +143,7 @@ Please help me understand the authentication system #improve
 
 The `#improve` tag is removed before the prompt reaches Claude, so it won't appear in the conversation.
 
-**Why opt-in?** Prompt improvement adds 30-50 seconds of latency per prompt due to Claude API calls. Opt-in mode gives you control over when to wait for enhanced prompts.
+**Why opt-in?** Prompt improvement adds latency per prompt (typically seconds with haiku, historically up to 30-50s). Opt-in mode gives you control over when to wait for enhanced prompts.
 
 ### Automatic Mode
 
@@ -165,7 +176,9 @@ The tag is removed before the prompt is passed through.
 Improvements include:
 - **Clarity enhancement**: Removes ambiguity and adds structure
 - **Context enrichment**: Injects relevant git, LSP, spec, and memory context
-- **XML structuring**: Applies semantic tags (task, context, constraints) when helpful
+- **Prose-first structuring**: Goal and rationale first, then scope, numbered questions, and an explicit deliverable; investigation and research prompts gain evidence and verdict requirements
+- **Verification and candour**: Non-trivial prompts end by naming how to verify the work; advice prompts instruct honest pushback
+- **Orchestration suggestions**: Subagent fan-out or workflow opt-in phrasing where the task warrants it
 
 The `improverModel` config field controls which Claude model performs the improvement:
 - **haiku**: Fastest, most cost-effective (default)
@@ -194,10 +207,10 @@ The plugin uses the following hardcoded timeouts:
 
 | Operation | Timeout | Description |
 |-----------|---------|-------------|
-| Hook total | 90s | Maximum time for entire hook execution |
-| Haiku improvement | 30s | Prompt improvement using Haiku model |
-| Sonnet improvement | 60s | Prompt improvement using Sonnet model |
-| Opus improvement | 90s | Prompt improvement using Opus model |
+| Hook total | 120s | Maximum time for entire hook execution (hooks.json) |
+| Haiku improvement | 60s | Prompt improvement using Haiku model |
+| Sonnet improvement | 90s | Prompt improvement using Sonnet model |
+| Opus improvement | 100s | Prompt improvement using Opus model |
 | Context gathering | 2s | Per-source timeout (git, LSP, spec, memory) |
 | Git commands | 2s | Per git command (status, log, diff) |
 
