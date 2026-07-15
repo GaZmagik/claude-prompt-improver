@@ -598,6 +598,35 @@ This is expanded with lots of detail and context information.`,
     });
   });
 
+  describe('T228: improvement template precision and output-contract guidance', () => {
+    it('should instruct noise guards for scan/review tasks', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toMatch(/only flag|flag only/i);
+      expect(prompt).toMatch(/cap|up to/i);
+    });
+
+    it('should instruct strict output contracts when results feed further processing', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toMatch(/output contract/i);
+    });
+
+    it('should instruct role assignment, first actions, and seeded hypotheses', () => {
+      const prompt = buildImprovementPrompt({
+        originalPrompt: 'test prompt',
+      });
+
+      expect(prompt).toMatch(/role or angle/i);
+      expect(prompt).toMatch(/first action|first command/i);
+      expect(prompt).toMatch(/hypothes/i);
+    });
+  });
+
   describe('T226: summary detects prose structure', () => {
     it('should report added structure when a numbered list is introduced', () => {
       const summary = generateImprovementSummary(
