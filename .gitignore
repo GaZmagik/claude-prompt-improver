@@ -36,7 +36,7 @@ yarn-error.log*
 .claude/cache/
 .claude/flags/
 .claude/logs/
-.claude/memory/local/
+.claude/memory/
 .claude/plans/
 .claude/projects/
 .claude/*.local.md
