@@ -7,7 +7,7 @@ forceImprove: false
 shortPromptThreshold: 10
 compactionThreshold: 5
 improverModel: haiku
-# contextWindowTokens: 1000000  # Uncomment for a 1M context model if not auto-detected
+# contextWindowTokens: 1000000  # Set on a 1M session (or export CLAUDE_CODE_MAX_CONTEXT_TOKENS); default 200K
 
 integrations:
   git: true

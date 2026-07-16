@@ -209,6 +209,32 @@ export function extractTokenUsageFromLine(line: string): MessageTokenUsage | und
 export const AUTOCOMPACT_BUFFER_PERCENT = 0.225;
 
 /**
+ * Resolves the context window size from all available sources, in precedence:
+ * 1. Explicit config (`contextWindowTokens`)
+ * 2. The CLAUDE_CODE_MAX_CONTEXT_TOKENS env var, which IS visible to the hook
+ *    process (unlike the model id, which is not in the UserPromptSubmit schema)
+ * 3. Best-effort detection from a model id, if one is somehow available
+ * 4. The 200K default
+ *
+ * @param sources configured value, raw env string, and/or model id
+ * @returns the resolved context window in tokens
+ */
+export function resolveContextWindow(sources: {
+  configured?: number;
+  envValue?: string;
+  model?: string;
+}): number {
+  if (typeof sources.configured === 'number' && sources.configured > 0) {
+    return sources.configured;
+  }
+  const envParsed = Number(sources.envValue);
+  if (Number.isFinite(envParsed) && envParsed > 0) {
+    return envParsed;
+  }
+  return detectContextWindow(sources.model);
+}
+
+/**
  * Calculate usable context window accounting for autocompact buffer
  * @param totalWindow Total context window size
  * @param autocompactEnabled Whether autocompact is enabled (default: true)

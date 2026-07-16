@@ -16,6 +16,7 @@ import {
   extractTokenUsageFromLine,
   calculateContextFromTranscript,
   detectContextWindow,
+  resolveContextWindow,
   getUsableContextWindow,
   isContextLowFromTranscript,
   CLAUDE_CONTEXT_WINDOW_TOKENS,
@@ -296,6 +297,39 @@ describe('Compaction Detector', () => {
 
     it('does not treat unrelated digits (e.g. 1master) as a 1M marker', () => {
       expect(detectContextWindow('model-1master-v2')).toBe(CLAUDE_CONTEXT_WINDOW_TOKENS);
+    });
+  });
+
+  describe('resolveContextWindow - precedence of window sources', () => {
+    it('uses the configured value first', () => {
+      expect(
+        resolveContextWindow({ configured: 500_000, envValue: '1000000', model: 'x[1m]' })
+      ).toBe(500_000);
+    });
+
+    it('uses CLAUDE_CODE_MAX_CONTEXT_TOKENS when no config is set', () => {
+      expect(resolveContextWindow({ envValue: '1000000', model: 'claude-opus-4-8' })).toBe(
+        1_000_000
+      );
+    });
+
+    it('ignores a non-numeric or non-positive env value', () => {
+      expect(resolveContextWindow({ envValue: 'lots', model: 'claude-opus-4-8' })).toBe(
+        CLAUDE_CONTEXT_WINDOW_TOKENS
+      );
+      expect(resolveContextWindow({ envValue: '0', model: 'claude-opus-4-8' })).toBe(
+        CLAUDE_CONTEXT_WINDOW_TOKENS
+      );
+    });
+
+    it('falls back to model detection when neither config nor env is set', () => {
+      expect(resolveContextWindow({ model: 'claude-opus-4-8[1m]' })).toBe(
+        CLAUDE_CONTEXT_WINDOW_TOKENS_1M
+      );
+    });
+
+    it('falls back to the 200K default when nothing is available', () => {
+      expect(resolveContextWindow({})).toBe(CLAUDE_CONTEXT_WINDOW_TOKENS);
     });
   });
 

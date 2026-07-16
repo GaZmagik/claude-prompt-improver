@@ -22,7 +22,7 @@ import { formatSystemMessage } from '../src/utils/message-formatter.ts';
 import { countTokens } from '../src/utils/token-counter.ts';
 import { createLogEntry, writeLogEntry } from '../src/utils/logger.ts';
 import { generateLogFilePath } from '../src/utils/logger.ts';
-import { calculateContextFromTranscript, detectContextWindow } from '../src/integrations/compaction-detector.ts';
+import { calculateContextFromTranscript, resolveContextWindow } from '../src/integrations/compaction-detector.ts';
 
 /**
  * Result of parsing hook input
@@ -535,10 +535,19 @@ async function main(): Promise<void> {
   } else if (context.transcript_path) {
     // Claude Code doesn't provide context_usage to UserPromptSubmit hooks
     // Calculate it from the transcript file instead.
-    // The window is the configured override, else inferred from the model id
-    // (so a 1M-context model isn't measured against the 200K default).
-    const contextWindow =
-      config.contextWindowTokens ?? detectContextWindow(context.session_settings?.model);
+    // Resolve the window from config, then CLAUDE_CODE_MAX_CONTEXT_TOKENS
+    // (visible to the hook), then a best-effort model id. Claude Code does not
+    // send context_usage or the model to UserPromptSubmit hooks, so without a
+    // configured or env value a 1M session is measured against the 200K default.
+    const contextWindow = resolveContextWindow({
+      ...(config.contextWindowTokens !== undefined && { configured: config.contextWindowTokens }),
+      ...(process.env.CLAUDE_CODE_MAX_CONTEXT_TOKENS !== undefined && {
+        envValue: process.env.CLAUDE_CODE_MAX_CONTEXT_TOKENS,
+      }),
+      ...(context.session_settings?.model !== undefined && {
+        model: context.session_settings.model,
+      }),
+    });
     const transcriptUsage = await calculateContextFromTranscript(
       context.transcript_path,
       contextWindow
