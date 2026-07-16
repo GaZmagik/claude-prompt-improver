@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.1] - 2026-07-15
+
+### Fixed
+
+- **Low-context bypass wrongly triggered on 1M-context models** - The transcript-based context calculation hardcoded a 200K window, so on a 1M model (e.g. `claude-opus-4-8[1m]`) the plugin stopped improving prompts at ~15-20% real fill (once usage passed the 200K-minus-buffer ceiling). The window is now inferred from the model id (1M for `[1m]`-tagged models, else 200K), with a new `contextWindowTokens` config option to override it.
+- **"Config not found" warning despite a present local config** - `ensureConfigSetup`/`loadConfigFromStandardPaths` resolved `.claude/prompt-improver.local.md` against the hook's cwd, which for a marketplace-installed plugin is the plugin cache directory, not the project. Config is now resolved against `CLAUDE_PROJECT_DIR`.
+
+### Added
+
+- **`contextWindowTokens` config option** - Explicit override for the low-context bypass window; auto-detection from the model id is the default.
+
+### Technical Details
+
+- Added 11 new test cases (window detection, 1M transcript calculation, project-dir resolution)
+
 ## [1.10.0] - 2026-07-15
 
 ### Added

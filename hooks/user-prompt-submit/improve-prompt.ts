@@ -17,12 +17,12 @@ import { improvePrompt, type ImprovementContext } from '../src/services/improver
 import { buildContext, formatContextForInjection, type ContextBuilderInput, type FormattedContext } from '../src/context/context-builder.ts';
 import type { SkillRule } from '../src/context/skill-matcher.ts';
 import type { AgentDefinition } from '../src/context/agent-suggester.ts';
-import { ensureConfigSetup, loadConfigFromStandardPaths } from '../src/core/config-loader.ts';
+import { ensureConfigSetup, loadConfigFromStandardPaths, resolveProjectBaseDir } from '../src/core/config-loader.ts';
 import { formatSystemMessage } from '../src/utils/message-formatter.ts';
 import { countTokens } from '../src/utils/token-counter.ts';
 import { createLogEntry, writeLogEntry } from '../src/utils/logger.ts';
 import { generateLogFilePath } from '../src/utils/logger.ts';
-import { calculateContextFromTranscript } from '../src/integrations/compaction-detector.ts';
+import { calculateContextFromTranscript, detectContextWindow } from '../src/integrations/compaction-detector.ts';
 
 /**
  * Result of parsing hook input
@@ -482,12 +482,17 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
 async function main(): Promise<void> {
   const startTime = performance.now();
 
+  // Resolve the project root: a marketplace-installed hook runs from the
+  // plugin cache dir, so config must be looked up against CLAUDE_PROJECT_DIR,
+  // not the hook's cwd (else a present local config reads as "not found")
+  const baseDir = resolveProjectBaseDir();
+
   // Ensure config setup exists (creates example.md if needed)
-  const setupResult = await ensureConfigSetup();
+  const setupResult = await ensureConfigSetup(baseDir);
   const setupMessage = setupResult.message; // Will be included in output if present
 
   // Load configuration
-  const config = await loadConfigFromStandardPaths();
+  const config = await loadConfigFromStandardPaths(baseDir);
 
   // Read stdin
   const stdin = await Bun.stdin.text();
@@ -529,8 +534,15 @@ async function main(): Promise<void> {
     };
   } else if (context.transcript_path) {
     // Claude Code doesn't provide context_usage to UserPromptSubmit hooks
-    // Calculate it from the transcript file instead
-    const transcriptUsage = await calculateContextFromTranscript(context.transcript_path);
+    // Calculate it from the transcript file instead.
+    // The window is the configured override, else inferred from the model id
+    // (so a 1M-context model isn't measured against the 200K default).
+    const contextWindow =
+      config.contextWindowTokens ?? detectContextWindow(context.session_settings?.model);
+    const transcriptUsage = await calculateContextFromTranscript(
+      context.transcript_path,
+      contextWindow
+    );
     if (transcriptUsage) {
       (processOptions as { contextUsage?: { used: number; max: number } }).contextUsage = {
         used: transcriptUsage.used,

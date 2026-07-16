@@ -11,8 +11,35 @@ import { COMPACTION_THRESHOLD_PERCENT } from '../core/constants.ts';
 // Constants
 // ============================================================================
 
-/** Claude's context window size in tokens (200K) */
+/** Claude's standard context window size in tokens (200K) */
 export const CLAUDE_CONTEXT_WINDOW_TOKENS = 200_000;
+
+/** Claude's extended 1M context window size in tokens */
+export const CLAUDE_CONTEXT_WINDOW_TOKENS_1M = 1_000_000;
+
+/**
+ * Infers the context window size from a Claude model identifier
+ *
+ * Claude Code marks the 1M-context variants with a "1m" tag (e.g.
+ * `claude-opus-4-8[1m]`). Without this, the transcript-based low-context
+ * calculation uses the 200K default and bypasses improvement far too early
+ * on a 1M window (around 15-20% real fill). A config override takes
+ * precedence; this is the zero-config fallback.
+ *
+ * @param model Model id from the hook's session settings (may be undefined)
+ * @returns 1,000,000 for 1M-tagged models, otherwise 200,000
+ */
+export function detectContextWindow(model?: string): number {
+  if (!model) {
+    return CLAUDE_CONTEXT_WINDOW_TOKENS;
+  }
+  // Match a "1m" token delimited by non-alphanumerics or string bounds,
+  // e.g. "[1m]", "-1m", "_1m" - but not "1master" or "21mb"
+  if (/(?:^|[^a-z0-9])1m(?:[^a-z0-9]|$)/i.test(model)) {
+    return CLAUDE_CONTEXT_WINDOW_TOKENS_1M;
+  }
+  return CLAUDE_CONTEXT_WINDOW_TOKENS;
+}
 
 /**
  * Context usage information from Claude Code

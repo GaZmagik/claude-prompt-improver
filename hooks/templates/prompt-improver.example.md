@@ -7,6 +7,7 @@ forceImprove: false
 shortPromptThreshold: 10
 compactionThreshold: 5
 improverModel: haiku
+# contextWindowTokens: 1000000  # Uncomment for a 1M context model if not auto-detected
 
 integrations:
   git: true
@@ -53,6 +54,7 @@ Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settin
 | `shortPromptThreshold` | number | `10` | Prompts with fewer tokens bypass improvement |
 | `compactionThreshold` | number | `5` | Skip when context availability is below this % |
 | `improverModel` | string | `haiku` | Model for improvements (haiku, sonnet, or opus) |
+| `contextWindowTokens` | number | _(auto)_ | Context window in tokens for the low-context bypass. Auto-detected from the model (1M for `[1m]` models, else 200K); set to override |
 
 ### Integration Toggles
 

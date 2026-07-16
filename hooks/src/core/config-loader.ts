@@ -74,6 +74,28 @@ export const CONFIG_PATHS = [
 /** Path to example config file in project */
 export const EXAMPLE_CONFIG_PATH = '.claude/prompt-improver.example.md';
 
+/**
+ * Resolves the project base directory for config lookup
+ *
+ * A marketplace-installed hook runs from the plugin cache directory, not the
+ * user's project, so a bare `.` misses the project's `.claude/` config and
+ * wrongly reports "config not found". Claude Code sets CLAUDE_PROJECT_DIR to
+ * the project root for hooks; prefer it, then an explicit cwd, then `.`.
+ *
+ * @param cwd Optional explicit directory (e.g. the hook's context.cwd)
+ * @returns The directory to resolve `.claude/prompt-improver.*` against
+ */
+export function resolveProjectBaseDir(cwd?: string): string {
+  if (cwd && cwd.length > 0) {
+    return cwd;
+  }
+  const projectDir = process.env.CLAUDE_PROJECT_DIR;
+  if (projectDir && projectDir.length > 0) {
+    return projectDir;
+  }
+  return '.';
+}
+
 /** Path to bundled example template (relative to src/core directory) */
 const BUNDLED_TEMPLATE_PATH = '../../templates/prompt-improver.example.md';
 
@@ -386,6 +408,11 @@ function yamlToConfig(yaml: Record<string, unknown>): Partial<Configuration> {
     config.improverModel = improverModel;
   }
 
+  const contextWindowTokens = yaml.contextWindowTokens ?? yaml.context_window_tokens;
+  if (typeof contextWindowTokens === 'number' && contextWindowTokens > 0) {
+    config.contextWindowTokens = contextWindowTokens;
+  }
+
   // Parse integrations section
   if (yaml.integrations && typeof yaml.integrations === 'object') {
     const src = yaml.integrations as Record<string, unknown>;
@@ -460,6 +487,9 @@ function mergeConfig(defaults: Configuration, partial: Partial<Configuration>): 
     defaultSimpleModel: partial.defaultSimpleModel ?? defaults.defaultSimpleModel,
     defaultComplexModel: partial.defaultComplexModel ?? defaults.defaultComplexModel,
     improverModel: partial.improverModel ?? defaults.improverModel,
+    ...((partial.contextWindowTokens ?? defaults.contextWindowTokens) !== undefined && {
+      contextWindowTokens: partial.contextWindowTokens ?? defaults.contextWindowTokens,
+    }),
     integrations: {
       git: partial.integrations?.git ?? defaults.integrations.git,
       lsp: partial.integrations?.lsp ?? defaults.integrations.lsp,

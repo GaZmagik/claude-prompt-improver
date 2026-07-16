@@ -138,6 +138,14 @@ export interface Configuration {
   /** Model for all improvements (haiku, sonnet, or opus). Defaults to haiku */
   readonly improverModel: ClaudeModel;
 
+  /**
+   * Total context window in tokens, used by the low-context bypass to decide
+   * how much room remains. When unset, the window is inferred from the model
+   * (1M for [1m]-tagged models, otherwise 200K). Set this to override, e.g.
+   * 1000000 for a 1M window that isn't being detected from the model id
+   */
+  readonly contextWindowTokens?: number;
+
   readonly integrations: IntegrationToggles;
   readonly logging: LoggingConfig;
 

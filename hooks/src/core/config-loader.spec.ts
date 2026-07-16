@@ -18,6 +18,7 @@ import {
   loadConfig,
   loadConfigFromStandardPaths,
   parseExemplarsFromBody,
+  resolveProjectBaseDir,
   parseYamlFrontmatter,
   validateConfig,
 } from './config-loader.ts';
@@ -890,6 +891,37 @@ enabled: true
       // Verify the paths are correct
       expect(CONFIG_PATHS[0]).toBe('.claude/prompt-improver.local.md');
       expect(EXAMPLE_CONFIG_PATH).toBe('.claude/prompt-improver.example.md');
+    });
+  });
+
+  describe('resolveProjectBaseDir', () => {
+    const original = process.env.CLAUDE_PROJECT_DIR;
+    afterEach(() => {
+      if (original === undefined) {
+        delete process.env.CLAUDE_PROJECT_DIR;
+      } else {
+        process.env.CLAUDE_PROJECT_DIR = original;
+      }
+    });
+
+    it('prefers CLAUDE_PROJECT_DIR when set', () => {
+      process.env.CLAUDE_PROJECT_DIR = '/home/user/project';
+      expect(resolveProjectBaseDir()).toBe('/home/user/project');
+    });
+
+    it('prefers an explicit cwd argument over the env var', () => {
+      process.env.CLAUDE_PROJECT_DIR = '/env/dir';
+      expect(resolveProjectBaseDir('/explicit/cwd')).toBe('/explicit/cwd');
+    });
+
+    it('falls back to "." when nothing is available', () => {
+      delete process.env.CLAUDE_PROJECT_DIR;
+      expect(resolveProjectBaseDir()).toBe('.');
+    });
+
+    it('ignores an empty env var', () => {
+      process.env.CLAUDE_PROJECT_DIR = '';
+      expect(resolveProjectBaseDir()).toBe('.');
     });
   });
 
