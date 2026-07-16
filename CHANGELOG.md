@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.1] - 2026-07-16
+
+### Fixed
+
+- **Global `~/.claude` config was ignored** - Config lookup only checked project-relative `.claude/prompt-improver.local.md`, so a user-global `~/.claude/prompt-improver.local.md` (the claude-memory-plugin pattern) was never read, producing the "config not found - copy the example" warning even when a global config existed. Lookup now falls back to the home-directory config after project paths, and `ensureConfigSetup` no longer warns when a global config is present. Project config still takes precedence.
+- **Low-context bypass wrongly triggered on 1M-context models** - The transcript-based context calculation (used because Claude Code does not send `context_usage` to UserPromptSubmit hooks) hardcoded a 200K window, so on a 1M session the plugin stopped improving prompts once usage passed the 200K-minus-buffer ceiling (~15-20% of a 1M window). The window is now resolved from, in order: the `contextWindowTokens` config option, the `CLAUDE_CODE_MAX_CONTEXT_TOKENS` environment variable, a best-effort model-id check, then the 200K default.
+- **Config resolved against the hook cwd** - `ensureConfigSetup`/`loadConfigFromStandardPaths` now resolve the project base against `CLAUDE_PROJECT_DIR` when set, rather than the hook's cwd (which for a marketplace install is the plugin cache directory).
+
+### Added
+
+- **`contextWindowTokens` config option** - Explicit override for the low-context bypass window. On a 1M session where auto-detection cannot fire (the model id is not in the UserPromptSubmit hook schema), set `contextWindowTokens: 1000000` or export `CLAUDE_CODE_MAX_CONTEXT_TOKENS=1000000`.
+
+### Technical Details
+
+- Added 20 new test cases (window resolution precedence, model detection, 1M transcript calculation, global-config fallback, project-dir resolution)
+- Note: Claude Code still exposes neither `context_usage` nor the model id to UserPromptSubmit hooks (verified July 2026), so context size is estimated from the transcript against a resolved window rather than read directly
+
 ## [1.10.0] - 2026-07-15
 
 ### Added

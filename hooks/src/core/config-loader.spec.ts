@@ -18,6 +18,7 @@ import {
   loadConfig,
   loadConfigFromStandardPaths,
   parseExemplarsFromBody,
+  resolveProjectBaseDir,
   parseYamlFrontmatter,
   validateConfig,
 } from './config-loader.ts';
@@ -785,7 +786,7 @@ enabled: true
       mkdirSync(join(setupTestDir, '.claude'), { recursive: true });
       writeFileSync(localConfigPath, '---\nenabled: true\n---\n');
 
-      const result = await ensureConfigSetup(setupTestDir);
+      const result = await ensureConfigSetup(setupTestDir, setupTestDir);
 
       expect(result.status).toBe('local_exists');
       expect(result.message).toBeUndefined();
@@ -796,7 +797,7 @@ enabled: true
       mkdirSync(join(setupTestDir, '.claude'), { recursive: true });
       writeFileSync(exampleConfigPath, '---\nenabled: true\n---\n');
 
-      const result = await ensureConfigSetup(setupTestDir);
+      const result = await ensureConfigSetup(setupTestDir, setupTestDir);
 
       expect(result.status).toBe('example_exists');
       expect(result.message).toBeDefined();
@@ -808,7 +809,7 @@ enabled: true
       // Create empty .claude directory (no configs)
       mkdirSync(join(setupTestDir, '.claude'), { recursive: true });
 
-      const result = await ensureConfigSetup(setupTestDir);
+      const result = await ensureConfigSetup(setupTestDir, setupTestDir);
 
       expect(result.status).toBe('example_created');
       expect(result.message).toBeDefined();
@@ -824,7 +825,7 @@ enabled: true
       mkdirSync(setupTestDir, { recursive: true });
       expect(existsSync(join(setupTestDir, '.claude'))).toBe(false);
 
-      const result = await ensureConfigSetup(setupTestDir);
+      const result = await ensureConfigSetup(setupTestDir, setupTestDir);
 
       expect(result.status).toBe('example_created');
       expect(existsSync(join(setupTestDir, '.claude'))).toBe(true);
@@ -837,7 +838,7 @@ enabled: true
       writeFileSync(localConfigPath, '---\nenabled: false\n---\n');
       writeFileSync(exampleConfigPath, '---\nenabled: true\n---\n');
 
-      const result = await ensureConfigSetup(setupTestDir);
+      const result = await ensureConfigSetup(setupTestDir, setupTestDir);
 
       // Should return local_exists, not example_exists
       expect(result.status).toBe('local_exists');
@@ -846,7 +847,7 @@ enabled: true
     it('should create example.md with valid YAML frontmatter content', async () => {
       mkdirSync(setupTestDir, { recursive: true });
 
-      await ensureConfigSetup(setupTestDir);
+      await ensureConfigSetup(setupTestDir, setupTestDir);
 
       // Read the created file and verify it has valid content
       const content = await Bun.file(exampleConfigPath).text();
@@ -870,7 +871,7 @@ enabled: true
         // On most systems, we can't easily make a dir read-only in a way that
         // prevents mkdir inside it, so we test the function handles errors
         // by checking the result type structure
-        const result = await ensureConfigSetup(readOnlyDir);
+        const result = await ensureConfigSetup(readOnlyDir, readOnlyDir);
 
         // Either it succeeds (creates the file) or fails gracefully
         expect(['example_created', 'setup_failed']).toContain(result.status);
@@ -890,6 +891,94 @@ enabled: true
       // Verify the paths are correct
       expect(CONFIG_PATHS[0]).toBe('.claude/prompt-improver.local.md');
       expect(EXAMPLE_CONFIG_PATH).toBe('.claude/prompt-improver.example.md');
+    });
+  });
+
+  describe('global config fallback', () => {
+    it('loadConfigFromStandardPaths reads ~/.claude when no project config exists', async () => {
+      const home = join(tmpdir(), `pi-home-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      const project = join(tmpdir(), `pi-proj-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      mkdirSync(join(home, '.claude'), { recursive: true });
+      mkdirSync(project, { recursive: true });
+      writeFileSync(
+        join(home, '.claude', 'prompt-improver.local.md'),
+        '---\nenabled: true\nimproverModel: opus\n---\n'
+      );
+      try {
+        const config = await loadConfigFromStandardPaths(project, home);
+        expect(config.improverModel).toBe('opus');
+      } finally {
+        rmSync(home, { recursive: true, force: true });
+        rmSync(project, { recursive: true, force: true });
+      }
+    });
+
+    it('project config takes precedence over the global config', async () => {
+      const home = join(tmpdir(), `pi-home2-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      const project = join(tmpdir(), `pi-proj2-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      mkdirSync(join(home, '.claude'), { recursive: true });
+      mkdirSync(join(project, '.claude'), { recursive: true });
+      writeFileSync(
+        join(home, '.claude', 'prompt-improver.local.md'),
+        '---\nimproverModel: opus\n---\n'
+      );
+      writeFileSync(
+        join(project, '.claude', 'prompt-improver.local.md'),
+        '---\nimproverModel: sonnet\n---\n'
+      );
+      try {
+        const config = await loadConfigFromStandardPaths(project, home);
+        expect(config.improverModel).toBe('sonnet');
+      } finally {
+        rmSync(home, { recursive: true, force: true });
+        rmSync(project, { recursive: true, force: true });
+      }
+    });
+
+    it('ensureConfigSetup reports local_exists when only the global config is present', async () => {
+      const home = join(tmpdir(), `pi-home3-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      const project = join(tmpdir(), `pi-proj3-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      mkdirSync(join(home, '.claude'), { recursive: true });
+      mkdirSync(project, { recursive: true });
+      writeFileSync(join(home, '.claude', 'prompt-improver.local.md'), '---\nenabled: true\n---\n');
+      try {
+        const result = await ensureConfigSetup(project, home);
+        expect(result.status).toBe('local_exists');
+      } finally {
+        rmSync(home, { recursive: true, force: true });
+        rmSync(project, { recursive: true, force: true });
+      }
+    });
+  });
+
+  describe('resolveProjectBaseDir', () => {
+    const original = process.env.CLAUDE_PROJECT_DIR;
+    afterEach(() => {
+      if (original === undefined) {
+        delete process.env.CLAUDE_PROJECT_DIR;
+      } else {
+        process.env.CLAUDE_PROJECT_DIR = original;
+      }
+    });
+
+    it('prefers CLAUDE_PROJECT_DIR when set', () => {
+      process.env.CLAUDE_PROJECT_DIR = '/home/user/project';
+      expect(resolveProjectBaseDir()).toBe('/home/user/project');
+    });
+
+    it('prefers an explicit cwd argument over the env var', () => {
+      process.env.CLAUDE_PROJECT_DIR = '/env/dir';
+      expect(resolveProjectBaseDir('/explicit/cwd')).toBe('/explicit/cwd');
+    });
+
+    it('falls back to "." when nothing is available', () => {
+      delete process.env.CLAUDE_PROJECT_DIR;
+      expect(resolveProjectBaseDir()).toBe('.');
+    });
+
+    it('ignores an empty env var', () => {
+      process.env.CLAUDE_PROJECT_DIR = '';
+      expect(resolveProjectBaseDir()).toBe('.');
     });
   });
 

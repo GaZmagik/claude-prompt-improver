@@ -11,8 +11,35 @@ import { COMPACTION_THRESHOLD_PERCENT } from '../core/constants.ts';
 // Constants
 // ============================================================================
 
-/** Claude's context window size in tokens (200K) */
+/** Claude's standard context window size in tokens (200K) */
 export const CLAUDE_CONTEXT_WINDOW_TOKENS = 200_000;
+
+/** Claude's extended 1M context window size in tokens */
+export const CLAUDE_CONTEXT_WINDOW_TOKENS_1M = 1_000_000;
+
+/**
+ * Infers the context window size from a Claude model identifier
+ *
+ * Claude Code marks the 1M-context variants with a "1m" tag (e.g.
+ * `claude-opus-4-8[1m]`). Without this, the transcript-based low-context
+ * calculation uses the 200K default and bypasses improvement far too early
+ * on a 1M window (around 15-20% real fill). A config override takes
+ * precedence; this is the zero-config fallback.
+ *
+ * @param model Model id from the hook's session settings (may be undefined)
+ * @returns 1,000,000 for 1M-tagged models, otherwise 200,000
+ */
+export function detectContextWindow(model?: string): number {
+  if (!model) {
+    return CLAUDE_CONTEXT_WINDOW_TOKENS;
+  }
+  // Match a "1m" token delimited by non-alphanumerics or string bounds,
+  // e.g. "[1m]", "-1m", "_1m" - but not "1master" or "21mb"
+  if (/(?:^|[^a-z0-9])1m(?:[^a-z0-9]|$)/i.test(model)) {
+    return CLAUDE_CONTEXT_WINDOW_TOKENS_1M;
+  }
+  return CLAUDE_CONTEXT_WINDOW_TOKENS;
+}
 
 /**
  * Context usage information from Claude Code
@@ -182,6 +209,32 @@ export function extractTokenUsageFromLine(line: string): MessageTokenUsage | und
 export const AUTOCOMPACT_BUFFER_PERCENT = 0.225;
 
 /**
+ * Resolves the context window size from all available sources, in precedence:
+ * 1. Explicit config (`contextWindowTokens`)
+ * 2. The CLAUDE_CODE_MAX_CONTEXT_TOKENS env var, which IS visible to the hook
+ *    process (unlike the model id, which is not in the UserPromptSubmit schema)
+ * 3. Best-effort detection from a model id, if one is somehow available
+ * 4. The 200K default
+ *
+ * @param sources configured value, raw env string, and/or model id
+ * @returns the resolved context window in tokens
+ */
+export function resolveContextWindow(sources: {
+  configured?: number;
+  envValue?: string;
+  model?: string;
+}): number {
+  if (typeof sources.configured === 'number' && sources.configured > 0) {
+    return sources.configured;
+  }
+  const envParsed = Number(sources.envValue);
+  if (Number.isFinite(envParsed) && envParsed > 0) {
+    return envParsed;
+  }
+  return detectContextWindow(sources.model);
+}
+
+/**
  * Calculate usable context window accounting for autocompact buffer
  * @param totalWindow Total context window size
  * @param autocompactEnabled Whether autocompact is enabled (default: true)
@@ -279,13 +332,16 @@ export async function calculateContextFromTranscript(
  *
  * @param transcriptPath Path to the .jsonl transcript file
  * @param threshold Minimum available percentage (default: 5%)
+ * @param contextWindow Total context window size (default: 200K) - forward the
+ *   resolved window here so a 1M session isn't measured against the default
  * @returns true if context is below threshold, false otherwise, undefined if can't determine
  */
 export async function isContextLowFromTranscript(
   transcriptPath: string,
-  threshold: number = COMPACTION_THRESHOLD_PERCENT
+  threshold: number = COMPACTION_THRESHOLD_PERCENT,
+  contextWindow: number = CLAUDE_CONTEXT_WINDOW_TOKENS
 ): Promise<boolean | undefined> {
-  const usage = await calculateContextFromTranscript(transcriptPath);
+  const usage = await calculateContextFromTranscript(transcriptPath, contextWindow);
   if (!usage) {
     return undefined;
   }

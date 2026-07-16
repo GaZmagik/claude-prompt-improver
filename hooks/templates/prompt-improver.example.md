@@ -7,6 +7,7 @@ forceImprove: false
 shortPromptThreshold: 10
 compactionThreshold: 5
 improverModel: haiku
+# contextWindowTokens: 1000000  # Set on a 1M session (or export CLAUDE_CODE_MAX_CONTEXT_TOKENS); default 200K
 
 integrations:
   git: true
@@ -53,6 +54,7 @@ Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settin
 | `shortPromptThreshold` | number | `10` | Prompts with fewer tokens bypass improvement |
 | `compactionThreshold` | number | `5` | Skip when context availability is below this % |
 | `improverModel` | string | `haiku` | Model for improvements (haiku, sonnet, or opus) |
+| `contextWindowTokens` | number | `200000` | Context window in tokens for the low-context bypass. Resolution: this option, then `CLAUDE_CODE_MAX_CONTEXT_TOKENS`, then a best-effort model-id check, then 200K. Set to `1000000` on a 1M session |
 
 ### Integration Toggles
 

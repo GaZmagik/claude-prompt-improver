@@ -75,6 +75,7 @@ enabled: true
 shortPromptThreshold: 10
 compactionThreshold: 5
 improverModel: haiku  # Model for all improvements: haiku, sonnet, or opus
+# contextWindowTokens: 1000000  # Set on a 1M session; or export CLAUDE_CODE_MAX_CONTEXT_TOKENS. Default 200K
 
 integrations:
   git: true
@@ -99,6 +100,8 @@ logging:
 
 Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settings private.
 
+Config is resolved project-first, then from a user-global `~/.claude/prompt-improver.local.md` that applies across all projects. A project config overrides the global one.
+
 ### Configuration Options
 
 | Option | Type | Default | Description |
@@ -109,6 +112,7 @@ Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settin
 | `shortPromptThreshold` | number | `10` | Prompts with fewer tokens bypass improvement |
 | `compactionThreshold` | number | `5` | Skip when context availability is below this % |
 | `improverModel` | string | `haiku` | Model for all improvements: `haiku` (fast), `sonnet` (balanced), or `opus` (highest quality) |
+| `contextWindowTokens` | number | _(auto)_ | Total context window in tokens for the low-context bypass. Set to `1000000` on a 1M session (or export `CLAUDE_CODE_MAX_CONTEXT_TOKENS`); defaults to 200K, since Claude Code does not report the model or context size to hooks |
 | `integrations.git` | boolean | `true` | Enable git context gathering |
 | `integrations.lsp` | boolean | `true` | Enable LSP diagnostics gathering |
 | `integrations.spec` | boolean | `true` | Enable specification awareness |

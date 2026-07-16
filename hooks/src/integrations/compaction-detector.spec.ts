@@ -15,9 +15,12 @@ import {
   shouldSkipProcessing,
   extractTokenUsageFromLine,
   calculateContextFromTranscript,
+  detectContextWindow,
+  resolveContextWindow,
   getUsableContextWindow,
   isContextLowFromTranscript,
   CLAUDE_CONTEXT_WINDOW_TOKENS,
+  CLAUDE_CONTEXT_WINDOW_TOKENS_1M,
   AUTOCOMPACT_BUFFER_PERCENT,
 } from './compaction-detector.ts';
 
@@ -268,6 +271,87 @@ describe('Compaction Detector', () => {
       expect(usage?.outputTokens).toBe(0);
       expect(usage?.cacheCreationTokens).toBe(0);
       expect(usage?.cacheReadTokens).toBe(0);
+    });
+  });
+
+  describe('detectContextWindow - infers window size from model id', () => {
+    it('returns the 1M window for models tagged [1m]', () => {
+      expect(detectContextWindow('claude-opus-4-8[1m]')).toBe(CLAUDE_CONTEXT_WINDOW_TOKENS_1M);
+      expect(detectContextWindow('claude-opus-4-8[1m]')).toBe(1_000_000);
+    });
+
+    it('returns the 1M window for other 1m markers', () => {
+      expect(detectContextWindow('claude-sonnet-5-1m')).toBe(CLAUDE_CONTEXT_WINDOW_TOKENS_1M);
+      expect(detectContextWindow('some-model-1M')).toBe(CLAUDE_CONTEXT_WINDOW_TOKENS_1M);
+    });
+
+    it('returns the standard 200K window for ordinary model ids', () => {
+      expect(detectContextWindow('claude-opus-4-8')).toBe(CLAUDE_CONTEXT_WINDOW_TOKENS);
+      expect(detectContextWindow('claude-sonnet-5')).toBe(200_000);
+    });
+
+    it('falls back to the standard window when model is undefined or empty', () => {
+      expect(detectContextWindow(undefined)).toBe(CLAUDE_CONTEXT_WINDOW_TOKENS);
+      expect(detectContextWindow('')).toBe(CLAUDE_CONTEXT_WINDOW_TOKENS);
+    });
+
+    it('does not treat unrelated digits (e.g. 1master) as a 1M marker', () => {
+      expect(detectContextWindow('model-1master-v2')).toBe(CLAUDE_CONTEXT_WINDOW_TOKENS);
+    });
+  });
+
+  describe('resolveContextWindow - precedence of window sources', () => {
+    it('uses the configured value first', () => {
+      expect(
+        resolveContextWindow({ configured: 500_000, envValue: '1000000', model: 'x[1m]' })
+      ).toBe(500_000);
+    });
+
+    it('uses CLAUDE_CODE_MAX_CONTEXT_TOKENS when no config is set', () => {
+      expect(resolveContextWindow({ envValue: '1000000', model: 'claude-opus-4-8' })).toBe(
+        1_000_000
+      );
+    });
+
+    it('ignores a non-numeric or non-positive env value', () => {
+      expect(resolveContextWindow({ envValue: 'lots', model: 'claude-opus-4-8' })).toBe(
+        CLAUDE_CONTEXT_WINDOW_TOKENS
+      );
+      expect(resolveContextWindow({ envValue: '0', model: 'claude-opus-4-8' })).toBe(
+        CLAUDE_CONTEXT_WINDOW_TOKENS
+      );
+    });
+
+    it('falls back to model detection when neither config nor env is set', () => {
+      expect(resolveContextWindow({ model: 'claude-opus-4-8[1m]' })).toBe(
+        CLAUDE_CONTEXT_WINDOW_TOKENS_1M
+      );
+    });
+
+    it('falls back to the 200K default when nothing is available', () => {
+      expect(resolveContextWindow({})).toBe(CLAUDE_CONTEXT_WINDOW_TOKENS);
+    });
+  });
+
+  describe('calculateContextFromTranscript - respects a 1M window', () => {
+    it('does not report low context at 200K used on a 1M window', async () => {
+      const dir = join(tmpdir(), `ctx-1m-${Date.now()}`);
+      mkdirSync(dir, { recursive: true });
+      const file = join(dir, 't.jsonl');
+      // 200K used: full on a 200K window, but only ~20% of a 1M window
+      writeFileSync(
+        file,
+        `${JSON.stringify({ type: 'assistant', message: { usage: { input_tokens: 200_000, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 } } })}\n`
+      );
+      try {
+        const usage = await calculateContextFromTranscript(file, CLAUDE_CONTEXT_WINDOW_TOKENS_1M);
+        expect(usage).toBeDefined();
+        // usable 1M window ~= 775K; 200K used leaves well over the 5% floor
+        const available = ((usage!.total - usage!.used) / usage!.total) * 100;
+        expect(available).toBeGreaterThan(50);
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
     });
   });
 

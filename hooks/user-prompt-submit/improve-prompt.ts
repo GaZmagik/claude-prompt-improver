@@ -17,12 +17,12 @@ import { improvePrompt, type ImprovementContext } from '../src/services/improver
 import { buildContext, formatContextForInjection, type ContextBuilderInput, type FormattedContext } from '../src/context/context-builder.ts';
 import type { SkillRule } from '../src/context/skill-matcher.ts';
 import type { AgentDefinition } from '../src/context/agent-suggester.ts';
-import { ensureConfigSetup, loadConfigFromStandardPaths } from '../src/core/config-loader.ts';
+import { ensureConfigSetup, loadConfigFromStandardPaths, resolveProjectBaseDir } from '../src/core/config-loader.ts';
 import { formatSystemMessage } from '../src/utils/message-formatter.ts';
 import { countTokens } from '../src/utils/token-counter.ts';
 import { createLogEntry, writeLogEntry } from '../src/utils/logger.ts';
 import { generateLogFilePath } from '../src/utils/logger.ts';
-import { calculateContextFromTranscript } from '../src/integrations/compaction-detector.ts';
+import { calculateContextFromTranscript, resolveContextWindow } from '../src/integrations/compaction-detector.ts';
 
 /**
  * Result of parsing hook input
@@ -200,6 +200,12 @@ export interface ProcessPromptOptions {
   readonly integrations?: IntegrationToggles;
   /** Current working directory for integrations */
   readonly cwd?: string;
+  /**
+   * Pre-loaded configuration from the entry point. When provided, it drives
+   * model selection instead of a second disk load (which would resolve
+   * against the hook cwd and ignore the project/global config)
+   */
+  readonly config?: Configuration;
   /** For testing - mock the classification response */
   readonly _mockClassification?: string | null;
   /** For testing - mock the improvement response */
@@ -432,8 +438,10 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
   }
   const improvementContext = await buildImprovementContext(contextOptions);
 
-  // Load config for model selection
-  const config = await loadConfigFromStandardPaths();
+  // Config for model selection: prefer the entry-point's already-resolved
+  // config (project/global aware); only fall back to a disk load for callers
+  // that don't supply one (e.g. tests)
+  const config = options.config ?? (await loadConfigFromStandardPaths(resolveProjectBaseDir()));
 
   // Count tokens before improvement (use original prompt for accurate before count)
   const tokensBefore = countTokens(prompt);
@@ -482,12 +490,17 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
 async function main(): Promise<void> {
   const startTime = performance.now();
 
+  // Resolve the project root: a marketplace-installed hook runs from the
+  // plugin cache dir, so config must be looked up against CLAUDE_PROJECT_DIR,
+  // not the hook's cwd (else a present local config reads as "not found")
+  const baseDir = resolveProjectBaseDir();
+
   // Ensure config setup exists (creates example.md if needed)
-  const setupResult = await ensureConfigSetup();
+  const setupResult = await ensureConfigSetup(baseDir);
   const setupMessage = setupResult.message; // Will be included in output if present
 
   // Load configuration
-  const config = await loadConfigFromStandardPaths();
+  const config = await loadConfigFromStandardPaths(baseDir);
 
   // Read stdin
   const stdin = await Bun.stdin.text();
@@ -511,6 +524,7 @@ async function main(): Promise<void> {
     pluginDisabled: !config.enabled,
     forceImprove: config.forceImprove,
     shortPromptThreshold: config.shortPromptThreshold,
+    config, // thread the resolved config through so processPrompt doesn't reload
   };
 
   if (config.defaultImprove !== undefined) {
@@ -529,8 +543,24 @@ async function main(): Promise<void> {
     };
   } else if (context.transcript_path) {
     // Claude Code doesn't provide context_usage to UserPromptSubmit hooks
-    // Calculate it from the transcript file instead
-    const transcriptUsage = await calculateContextFromTranscript(context.transcript_path);
+    // Calculate it from the transcript file instead.
+    // Resolve the window from config, then CLAUDE_CODE_MAX_CONTEXT_TOKENS
+    // (visible to the hook), then a best-effort model id. Claude Code does not
+    // send context_usage or the model to UserPromptSubmit hooks, so without a
+    // configured or env value a 1M session is measured against the 200K default.
+    const contextWindow = resolveContextWindow({
+      ...(config.contextWindowTokens !== undefined && { configured: config.contextWindowTokens }),
+      ...(process.env.CLAUDE_CODE_MAX_CONTEXT_TOKENS !== undefined && {
+        envValue: process.env.CLAUDE_CODE_MAX_CONTEXT_TOKENS,
+      }),
+      ...(context.session_settings?.model !== undefined && {
+        model: context.session_settings.model,
+      }),
+    });
+    const transcriptUsage = await calculateContextFromTranscript(
+      context.transcript_path,
+      contextWindow
+    );
     if (transcriptUsage) {
       (processOptions as { contextUsage?: { used: number; max: number } }).contextUsage = {
         used: transcriptUsage.used,

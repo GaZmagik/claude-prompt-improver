@@ -4,6 +4,7 @@
  * Similar to claude-memory-plugin's local.md pattern
  */
 import { access, mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import type { Configuration, IntegrationToggles, LogLevel, LoggingConfig, PromptGenre } from './types.ts';
 
@@ -74,6 +75,29 @@ export const CONFIG_PATHS = [
 /** Path to example config file in project */
 export const EXAMPLE_CONFIG_PATH = '.claude/prompt-improver.example.md';
 
+/**
+ * Resolves the project base directory for config lookup
+ *
+ * A marketplace-installed hook runs from the plugin cache directory, not the
+ * user's project, so a bare `.` misses the project's `.claude/` config and
+ * wrongly reports "config not found". Claude Code sets CLAUDE_PROJECT_DIR to
+ * the project root for hooks. Precedence: an explicit cwd, then
+ * CLAUDE_PROJECT_DIR, then `.`.
+ *
+ * @param cwd Optional explicit directory (e.g. the hook's context.cwd)
+ * @returns The directory to resolve `.claude/prompt-improver.*` against
+ */
+export function resolveProjectBaseDir(cwd?: string): string {
+  if (cwd && cwd.length > 0) {
+    return cwd;
+  }
+  const projectDir = process.env.CLAUDE_PROJECT_DIR;
+  if (projectDir && projectDir.length > 0) {
+    return projectDir;
+  }
+  return '.';
+}
+
 /** Path to bundled example template (relative to src/core directory) */
 const BUNDLED_TEMPLATE_PATH = '../../templates/prompt-improver.example.md';
 
@@ -96,16 +120,26 @@ function getBundledTemplatePath(): string {
  * Ensures config setup exists, creating example.md if neither config exists
  * Returns status indicating what was found/created
  */
-export async function ensureConfigSetup(baseDir = '.'): Promise<ConfigSetupResult> {
+export async function ensureConfigSetup(
+  baseDir = '.',
+  homeDir: string = homedir()
+): Promise<ConfigSetupResult> {
   const localPath = join(baseDir, CONFIG_PATHS[0]);
   const examplePath = join(baseDir, EXAMPLE_CONFIG_PATH);
 
-  // Check if local.md exists
+  // Check if a project-local or user-global local.md exists
   try {
     await access(localPath);
     return { status: 'local_exists' };
   } catch {
-    // local.md doesn't exist, continue
+    // project local.md doesn't exist, continue
+  }
+
+  try {
+    await access(getGlobalConfigPath(homeDir));
+    return { status: 'local_exists' };
+  } catch {
+    // global local.md doesn't exist, continue
   }
 
   // Check if example.md exists
@@ -386,6 +420,11 @@ function yamlToConfig(yaml: Record<string, unknown>): Partial<Configuration> {
     config.improverModel = improverModel;
   }
 
+  const contextWindowTokens = yaml.contextWindowTokens ?? yaml.context_window_tokens;
+  if (typeof contextWindowTokens === 'number' && contextWindowTokens > 0) {
+    config.contextWindowTokens = contextWindowTokens;
+  }
+
   // Parse integrations section
   if (yaml.integrations && typeof yaml.integrations === 'object') {
     const src = yaml.integrations as Record<string, unknown>;
@@ -460,6 +499,9 @@ function mergeConfig(defaults: Configuration, partial: Partial<Configuration>): 
     defaultSimpleModel: partial.defaultSimpleModel ?? defaults.defaultSimpleModel,
     defaultComplexModel: partial.defaultComplexModel ?? defaults.defaultComplexModel,
     improverModel: partial.improverModel ?? defaults.improverModel,
+    ...((partial.contextWindowTokens ?? defaults.contextWindowTokens) !== undefined && {
+      contextWindowTokens: partial.contextWindowTokens ?? defaults.contextWindowTokens,
+    }),
     integrations: {
       git: partial.integrations?.git ?? defaults.integrations.git,
       lsp: partial.integrations?.lsp ?? defaults.integrations.lsp,
@@ -557,12 +599,34 @@ export async function loadConfig(filePath: string): Promise<Configuration> {
 }
 
 /**
- * Finds and loads configuration from standard locations
- * Checks paths in order of precedence
+ * Path to the user-global config in the home .claude directory
+ * Allows a single config to apply across all projects, mirroring how
+ * claude-memory-plugin resolves its global local.md
  */
-export async function loadConfigFromStandardPaths(baseDir = '.'): Promise<Configuration> {
-  for (const configPath of CONFIG_PATHS) {
-    const fullPath = join(baseDir, configPath);
+export function getGlobalConfigPath(homeDir: string = homedir()): string {
+  return join(homeDir, '.claude', 'prompt-improver.local.md');
+}
+
+/**
+ * Ordered config candidate paths: project-local first (most specific),
+ * then the user-global home config as a fallback
+ */
+function getConfigCandidatePaths(baseDir: string, homeDir: string): string[] {
+  return [
+    ...CONFIG_PATHS.map((configPath) => join(baseDir, configPath)),
+    getGlobalConfigPath(homeDir),
+  ];
+}
+
+/**
+ * Finds and loads configuration from standard locations
+ * Checks project-local paths first, then the user-global ~/.claude config
+ */
+export async function loadConfigFromStandardPaths(
+  baseDir = '.',
+  homeDir: string = homedir()
+): Promise<Configuration> {
+  for (const fullPath of getConfigCandidatePaths(baseDir, homeDir)) {
     try {
       await access(fullPath);
       return await loadConfig(fullPath);
