@@ -5,12 +5,15 @@
  */
 import { describe, expect, it } from 'bun:test';
 import type { HookOutput } from '../src/core/types.ts';
+import { DEFAULT_CONFIG } from '../src/core/config-loader.ts';
 import {
   createHookOutput,
   parseHookInput,
   processPrompt,
   serializeHookOutput,
 } from './improve-prompt.ts';
+
+const mockConfig = DEFAULT_CONFIG;
 
 describe('Hook Input/Output', () => {
   describe('T018: parseHookInput - stdin parsing for prompt and context', () => {
@@ -250,6 +253,21 @@ describe('Hook Input/Output', () => {
       expect(result.type).toBe('improved');
       if (result.type === 'improved') {
         expect(result.improvedPrompt).toContain('unit tests');
+      }
+    });
+
+    it('should use the threaded config for model selection instead of reloading from disk', async () => {
+      const result = await processPrompt({
+        prompt: 'I need some help with testing the application but I am not sure where to start',
+        sessionId: 'session-cfg',
+        defaultImprove: true,
+        config: { ...mockConfig, improverModel: 'opus' },
+        _mockImprovement: 'Improved with the opus model selection',
+      });
+
+      expect(result.type).toBe('improved');
+      if (result.type === 'improved') {
+        expect(result.modelUsed).toBe('opus');
       }
     });
 

@@ -200,6 +200,12 @@ export interface ProcessPromptOptions {
   readonly integrations?: IntegrationToggles;
   /** Current working directory for integrations */
   readonly cwd?: string;
+  /**
+   * Pre-loaded configuration from the entry point. When provided, it drives
+   * model selection instead of a second disk load (which would resolve
+   * against the hook cwd and ignore the project/global config)
+   */
+  readonly config?: Configuration;
   /** For testing - mock the classification response */
   readonly _mockClassification?: string | null;
   /** For testing - mock the improvement response */
@@ -432,8 +438,10 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
   }
   const improvementContext = await buildImprovementContext(contextOptions);
 
-  // Load config for model selection
-  const config = await loadConfigFromStandardPaths();
+  // Config for model selection: prefer the entry-point's already-resolved
+  // config (project/global aware); only fall back to a disk load for callers
+  // that don't supply one (e.g. tests)
+  const config = options.config ?? (await loadConfigFromStandardPaths(resolveProjectBaseDir()));
 
   // Count tokens before improvement (use original prompt for accurate before count)
   const tokensBefore = countTokens(prompt);
@@ -516,6 +524,7 @@ async function main(): Promise<void> {
     pluginDisabled: !config.enabled,
     forceImprove: config.forceImprove,
     shortPromptThreshold: config.shortPromptThreshold,
+    config, // thread the resolved config through so processPrompt doesn't reload
   };
 
   if (config.defaultImprove !== undefined) {

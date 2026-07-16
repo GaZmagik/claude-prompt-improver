@@ -54,7 +54,7 @@ Add `.claude/prompt-improver.local.md` to your `.gitignore` to keep local settin
 | `shortPromptThreshold` | number | `10` | Prompts with fewer tokens bypass improvement |
 | `compactionThreshold` | number | `5` | Skip when context availability is below this % |
 | `improverModel` | string | `haiku` | Model for improvements (haiku, sonnet, or opus) |
-| `contextWindowTokens` | number | _(auto)_ | Context window in tokens for the low-context bypass. Auto-detected from the model (1M for `[1m]` models, else 200K); set to override |
+| `contextWindowTokens` | number | `200000` | Context window in tokens for the low-context bypass. Resolution: this option, then `CLAUDE_CODE_MAX_CONTEXT_TOKENS`, then a best-effort model-id check, then 200K. Set to `1000000` on a 1M session |
 
 ### Integration Toggles
 

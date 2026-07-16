@@ -75,7 +75,7 @@ enabled: true
 shortPromptThreshold: 10
 compactionThreshold: 5
 improverModel: haiku  # Model for all improvements: haiku, sonnet, or opus
-# contextWindowTokens: 1000000  # Override the low-context window (auto-detected from model otherwise)
+# contextWindowTokens: 1000000  # Set on a 1M session; or export CLAUDE_CODE_MAX_CONTEXT_TOKENS. Default 200K
 
 integrations:
   git: true

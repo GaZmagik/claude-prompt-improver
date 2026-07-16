@@ -332,13 +332,16 @@ export async function calculateContextFromTranscript(
  *
  * @param transcriptPath Path to the .jsonl transcript file
  * @param threshold Minimum available percentage (default: 5%)
+ * @param contextWindow Total context window size (default: 200K) - forward the
+ *   resolved window here so a 1M session isn't measured against the default
  * @returns true if context is below threshold, false otherwise, undefined if can't determine
  */
 export async function isContextLowFromTranscript(
   transcriptPath: string,
-  threshold: number = COMPACTION_THRESHOLD_PERCENT
+  threshold: number = COMPACTION_THRESHOLD_PERCENT,
+  contextWindow: number = CLAUDE_CONTEXT_WINDOW_TOKENS
 ): Promise<boolean | undefined> {
-  const usage = await calculateContextFromTranscript(transcriptPath);
+  const usage = await calculateContextFromTranscript(transcriptPath, contextWindow);
   if (!usage) {
     return undefined;
   }

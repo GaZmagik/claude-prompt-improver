@@ -81,7 +81,8 @@ export const EXAMPLE_CONFIG_PATH = '.claude/prompt-improver.example.md';
  * A marketplace-installed hook runs from the plugin cache directory, not the
  * user's project, so a bare `.` misses the project's `.claude/` config and
  * wrongly reports "config not found". Claude Code sets CLAUDE_PROJECT_DIR to
- * the project root for hooks; prefer it, then an explicit cwd, then `.`.
+ * the project root for hooks. Precedence: an explicit cwd, then
+ * CLAUDE_PROJECT_DIR, then `.`.
  *
  * @param cwd Optional explicit directory (e.g. the hook's context.cwd)
  * @returns The directory to resolve `.claude/prompt-improver.*` against
