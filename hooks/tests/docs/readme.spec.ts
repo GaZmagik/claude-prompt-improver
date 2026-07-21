@@ -5,8 +5,8 @@
  * T134: Test README.md documents all configuration options
  * T135: Test README.md contains troubleshooting section
  */
-import { describe, expect, it, beforeAll } from 'bun:test';
-import { readFileSync, existsSync } from 'node:fs';
+import { beforeAll, describe, expect, it } from 'bun:test';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const PROJECT_ROOT = join(import.meta.dir, '..', '..', '..');
@@ -31,7 +31,7 @@ describe('README.md Documentation', () => {
     it('should contain purpose in first paragraph', () => {
       expect(readmeContent).toBeDefined();
       // First paragraph should mention prompt improvement/enhancement
-      const firstParagraph = readmeContent.split('\n\n')[0] + '\n\n' + readmeContent.split('\n\n')[1];
+      const firstParagraph = `${readmeContent.split('\n\n')[0]}\n\n${readmeContent.split('\n\n')[1]}`;
       const hasPurpose =
         firstParagraph.toLowerCase().includes('prompt') &&
         (firstParagraph.toLowerCase().includes('improv') ||
@@ -138,6 +138,35 @@ describe('README.md Documentation', () => {
         readmeContent.toLowerCase().includes('error') ||
         readmeContent.toLowerCase().includes('issue');
       expect(hasIssues).toBe(true);
+    });
+  });
+
+  describe('Test-coverage claims stay honest', () => {
+    // README states "N+ tests across M+ spec files" and "K+ expect() assertions".
+    // Assert each claimed floor is still at or below the actual count so the
+    // numbers can never silently overstate coverage.
+    it('should not claim more tests, spec files, or assertions than exist', async () => {
+      const glob = new Bun.Glob('**/*.spec.ts');
+      const hooksDir = join(PROJECT_ROOT, 'hooks');
+      let specFileCount = 0;
+      let testCount = 0;
+      let expectCount = 0;
+
+      for await (const file of glob.scan({ cwd: hooksDir })) {
+        specFileCount++;
+        const content = readFileSync(join(hooksDir, file), 'utf-8');
+        testCount += (content.match(/^\s*(?:it|test)(?:\.each\([^)]*\))?\(/gm) ?? []).length;
+        expectCount += (content.match(/\bexpect\(/g) ?? []).length;
+      }
+
+      const testsClaim = readmeContent.match(/(\d+)\+ tests across (\d+)\+? (?:spec )?files/);
+      expect(testsClaim).not.toBeNull();
+      const assertClaim = readmeContent.match(/(\d+)\+ expect\(\) assertions/);
+      expect(assertClaim).not.toBeNull();
+
+      expect(Number(testsClaim?.[1])).toBeLessThanOrEqual(testCount);
+      expect(Number(testsClaim?.[2])).toBeLessThanOrEqual(specFileCount);
+      expect(Number(assertClaim?.[1])).toBeLessThanOrEqual(expectCount);
     });
   });
 });

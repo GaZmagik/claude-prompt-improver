@@ -127,7 +127,9 @@ export function formatResourcesXml(context: ResourceContext): string {
     lines.push('  <plugins>');
     for (const plugin of context.plugins) {
       const desc = plugin.description ? ` description="${escapeXml(plugin.description)}"` : '';
-      lines.push(`    <plugin name="${escapeXml(plugin.name)}" version="${escapeXml(plugin.version)}"${desc} />`);
+      lines.push(
+        `    <plugin name="${escapeXml(plugin.name)}" version="${escapeXml(plugin.version)}"${desc} />`
+      );
     }
     lines.push('  </plugins>');
   }

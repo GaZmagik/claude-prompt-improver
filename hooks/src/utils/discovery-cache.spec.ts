@@ -2,12 +2,8 @@
  * Tests for discovery-cache utility
  * TDD: Write tests first, verify they fail, then implement
  */
-import { describe, expect, it, beforeEach } from 'bun:test';
-import {
-  createDiscoveryCache,
-  type DiscoveryCache,
-  MAX_CACHE_SIZE,
-} from './discovery-cache.ts';
+import { beforeEach, describe, expect, it } from 'bun:test';
+import { type DiscoveryCache, MAX_CACHE_SIZE, createDiscoveryCache } from './discovery-cache.ts';
 
 describe('DiscoveryCache', () => {
   let cache: DiscoveryCache<string[]>;
@@ -60,14 +56,15 @@ describe('DiscoveryCache', () => {
 
       cache.set('/test/', items, mtime);
       const entryBefore = cache.getEntry('/test/');
-      const accessedBefore = entryBefore!.lastAccessed;
+      expect(entryBefore).not.toBeNull();
+      const accessedBefore = entryBefore?.lastAccessed ?? 0;
 
       // Access the cache
       cache.get('/test/', mtime);
 
       const entryAfter = cache.getEntry('/test/');
       expect(entryAfter).not.toBeNull();
-      expect(entryAfter!.lastAccessed).toBeGreaterThan(accessedBefore);
+      expect(entryAfter?.lastAccessed).toBeGreaterThan(accessedBefore);
     });
   });
 
@@ -80,10 +77,10 @@ describe('DiscoveryCache', () => {
 
       const entry = cache.getEntry('/path/');
       expect(entry).not.toBeNull();
-      expect(entry!.items).toEqual(items);
-      expect(entry!.mtime).toBe(mtime);
-      expect(entry!.lastAccessed).toBeDefined();
-      expect(typeof entry!.lastAccessed).toBe('number');
+      expect(entry?.items).toEqual(items);
+      expect(entry?.mtime).toBe(mtime);
+      expect(entry?.lastAccessed).toBeDefined();
+      expect(typeof entry?.lastAccessed).toBe('number');
     });
 
     it('should overwrite existing entry for same key', () => {
@@ -91,8 +88,8 @@ describe('DiscoveryCache', () => {
       cache.set('/path/', ['new.md'], 200);
 
       const entry = cache.getEntry('/path/');
-      expect(entry!.items).toEqual(['new.md']);
-      expect(entry!.mtime).toBe(200);
+      expect(entry?.items).toEqual(['new.md']);
+      expect(entry?.mtime).toBe(200);
     });
   });
 

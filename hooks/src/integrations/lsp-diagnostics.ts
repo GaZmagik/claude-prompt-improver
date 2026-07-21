@@ -113,11 +113,11 @@ export function parseTscOutput(stdout: string): Diagnostic[] {
     // Match: file(line,col): severity TS####: message
     // Use non-greedy match for file path to handle paths with special chars
     const match = line.match(/^(.+?)\((\d+),(\d+)\):\s*(error|warning)\s+TS\d+:\s*(.+)$/);
-    if (match && match[1] && match[2] && match[3] && match[4] && match[5]) {
+    if (match?.[1] && match[2] && match[3] && match[4] && match[5]) {
       diagnostics.push({
         filePath: match[1].trim(),
-        line: parseInt(match[2], 10),
-        column: parseInt(match[3], 10),
+        line: Number.parseInt(match[2], 10),
+        column: Number.parseInt(match[3], 10),
         severity: match[4] as DiagnosticSeverity,
         message: match[5].trim(),
         source: 'typescript',

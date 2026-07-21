@@ -4,8 +4,8 @@
  * T019: Test hook stdout output format matches contract
  */
 import { describe, expect, it } from 'bun:test';
-import type { HookOutput } from '../src/core/types.ts';
 import { DEFAULT_CONFIG } from '../src/core/config-loader.ts';
+import type { HookOutput } from '../src/core/types.ts';
 import {
   createHookOutput,
   parseHookInput,
@@ -273,7 +273,8 @@ describe('Hook Input/Output', () => {
 
     it('should improve vague prompts', async () => {
       const result = await processPrompt({
-        prompt: 'There is a bug somewhere in the code and it is causing issues with the user interface',
+        prompt:
+          'There is a bug somewhere in the code and it is causing issues with the user interface',
         sessionId: 'session-456',
         defaultImprove: true,
         _mockClassification: 'COMPLEX: Very vague, no specifics',
@@ -288,7 +289,8 @@ describe('Hook Input/Output', () => {
 
     it('should passthrough when running in forked session (permission_mode=fork)', async () => {
       const result = await processPrompt({
-        prompt: 'This is a longer prompt that would normally be processed by the improvement engine',
+        prompt:
+          'This is a longer prompt that would normally be processed by the improvement engine',
         sessionId: 'session-789',
         defaultImprove: true,
         permissionMode: 'fork',
@@ -304,7 +306,8 @@ describe('Hook Input/Output', () => {
 
     it('should passthrough on classification error', async () => {
       const result = await processPrompt({
-        prompt: 'This is a test prompt that is long enough to pass the short prompt threshold check',
+        prompt:
+          'This is a test prompt that is long enough to pass the short prompt threshold check',
         sessionId: 'session-error',
         defaultImprove: true,
         _mockClassification: null, // Simulates timeout/error
@@ -315,7 +318,8 @@ describe('Hook Input/Output', () => {
 
     it('should passthrough on improvement error with improvement_failed reason', async () => {
       const result = await processPrompt({
-        prompt: 'This is a vague prompt about something that needs to be fixed but without specifics',
+        prompt:
+          'This is a vague prompt about something that needs to be fixed but without specifics',
         sessionId: 'session-error',
         defaultImprove: true,
         _mockClassification: 'COMPLEX: Very vague',
@@ -399,9 +403,7 @@ describe('Hook Input/Output', () => {
         sessionId: 'session-multi',
         defaultImprove: true,
         availableTools: ['Read', 'Write'],
-        skillRules: [
-          { name: 'commit', keywords: ['commit'], description: 'Git commit' },
-        ],
+        skillRules: [{ name: 'commit', keywords: ['commit'], description: 'Git commit' }],
         agentDefinitions: [
           {
             name: 'typescript-expert',
@@ -506,13 +508,9 @@ describe('Hook Input/Output', () => {
     });
 
     it('should include all bypass reasons in messages', () => {
-      const reasons: Array<'short_prompt' | 'skip_tag' | 'low_context' | 'forked_session' | 'plugin_disabled'> = [
-        'short_prompt',
-        'skip_tag',
-        'low_context',
-        'forked_session',
-        'plugin_disabled',
-      ];
+      const reasons: Array<
+        'short_prompt' | 'skip_tag' | 'low_context' | 'forked_session' | 'plugin_disabled'
+      > = ['short_prompt', 'skip_tag', 'low_context', 'forked_session', 'plugin_disabled'];
 
       for (const reason of reasons) {
         const output = createHookOutput({

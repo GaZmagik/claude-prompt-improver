@@ -72,9 +72,12 @@ function hasImproveTrigger(prompt: string): boolean {
  * the hook again, we get infinite recursion with exponential XML escaping.
  */
 function isImprovementPrompt(prompt: string): boolean {
-  // Check for the improvement prompt template signature
-  return prompt.startsWith('You are improving a user prompt') ||
-    prompt.includes('<original_prompt>');
+  // Check for the improvement prompt template signatures: the template header
+  // (see TEMPLATE_HEADER in services/improver.ts) or the original_prompt tag
+  return (
+    prompt.startsWith('[FORKED SESSION - PROMPT IMPROVEMENT AGENT]') ||
+    prompt.includes('<original_prompt>')
+  );
 }
 
 /**
@@ -100,7 +103,15 @@ function getAvailableContextPercent(contextUsage: { used: number; max: number })
  * 6. short_prompt - Prompt is ≤10 tokens
  */
 export function detectBypass(input: BypassCheckInput): BypassCheckResult {
-  const { prompt, permissionMode, pluginDisabled, forceImprove, defaultImprove, shortPromptThreshold, contextUsage } = input;
+  const {
+    prompt,
+    permissionMode,
+    pluginDisabled,
+    forceImprove,
+    defaultImprove,
+    shortPromptThreshold,
+    contextUsage,
+  } = input;
 
   // Priority 0: Force improve bypasses ALL checks except plugin_disabled
   if (forceImprove === true && pluginDisabled !== true) {

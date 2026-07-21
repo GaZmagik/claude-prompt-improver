@@ -3,10 +3,10 @@
  * Tests end-to-end flows including bypass detection, classification, and improvement
  */
 import { describe, expect, it } from 'bun:test';
-import { parseHookInput } from '../../user-prompt-submit/improve-prompt.ts';
-import { detectBypass } from '../../src/core/bypass-detector.ts';
 import { buildContext } from '../../src/context/context-builder.ts';
+import { detectBypass } from '../../src/core/bypass-detector.ts';
 import type { HookInput } from '../../src/core/types.ts';
+import { parseHookInput } from '../../user-prompt-submit/improve-prompt.ts';
 
 describe('Integration Tests - Full Flow', () => {
   describe('Hook Input Parsing', () => {

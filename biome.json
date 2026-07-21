@@ -33,11 +33,6 @@
     }
   },
   "files": {
-    "ignore": [
-      "node_modules",
-      "dist",
-      ".claude",
-      ".specify"
-    ]
+    "ignore": ["node_modules", "dist", ".claude", ".specify"]
   }
 }

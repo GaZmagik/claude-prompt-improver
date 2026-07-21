@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.2] - 2026-07-21
+
+### Added
+
+- **CI workflow** - `.github/workflows/ci.yml` now runs `bun run typecheck`, `bun run lint`, and `bun test` on every push to main and every pull request; previously no workflow executed the test suite.
+- **Recursion-guard tests** - The improvement-prompt recursion guard in the bypass detector now has direct test coverage (template header, `<original_prompt>` tag, and a non-matching lookalike).
+- **README coverage-claim test** - A documentation test asserts the README's claimed test/spec-file/assertion floors never exceed the actual counts, so the numbers cannot silently overstate coverage again.
+
+### Fixed
+
+- **Stale recursion-guard signature** - The bypass detector matched a template header (`You are improving a user prompt`) that the improver no longer emits; it now matches the real `[FORKED SESSION - PROMPT IMPROVEMENT AGENT]` header alongside the `<original_prompt>` check.
+- **Potential pipe deadlock in the Claude client** - stdout/stderr are now drained concurrently with awaiting process exit; previously a child producing more `--debug` output than the OS pipe buffer could never exit.
+- **README drift** - Corrected stale test counts, documented `forceImprove`, `defaultImprove`, and `logging.logLevel` in the YAML example, and reworded the forked-session bypass to describe the actual recursion prevention.
+
+### Changed
+
+- **Lint debt cleared** - `bun run lint` is green: `node:` import protocol applied consistently, formatting settled, `matchAll` replaces assign-in-expression regex loops, deliberate control-character security regexes annotated, and all `noExcessiveCognitiveComplexity` warnings resolved by extracting focused helpers (worst offender: complexity 70).
+- **Cast-pattern removal** - The entry point's ~20 `(x as {...}).field =` type-assertion mutations are replaced with conditional-spread object literals; `main()` (complexity 32) is decomposed into `resolveContextUsage`, `logResult`, and `createResultOutput`.
+- **Dead fork-session code removed** - Deleted the commented fork-session block and the vestigial `sessionId` threading through `ClaudeClientOptions`/`ImprovePromptOptions`, and corrected the stale "required for fork-session" comments. `getTimeoutForModel` gains a defensive default.
+
+### Removed
+
+- **Unused `@anthropic-ai/sdk` dependency** - All model calls go through the `claude` CLI; the SDK was never imported.
+
 ## [1.10.1] - 2026-07-16
 
 ### Fixed

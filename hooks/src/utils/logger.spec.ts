@@ -279,8 +279,8 @@ describe('Logger', () => {
 
       expect(lines.length).toBe(2);
 
-      const parsed1 = JSON.parse(lines[0]!);
-      const parsed2 = JSON.parse(lines[1]!);
+      const parsed1 = JSON.parse(lines[0] ?? '{}');
+      const parsed2 = JSON.parse(lines[1] ?? '{}');
 
       expect(parsed1.promptPreview).toContain('first');
       expect(parsed2.promptPreview).toContain('second');

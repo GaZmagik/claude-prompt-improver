@@ -102,9 +102,10 @@ async function scanMockDirectory(
   }
 
   // Simulate delay if specified
-  if (mockDir._delay) {
+  const mockDelay = mockDir._delay;
+  if (mockDelay) {
     const scanPromise = (async () => {
-      await delay(mockDir._delay!);
+      await delay(mockDelay);
       return filterMockEntries(normalizedPath, mockDir, extensions);
     })();
 

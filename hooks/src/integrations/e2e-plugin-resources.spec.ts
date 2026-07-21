@@ -2,30 +2,37 @@
  * T214-T216: End-to-End Plugin Resources Integration Tests
  * Validates the full pipeline from plugin scanning to prompt improvement
  */
-import { describe, it, expect, afterAll } from 'bun:test';
-import { mkdirSync, writeFileSync, rmSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { afterAll, describe, expect, it } from 'bun:test';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { scanEnhancePlugins, type PluginInfo } from './plugin-scanner.ts';
+import { join } from 'node:path';
 import { buildContext, formatContextForInjection } from '../context/context-builder.ts';
+import { type PluginInfo, scanEnhancePlugins } from './plugin-scanner.ts';
 
 // Create a temporary test plugin structure
-function createTestPlugin(basePath: string, pluginName: string, config: {
-  version: string;
-  skills?: string[];
-  agents?: string[];
-  commands?: string[];
-  outputStyles?: string[];
-}): void {
+function createTestPlugin(
+  basePath: string,
+  pluginName: string,
+  config: {
+    version: string;
+    skills?: string[];
+    agents?: string[];
+    commands?: string[];
+    outputStyles?: string[];
+  }
+): void {
   const pluginPath = join(basePath, pluginName, config.version, '.claude-plugin');
   mkdirSync(pluginPath, { recursive: true });
 
   // Create plugin.json
-  writeFileSync(join(pluginPath, 'plugin.json'), JSON.stringify({
-    name: pluginName,
-    version: config.version,
-    description: `Test plugin ${pluginName}`,
-  }));
+  writeFileSync(
+    join(pluginPath, 'plugin.json'),
+    JSON.stringify({
+      name: pluginName,
+      version: config.version,
+      description: `Test plugin ${pluginName}`,
+    })
+  );
 
   const versionPath = join(basePath, pluginName, config.version);
 
@@ -35,13 +42,16 @@ function createTestPlugin(basePath: string, pluginName: string, config: {
     for (const skill of config.skills) {
       const skillDir = join(skillsDir, skill);
       mkdirSync(skillDir, { recursive: true });
-      writeFileSync(join(skillDir, `${skill}.md`), `---
+      writeFileSync(
+        join(skillDir, `${skill}.md`),
+        `---
 name: ${skill}
 description: Test skill ${skill}
 ---
 # ${skill}
 Test skill content.
-`);
+`
+      );
     }
   }
 
@@ -50,14 +60,17 @@ Test skill content.
     const agentsDir = join(versionPath, 'agents');
     mkdirSync(agentsDir, { recursive: true });
     for (const agent of config.agents) {
-      writeFileSync(join(agentsDir, `${agent}.md`), `---
+      writeFileSync(
+        join(agentsDir, `${agent}.md`),
+        `---
 name: ${agent}
 description: Test agent ${agent}
 model: haiku
 ---
 # ${agent}
 Test agent content.
-`);
+`
+      );
     }
   }
 
@@ -66,12 +79,15 @@ Test agent content.
     const commandsDir = join(versionPath, 'commands');
     mkdirSync(commandsDir, { recursive: true });
     for (const command of config.commands) {
-      writeFileSync(join(commandsDir, `${command}.md`), `---
+      writeFileSync(
+        join(commandsDir, `${command}.md`),
+        `---
 description: Test command ${command}
 ---
 # ${command}
 Test command content.
-`);
+`
+      );
     }
   }
 
@@ -80,13 +96,16 @@ Test command content.
     const outputStylesDir = join(versionPath, 'output-styles');
     mkdirSync(outputStylesDir, { recursive: true });
     for (const style of config.outputStyles) {
-      writeFileSync(join(outputStylesDir, `${style}.md`), `---
+      writeFileSync(
+        join(outputStylesDir, `${style}.md`),
+        `---
 name: ${style}
 description: Test output style ${style}
 ---
 # ${style}
 Test output style content.
-`);
+`
+      );
     }
   }
 }

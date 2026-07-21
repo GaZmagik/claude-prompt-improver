@@ -90,11 +90,14 @@ async function readPackageInfo(cwd: string): Promise<{
  */
 async function readRecentFiles(cwd: string): Promise<string[] | undefined> {
   try {
-    const proc = Bun.spawn(['git', 'log', '--name-only', '--diff-filter=d', '--pretty=format:', '-5'], {
-      cwd,
-      stdout: 'pipe',
-      stderr: 'ignore',
-    });
+    const proc = Bun.spawn(
+      ['git', 'log', '--name-only', '--diff-filter=d', '--pretty=format:', '-5'],
+      {
+        cwd,
+        stdout: 'pipe',
+        stderr: 'ignore',
+      }
+    );
 
     const timeout = setTimeout(() => proc.kill(), GIT_TIMEOUT_MS);
     try {

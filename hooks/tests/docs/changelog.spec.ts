@@ -2,8 +2,8 @@
  * T136: CHANGELOG.md documentation tests
  * T136: Test CHANGELOG.md exists and follows SemVer format
  */
-import { describe, expect, it, beforeAll } from 'bun:test';
-import { readFileSync, existsSync } from 'node:fs';
+import { beforeAll, describe, expect, it } from 'bun:test';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const PROJECT_ROOT = join(import.meta.dir, '..', '..', '..');
@@ -66,8 +66,7 @@ describe('CHANGELOG.md Documentation', () => {
     it('should follow Keep a Changelog format or similar', () => {
       expect(changelogContent).toBeDefined();
       // Should have hierarchical structure
-      const hasStructure =
-        changelogContent.includes('##') && changelogContent.includes('-');
+      const hasStructure = changelogContent.includes('##') && changelogContent.includes('-');
       expect(hasStructure).toBe(true);
     });
   });

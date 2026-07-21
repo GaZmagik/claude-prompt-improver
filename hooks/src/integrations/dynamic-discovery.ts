@@ -3,12 +3,12 @@
  * Scans filesystem at runtime to discover available resources and match to prompts
  */
 import { homedir } from 'node:os';
-import { join, basename } from 'node:path';
-import { parseFrontmatter } from './spec-awareness.ts';
-import { matchItemsByKeywords, type ItemMatchResult } from '../utils/keyword-matcher.ts';
-import { scanDirectory, type DirectoryScannerOptions } from '../utils/directory-scanner.ts';
+import { basename, join } from 'node:path';
+import { type DirectoryScannerOptions, scanDirectory } from '../utils/directory-scanner.ts';
 import { readFileSyncSafe } from '../utils/file-reader.ts';
+import { type ItemMatchResult, matchItemsByKeywords } from '../utils/keyword-matcher.ts';
 import { detectDeliberationKeywords } from './plugin-scanner.ts';
+import { parseFrontmatter } from './spec-awareness.ts';
 
 /** Maximum number of suggestions to show */
 export const MAX_SUGGESTIONS = 5;
@@ -215,7 +215,10 @@ export function parseResourceMetadata(
   // Validate that name looks reasonable (not malformed YAML artifact)
   const rawName = frontmatter.name;
   const isValidName =
-    typeof rawName === 'string' && rawName.length > 0 && !rawName.includes('[') && !rawName.includes('{');
+    typeof rawName === 'string' &&
+    rawName.length > 0 &&
+    !rawName.includes('[') &&
+    !rawName.includes('{');
   const name = isValidName ? rawName : filename;
 
   // Extract description
@@ -290,53 +293,91 @@ function expandPath(path: string): string {
 }
 
 /**
- * Discovers agents from global and local directories
+ * Builds the standard local-then-global directory pair for a resource subdirectory
+ * Local first so it takes precedence during deduplication
  */
-export async function discoverAgents(
-  options: DynamicDiscoveryOptions = {}
+function resourceDirectories(subdir: string): Array<{ path: string; source: ResourceSource }> {
+  return [
+    { path: `.claude/${subdir}/`, source: 'local' },
+    { path: `~/.claude/${subdir}/`, source: 'global' },
+  ];
+}
+
+/**
+ * Scans a resource directory, routing through the mock filesystem when present
+ */
+async function scanResourceDirectory(
+  expandedPath: string,
+  mockFs: MockFileSystem | undefined,
+  extensions?: readonly string[]
+): ReturnType<typeof scanDirectory> {
+  const scannerMockFs = convertMockFs(mockFs ?? {});
+  const baseOptions = extensions ? { extensions } : {};
+  return scanDirectory(
+    expandedPath,
+    scannerMockFs ? { ...baseOptions, _mockFileSystem: scannerMockFs } : baseOptions
+  );
+}
+
+/**
+ * Parses discovered files and adds them to the collection, deduplicating by
+ * normalised (case-insensitive) name; earlier entries take precedence
+ */
+function collectResourceFiles(
+  files: readonly string[],
+  resourceType: ResourceType,
+  source: ResourceSource,
+  mockFs: MockFileSystem | undefined,
+  seenNames: Map<string, DiscoveredItem>,
+  items: DiscoveredItem[]
+): void {
+  for (const filePath of files) {
+    const content = readFileContent(filePath, mockFs);
+    if (!content) continue;
+
+    const item = parseResourceMetadata(content, filePath, resourceType, source);
+    const normalisedName = item.name.toLowerCase();
+    if (!seenNames.has(normalisedName)) {
+      seenNames.set(normalisedName, item);
+      items.push(item);
+    }
+    // If already seen, local takes precedence (already added first)
+  }
+}
+
+/**
+ * Discovers markdown-file resources from global and local directories
+ */
+async function discoverMarkdownResources(
+  subdir: string,
+  resourceType: ResourceType,
+  options: DynamicDiscoveryOptions
 ): Promise<DiscoveredItem[]> {
   const { _mockFileSystem } = options;
-  const agents: DiscoveredItem[] = [];
+  const items: DiscoveredItem[] = [];
   const seenNames = new Map<string, DiscoveredItem>();
 
-  // Define directories to scan (local first for precedence)
-  const directories: Array<{ path: string; source: ResourceSource }> = [
-    { path: '.claude/agents/', source: 'local' },
-    { path: '~/.claude/agents/', source: 'global' },
-  ];
-
-  for (const { path, source } of directories) {
+  for (const { path, source } of resourceDirectories(subdir)) {
     const expandedPath = _mockFileSystem ? path : expandPath(path);
-    const scannerMockFs = convertMockFs(_mockFileSystem ?? {});
-
-    const scanResult = await scanDirectory(
-      expandedPath,
-      scannerMockFs
-        ? { extensions: ['.md'], _mockFileSystem: scannerMockFs }
-        : { extensions: ['.md'] }
-    );
+    const scanResult = await scanResourceDirectory(expandedPath, _mockFileSystem, ['.md']);
 
     if (!scanResult.success) {
       continue; // Directory doesn't exist or error - skip gracefully
     }
 
-    for (const filePath of scanResult.files) {
-      const content = readFileContent(filePath, _mockFileSystem);
-      if (!content) continue;
-
-      const item = parseResourceMetadata(content, filePath, 'agent', source);
-
-      // Deduplicate by normalised name (case-insensitive)
-      const normalisedName = item.name.toLowerCase();
-      if (!seenNames.has(normalisedName)) {
-        seenNames.set(normalisedName, item);
-        agents.push(item);
-      }
-      // If already seen, local takes precedence (already added first)
-    }
+    collectResourceFiles(scanResult.files, resourceType, source, _mockFileSystem, seenNames, items);
   }
 
-  return agents;
+  return items;
+}
+
+/**
+ * Discovers agents from global and local directories
+ */
+export async function discoverAgents(
+  options: DynamicDiscoveryOptions = {}
+): Promise<DiscoveredItem[]> {
+  return discoverMarkdownResources('agents', 'agent', options);
 }
 
 /**
@@ -345,42 +386,7 @@ export async function discoverAgents(
 export async function discoverCommands(
   options: DynamicDiscoveryOptions = {}
 ): Promise<DiscoveredItem[]> {
-  const { _mockFileSystem } = options;
-  const commands: DiscoveredItem[] = [];
-  const seenNames = new Map<string, DiscoveredItem>();
-
-  const directories: Array<{ path: string; source: ResourceSource }> = [
-    { path: '.claude/commands/', source: 'local' },
-    { path: '~/.claude/commands/', source: 'global' },
-  ];
-
-  for (const { path, source } of directories) {
-    const expandedPath = _mockFileSystem ? path : expandPath(path);
-    const scannerMockFs = convertMockFs(_mockFileSystem ?? {});
-
-    const scanResult = await scanDirectory(
-      expandedPath,
-      scannerMockFs
-        ? { extensions: ['.md'], _mockFileSystem: scannerMockFs }
-        : { extensions: ['.md'] }
-    );
-
-    if (!scanResult.success) continue;
-
-    for (const filePath of scanResult.files) {
-      const content = readFileContent(filePath, _mockFileSystem);
-      if (!content) continue;
-
-      const item = parseResourceMetadata(content, filePath, 'command', source);
-      const normalisedName = item.name.toLowerCase();
-      if (!seenNames.has(normalisedName)) {
-        seenNames.set(normalisedName, item);
-        commands.push(item);
-      }
-    }
-  }
-
-  return commands;
+  return discoverMarkdownResources('commands', 'command', options);
 }
 
 /**
@@ -389,42 +395,76 @@ export async function discoverCommands(
 export async function discoverOutputStyles(
   options: DynamicDiscoveryOptions = {}
 ): Promise<DiscoveredItem[]> {
-  const { _mockFileSystem } = options;
-  const styles: DiscoveredItem[] = [];
-  const seenNames = new Map<string, DiscoveredItem>();
+  return discoverMarkdownResources('output-styles', 'outputStyle', options);
+}
 
-  const directories: Array<{ path: string; source: ResourceSource }> = [
-    { path: '.claude/output-styles/', source: 'local' },
-    { path: '~/.claude/output-styles/', source: 'global' },
-  ];
+/**
+ * Parses a skill directory entry's SKILL.md and adds it to the collection
+ * Skips .disabled directories; uses the directory name when frontmatter has no name
+ */
+function collectSkillEntry(
+  entryName: string,
+  expandedPath: string,
+  source: ResourceSource,
+  mockFs: MockFileSystem | undefined,
+  seenNames: Map<string, DiscoveredItem>,
+  skills: DiscoveredItem[]
+): void {
+  // Skip .disabled directories
+  if (entryName.endsWith('.disabled')) return;
 
-  for (const { path, source } of directories) {
-    const expandedPath = _mockFileSystem ? path : expandPath(path);
-    const scannerMockFs = convertMockFs(_mockFileSystem ?? {});
+  const skillDir = `${expandedPath}${entryName}/`;
+  const skillFilePath = `${skillDir}SKILL.md`;
+  const content = readFileContent(skillFilePath, mockFs);
+  if (!content) return;
 
-    const scanResult = await scanDirectory(
-      expandedPath,
-      scannerMockFs
-        ? { extensions: ['.md'], _mockFileSystem: scannerMockFs }
-        : { extensions: ['.md'] }
-    );
+  const item = parseResourceMetadata(content, skillFilePath, 'skill', source);
+  // Use directory name as fallback if no name in frontmatter
+  const name = item.name === 'SKILL' ? entryName : item.name;
+  const normalisedName = name.toLowerCase();
 
-    if (!scanResult.success) continue;
-
-    for (const filePath of scanResult.files) {
-      const content = readFileContent(filePath, _mockFileSystem);
-      if (!content) continue;
-
-      const item = parseResourceMetadata(content, filePath, 'outputStyle', source);
-      const normalisedName = item.name.toLowerCase();
-      if (!seenNames.has(normalisedName)) {
-        seenNames.set(normalisedName, item);
-        styles.push(item);
-      }
-    }
+  if (!seenNames.has(normalisedName)) {
+    seenNames.set(normalisedName, { ...item, name });
+    skills.push({ ...item, name });
   }
+}
 
-  return styles;
+/**
+ * Collects skills from a mock filesystem directory listing
+ */
+function collectSkillsFromMockDir(
+  entries: ReadonlyArray<{ name: string; isFile: boolean; isDirectory: boolean }>,
+  expandedPath: string,
+  source: ResourceSource,
+  mockFs: MockFileSystem,
+  seenNames: Map<string, DiscoveredItem>,
+  skills: DiscoveredItem[]
+): void {
+  for (const entry of entries) {
+    if (!entry.isDirectory) continue;
+    collectSkillEntry(entry.name, expandedPath, source, mockFs, seenNames, skills);
+  }
+}
+
+/**
+ * Collects skills from a real filesystem directory listing
+ */
+async function collectSkillsFromRealDir(
+  expandedPath: string,
+  source: ResourceSource,
+  seenNames: Map<string, DiscoveredItem>,
+  skills: DiscoveredItem[]
+): Promise<void> {
+  const { readdirSync } = await import('node:fs');
+  try {
+    const entries = readdirSync(expandedPath, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      collectSkillEntry(entry.name, expandedPath, source, undefined, seenNames, skills);
+    }
+  } catch {
+    // Directory doesn't exist or can't be read - skip gracefully
+  }
 }
 
 /**
@@ -438,75 +478,32 @@ export async function discoverSkills(
   const skills: DiscoveredItem[] = [];
   const seenNames = new Map<string, DiscoveredItem>();
 
-  const directories: Array<{ path: string; source: ResourceSource }> = [
-    { path: '.claude/skills/', source: 'local' },
-    { path: '~/.claude/skills/', source: 'global' },
-  ];
-
-  for (const { path, source } of directories) {
+  for (const { path, source } of resourceDirectories('skills')) {
     const expandedPath = _mockFileSystem ? path : expandPath(path);
-    const scannerMockFs = convertMockFs(_mockFileSystem ?? {});
 
     // Scan for subdirectories (each skill is a directory)
-    const scanResult = await scanDirectory(
-      expandedPath,
-      scannerMockFs ? { _mockFileSystem: scannerMockFs } : {}
-    );
+    const scanResult = await scanResourceDirectory(expandedPath, _mockFileSystem);
 
     if (!scanResult.success) continue;
 
     // For each directory entry, look for SKILL.md
     const mockDirData = _mockFileSystem?.[expandedPath];
-    if (_mockFileSystem && mockDirData && typeof mockDirData === 'object' && 'entries' in mockDirData) {
-      // Mock filesystem: iterate directory entries
-      for (const entry of mockDirData.entries) {
-        if (!entry.isDirectory) continue;
-        // Skip .disabled directories
-        if (entry.name.endsWith('.disabled')) continue;
-
-        const skillDir = `${expandedPath}${entry.name}/`;
-        const skillFilePath = `${skillDir}SKILL.md`;
-        const content = readFileContent(skillFilePath, _mockFileSystem);
-        if (!content) continue;
-
-        const item = parseResourceMetadata(content, skillFilePath, 'skill', source);
-        // Use directory name as fallback if no name in frontmatter
-        const name = item.name === 'SKILL' ? entry.name : item.name;
-        const normalisedName = name.toLowerCase();
-
-        if (!seenNames.has(normalisedName)) {
-          seenNames.set(normalisedName, { ...item, name });
-          skills.push({ ...item, name });
-        }
-      }
+    if (
+      _mockFileSystem &&
+      mockDirData &&
+      typeof mockDirData === 'object' &&
+      'entries' in mockDirData
+    ) {
+      collectSkillsFromMockDir(
+        mockDirData.entries,
+        expandedPath,
+        source,
+        _mockFileSystem,
+        seenNames,
+        skills
+      );
     } else if (!_mockFileSystem) {
-      // Real filesystem: use fs to read directory
-      const { readdirSync } = await import('node:fs');
-      try {
-        const entries = readdirSync(expandedPath, { withFileTypes: true });
-        for (const entry of entries) {
-          if (!entry.isDirectory()) continue;
-          // Skip .disabled directories
-          if (entry.name.endsWith('.disabled')) continue;
-
-          const skillDir = `${expandedPath}${entry.name}/`;
-          const skillFilePath = `${skillDir}SKILL.md`;
-          const content = readFileContent(skillFilePath, _mockFileSystem);
-          if (!content) continue;
-
-          const item = parseResourceMetadata(content, skillFilePath, 'skill', source);
-          // Use directory name as fallback if no name in frontmatter
-          const name = item.name === 'SKILL' ? entry.name : item.name;
-          const normalisedName = name.toLowerCase();
-
-          if (!seenNames.has(normalisedName)) {
-            seenNames.set(normalisedName, { ...item, name });
-            skills.push({ ...item, name });
-          }
-        }
-      } catch {
-        // Directory doesn't exist or can't be read - skip gracefully
-      }
+      await collectSkillsFromRealDir(expandedPath, source, seenNames, skills);
     }
   }
 
@@ -573,7 +570,10 @@ export function formatSkillSuggestions(skills: readonly DiscoveredItem[], total:
 /**
  * Formats command suggestions for prompt injection
  */
-export function formatCommandSuggestions(commands: readonly DiscoveredItem[], total: number): string {
+export function formatCommandSuggestions(
+  commands: readonly DiscoveredItem[],
+  total: number
+): string {
   if (commands.length === 0) {
     return '';
   }
@@ -595,7 +595,10 @@ export function formatCommandSuggestions(commands: readonly DiscoveredItem[], to
 /**
  * Formats output style suggestions for prompt injection
  */
-export function formatOutputStyleSuggestions(styles: readonly DiscoveredItem[], total: number): string {
+export function formatOutputStyleSuggestions(
+  styles: readonly DiscoveredItem[],
+  total: number
+): string {
   if (styles.length === 0) {
     return '';
   }
@@ -707,7 +710,9 @@ export function formatDynamicContext(context: DynamicContext): string {
 
   // Special formatting for memory think context
   if (context.isMemoryThinkContext) {
-    sections.push('Consider using --agent <name> for domain expertise or --style <name> for perspective.');
+    sections.push(
+      'Consider using --agent <name> for domain expertise or --style <name> for perspective.'
+    );
 
     if (context.matchedAgents.length > 0) {
       const agentNames = context.matchedAgents.slice(0, 5).map((m) => m.item.name);

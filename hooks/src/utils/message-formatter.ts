@@ -14,8 +14,8 @@ export function formatSystemMessage(info: VisibilityInfo): string {
       return formatBypassMessage(info.bypassReason);
     case 'applied':
       return formatAppliedMessage(
-        info.tokensBefore!,
-        info.tokensAfter!,
+        info.tokensBefore ?? 0,
+        info.tokensAfter ?? 0,
         info.summary,
         info.latencyMs,
         info.improvedPrompt
@@ -69,7 +69,7 @@ function formatAppliedMessage(
   latencyMs?: number,
   improvedPrompt?: string
 ): string {
-  let message = `🎯 Prompt improved`;
+  let message = '🎯 Prompt improved';
 
   // Add token change
   message += `\n   Tokens: ${tokensBefore} → ${tokensAfter}`;
