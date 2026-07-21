@@ -2,10 +2,10 @@
  * Tests for file-reader utility
  */
 import { describe, expect, it } from 'bun:test';
-import { readFileSyncSafe } from './file-reader.ts';
-import { existsSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { readFileSyncSafe } from './file-reader.ts';
 
 describe('readFileSyncSafe', () => {
   describe('with mock filesystem', () => {

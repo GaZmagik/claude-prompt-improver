@@ -178,6 +178,40 @@ export function checkSpecifyDirectory(options: SpecAwarenessOptions): boolean {
 }
 
 /**
+ * Mutable parser state shared across frontmatter lines
+ */
+interface FrontmatterParseState {
+  currentKey: string | null;
+  currentArray: string[] | null;
+}
+
+/**
+ * Handles a "key: value" frontmatter line, saving any in-progress array
+ */
+function processFrontmatterKeyValue(
+  key: string,
+  rawValue: string,
+  result: Record<string, unknown>,
+  state: FrontmatterParseState
+): void {
+  // Save previous array if exists
+  if (state.currentKey && state.currentArray) {
+    result[state.currentKey] = state.currentArray;
+  }
+
+  state.currentKey = key;
+  const value = rawValue.trim();
+
+  if (value === '') {
+    // Could be array or nested object starting
+    state.currentArray = [];
+  } else {
+    result[state.currentKey] = value;
+    state.currentArray = null;
+  }
+}
+
+/**
  * Parses YAML frontmatter from markdown file
  */
 export function parseFrontmatter(content: string): Record<string, unknown> {
@@ -191,41 +225,26 @@ export function parseFrontmatter(content: string): Record<string, unknown> {
 
   // Simple YAML parser for common cases
   const lines = yamlContent.split('\n');
-  let currentKey: string | null = null;
-  let currentArray: string[] | null = null;
+  const state: FrontmatterParseState = { currentKey: null, currentArray: null };
 
   for (const line of lines) {
     // Check for array item
     const arrayMatch = line.match(/^\s+-\s+(.+)$/);
-    if (arrayMatch?.[1] && currentKey && currentArray) {
-      currentArray.push(arrayMatch[1].trim());
+    if (arrayMatch?.[1] && state.currentKey && state.currentArray) {
+      state.currentArray.push(arrayMatch[1].trim());
       continue;
     }
 
     // Check for key: value
     const kvMatch = line.match(/^(\w+):\s*(.*)$/);
     if (kvMatch?.[1]) {
-      // Save previous array if exists
-      if (currentKey && currentArray) {
-        result[currentKey] = currentArray;
-      }
-
-      currentKey = kvMatch[1];
-      const value = (kvMatch[2] ?? '').trim();
-
-      if (value === '') {
-        // Could be array or nested object starting
-        currentArray = [];
-      } else {
-        result[currentKey] = value;
-        currentArray = null;
-      }
+      processFrontmatterKeyValue(kvMatch[1], kvMatch[2] ?? '', result, state);
     }
   }
 
   // Save final array if exists
-  if (currentKey && currentArray && currentArray.length > 0) {
-    result[currentKey] = currentArray;
+  if (state.currentKey && state.currentArray && state.currentArray.length > 0) {
+    result[state.currentKey] = state.currentArray;
   }
 
   return result;
@@ -239,9 +258,8 @@ export function extractUserStories(content: string): UserStory[] {
 
   // Match ### US{id}: {title} pattern
   const storyRegex = /###\s+(US\d+):\s+(.+?)(?=\n###|\n##|$)/gs;
-  let match;
 
-  while ((match = storyRegex.exec(content)) !== null) {
+  for (const match of content.matchAll(storyRegex)) {
     const id = match[1];
     const titleAndContent = match[2];
     if (!id || !titleAndContent) continue;
@@ -266,6 +284,31 @@ export function extractUserStories(content: string): UserStory[] {
 }
 
 /**
+ * Extracts the phase status from a phase's content lines
+ * Looks for a "Status: {value}" line with a recognised value
+ */
+function extractPhaseStatus(lines: readonly string[]): PlanPhase['status'] | undefined {
+  const validStatuses: ReadonlyArray<'pending' | 'in_progress' | 'completed'> = [
+    'pending',
+    'in_progress',
+    'completed',
+  ];
+
+  let status: PlanPhase['status'] | undefined;
+  for (const line of lines) {
+    const statusMatch = line.match(/Status:\s*(\w+)/i);
+    if (statusMatch?.[1]) {
+      const rawStatus = statusMatch[1].toLowerCase();
+      const found = validStatuses.find((s) => s === rawStatus);
+      if (found) {
+        status = found;
+      }
+    }
+  }
+  return status;
+}
+
+/**
  * Parses phases from plan.md content
  */
 export function parsePlanPhases(content: string): PlanPhase[] {
@@ -273,9 +316,8 @@ export function parsePlanPhases(content: string): PlanPhase[] {
 
   // Match ## Phase {id}: {name} or ### Phase {id}: {name} pattern
   const phaseRegex = /##[#]?\s*Phase\s+(\d+):\s+(.+?)(?=\n##|$)/gs;
-  let match;
 
-  while ((match = phaseRegex.exec(content)) !== null) {
+  for (const match of content.matchAll(phaseRegex)) {
     const id = match[1];
     const nameAndContent = match[2];
     if (!id || !nameAndContent) continue;
@@ -285,16 +327,7 @@ export function parsePlanPhases(content: string): PlanPhase[] {
     if (!name) continue;
 
     // Look for Status: line
-    let status: 'pending' | 'in_progress' | 'completed' | undefined;
-    for (const line of lines) {
-      const statusMatch = line.match(/Status:\s*(\w+)/i);
-      if (statusMatch?.[1]) {
-        const rawStatus = statusMatch[1].toLowerCase();
-        if (rawStatus === 'completed') status = 'completed';
-        else if (rawStatus === 'in_progress') status = 'in_progress';
-        else if (rawStatus === 'pending') status = 'pending';
-      }
-    }
+    const status = extractPhaseStatus(lines);
 
     if (status) {
       phases.push({ id, name, status });
@@ -314,9 +347,8 @@ export function parseTasks(content: string): SpecTask[] {
 
   // Match - [X] or - [ ] followed by task info
   const taskRegex = /^-\s+\[([ Xx])\]\s+(T\d+)(.+)$/gm;
-  let match;
 
-  while ((match = taskRegex.exec(content)) !== null) {
+  for (const match of content.matchAll(taskRegex)) {
     const checkMark = match[1];
     const id = match[2];
     const rest = match[3];

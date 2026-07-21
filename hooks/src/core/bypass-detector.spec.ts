@@ -206,6 +206,49 @@ describe('Bypass Detector', () => {
     });
   });
 
+  describe('detectBypass - improvement prompt recursion prevention', () => {
+    it('should bypass prompts carrying the improvement template header', () => {
+      const input: BypassCheckInput = {
+        prompt:
+          '[FORKED SESSION - PROMPT IMPROVEMENT AGENT]\n\nYou are running in a FORKED SESSION as a specialised prompt improvement agent.',
+        sessionId: 'session-123',
+        defaultImprove: true,
+      };
+
+      const result = detectBypass(input);
+
+      expect(result.shouldBypass).toBe(true);
+      expect(result.reason).toBe('forked_session');
+    });
+
+    it('should bypass prompts containing an original_prompt tag', () => {
+      const input: BypassCheckInput = {
+        prompt:
+          'Improve the following user prompt.\n<original_prompt>\nfix the login bug\n</original_prompt>',
+        sessionId: 'session-123',
+        defaultImprove: true,
+      };
+
+      const result = detectBypass(input);
+
+      expect(result.shouldBypass).toBe(true);
+      expect(result.reason).toBe('forked_session');
+    });
+
+    it('should not bypass ordinary prompts that merely mention improving prompts', () => {
+      const input: BypassCheckInput = {
+        prompt:
+          'You are improving a user prompt for me, please explain how prompt engineering works',
+        sessionId: 'session-123',
+        defaultImprove: true,
+      };
+
+      const result = detectBypass(input);
+
+      expect(result.shouldBypass).toBe(false);
+    });
+  });
+
   describe('T056: detectBypass - plugin_disabled configuration', () => {
     it('should bypass when plugin is disabled', () => {
       const input: BypassCheckInput = {
@@ -504,7 +547,8 @@ describe('Bypass Detector', () => {
 
     it('should not bypass when #improve tag is present', () => {
       const input: BypassCheckInput = {
-        prompt: 'Please help me understand the authentication module and fix any security issues #improve',
+        prompt:
+          'Please help me understand the authentication module and fix any security issues #improve',
         sessionId: 'session-123',
         defaultImprove: false,
       };
@@ -516,7 +560,8 @@ describe('Bypass Detector', () => {
 
     it('should not bypass when defaultImprove is true', () => {
       const input: BypassCheckInput = {
-        prompt: 'Please help me understand how the authentication system works and identify security issues',
+        prompt:
+          'Please help me understand how the authentication system works and identify security issues',
         sessionId: 'session-123',
         defaultImprove: true,
       };
@@ -528,7 +573,8 @@ describe('Bypass Detector', () => {
 
     it('should strip #improve tag from prompt when improving', () => {
       const input: BypassCheckInput = {
-        prompt: 'Please help me understand the authentication module and #improve fix any security issues that you find',
+        prompt:
+          'Please help me understand the authentication module and #improve fix any security issues that you find',
         sessionId: 'session-123',
         defaultImprove: false,
       };
@@ -536,12 +582,15 @@ describe('Bypass Detector', () => {
       const result = detectBypass(input);
 
       expect(result.shouldBypass).toBe(false);
-      expect(result.cleanedPrompt).toBe('Please help me understand the authentication module and fix any security issues that you find');
+      expect(result.cleanedPrompt).toBe(
+        'Please help me understand the authentication module and fix any security issues that you find'
+      );
     });
 
     it('should handle #improve tag case-insensitively', () => {
       const input: BypassCheckInput = {
-        prompt: 'Please help me understand the authentication system and fix the security issues #IMPROVE',
+        prompt:
+          'Please help me understand the authentication system and fix the security issues #IMPROVE',
         sessionId: 'session-123',
         defaultImprove: false,
       };
@@ -549,7 +598,9 @@ describe('Bypass Detector', () => {
       const result = detectBypass(input);
 
       expect(result.shouldBypass).toBe(false);
-      expect(result.cleanedPrompt).toBe('Please help me understand the authentication system and fix the security issues');
+      expect(result.cleanedPrompt).toBe(
+        'Please help me understand the authentication system and fix the security issues'
+      );
     });
 
     it('should handle multiple #improve tags', () => {
@@ -561,7 +612,9 @@ describe('Bypass Detector', () => {
       const result = detectBypass(input);
 
       expect(result.shouldBypass).toBe(false);
-      expect(result.cleanedPrompt).toBe('Please help me understand how this authentication module works');
+      expect(result.cleanedPrompt).toBe(
+        'Please help me understand how this authentication module works'
+      );
     });
 
     it('should prioritize #skip over opt-in check', () => {

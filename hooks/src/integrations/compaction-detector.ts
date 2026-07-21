@@ -2,9 +2,9 @@
  * Compaction detector for detecting low context availability
  * Used to skip processing when context is nearly exhausted (pre-compaction)
  */
-import { existsSync } from 'fs';
-import { createReadStream } from 'fs';
-import { createInterface } from 'readline';
+import { existsSync } from 'node:fs';
+import { createReadStream } from 'node:fs';
+import { createInterface } from 'node:readline';
 import { COMPACTION_THRESHOLD_PERCENT } from '../core/constants.ts';
 
 // ============================================================================
@@ -94,28 +94,34 @@ export function parseContextUsage(stdin: unknown): ContextUsage | undefined {
   const obj = stdin as Record<string, unknown>;
 
   // Check for direct context_usage
-  if (obj.context_usage && typeof obj.context_usage === 'object') {
-    const contextUsage = obj.context_usage as Record<string, unknown>;
-    if (typeof contextUsage.used === 'number' && typeof contextUsage.total === 'number') {
-      return {
-        used: contextUsage.used,
-        total: contextUsage.total,
-      };
-    }
+  const direct = coerceContextUsage(obj.context_usage);
+  if (direct) {
+    return direct;
   }
 
   // Check for nested session.context_usage
   if (obj.session && typeof obj.session === 'object') {
     const session = obj.session as Record<string, unknown>;
-    if (session.context_usage && typeof session.context_usage === 'object') {
-      const contextUsage = session.context_usage as Record<string, unknown>;
-      if (typeof contextUsage.used === 'number' && typeof contextUsage.total === 'number') {
-        return {
-          used: contextUsage.used,
-          total: contextUsage.total,
-        };
-      }
-    }
+    return coerceContextUsage(session.context_usage);
+  }
+
+  return undefined;
+}
+
+/**
+ * Coerces an unknown value into a ContextUsage if it has numeric used/total
+ */
+function coerceContextUsage(value: unknown): ContextUsage | undefined {
+  if (!value || typeof value !== 'object') {
+    return undefined;
+  }
+
+  const contextUsage = value as Record<string, unknown>;
+  if (typeof contextUsage.used === 'number' && typeof contextUsage.total === 'number') {
+    return {
+      used: contextUsage.used,
+      total: contextUsage.total,
+    };
   }
 
   return undefined;
@@ -172,10 +178,10 @@ export function extractTokenUsageFromLine(line: string): MessageTokenUsage | und
     // Extract token counts (default to 0 if missing)
     const inputTokens = typeof usage.input_tokens === 'number' ? usage.input_tokens : 0;
     const outputTokens = typeof usage.output_tokens === 'number' ? usage.output_tokens : 0;
-    const cacheCreationTokens = typeof usage.cache_creation_input_tokens === 'number'
-      ? usage.cache_creation_input_tokens : 0;
-    const cacheReadTokens = typeof usage.cache_read_input_tokens === 'number'
-      ? usage.cache_read_input_tokens : 0;
+    const cacheCreationTokens =
+      typeof usage.cache_creation_input_tokens === 'number' ? usage.cache_creation_input_tokens : 0;
+    const cacheReadTokens =
+      typeof usage.cache_read_input_tokens === 'number' ? usage.cache_read_input_tokens : 0;
 
     return {
       inputTokens,
@@ -242,7 +248,7 @@ export function resolveContextWindow(sources: {
  */
 export function getUsableContextWindow(
   totalWindow: number = CLAUDE_CONTEXT_WINDOW_TOKENS,
-  autocompactEnabled: boolean = true
+  autocompactEnabled = true
 ): number {
   if (!autocompactEnabled) {
     return totalWindow;
@@ -264,7 +270,7 @@ export function getUsableContextWindow(
 export async function calculateContextFromTranscript(
   transcriptPath: string,
   contextWindow: number = CLAUDE_CONTEXT_WINDOW_TOKENS,
-  autocompactEnabled: boolean = true
+  autocompactEnabled = true
 ): Promise<TranscriptContextUsage | undefined> {
   // Check file exists
   if (!existsSync(transcriptPath)) {
@@ -279,7 +285,7 @@ export async function calculateContextFromTranscript(
     const fileStream = createReadStream(transcriptPath, { encoding: 'utf-8' });
     const rl = createInterface({
       input: fileStream,
-      crlfDelay: Infinity, // Handle Windows line endings
+      crlfDelay: Number.POSITIVE_INFINITY, // Handle Windows line endings
     });
 
     for await (const line of rl) {

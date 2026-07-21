@@ -10,7 +10,10 @@ import { join } from 'node:path';
 import { formatProjectShape, gatherProjectShape } from './project-shape.ts';
 
 function makeTempProject(): string {
-  const dir = join(tmpdir(), `project-shape-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  const dir = join(
+    tmpdir(),
+    `project-shape-test-${Date.now()}-${Math.random().toString(36).slice(2)}`
+  );
   mkdirSync(join(dir, 'src'), { recursive: true });
   mkdirSync(join(dir, 'tests'), { recursive: true });
   mkdirSync(join(dir, 'node_modules'), { recursive: true });

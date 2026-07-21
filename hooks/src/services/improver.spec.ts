@@ -6,11 +6,7 @@
  */
 import { describe, expect, it } from 'bun:test';
 import type { Configuration } from '../core/types.ts';
-import {
-  buildImprovementPrompt,
-  generateImprovementSummary,
-  improvePrompt,
-} from './improver.ts';
+import { buildImprovementPrompt, generateImprovementSummary, improvePrompt } from './improver.ts';
 
 // Mock config for tests
 const mockConfig: Configuration = {
@@ -43,7 +39,6 @@ const mockConfig: Configuration = {
 };
 
 describe('Improver', () => {
-
   describe('T038: buildImprovementPrompt - preserves original intent and tone', () => {
     it('should include instruction to preserve intent', () => {
       const prompt = buildImprovementPrompt({
@@ -162,7 +157,6 @@ describe('Improver', () => {
       const result = await improvePrompt({
         config: mockConfig,
         originalPrompt: 'fix the bug',
-        sessionId: 'session-123',
         _mockClaudeResponse: null, // Simulates timeout
       });
 
@@ -175,7 +169,6 @@ describe('Improver', () => {
       const result = await improvePrompt({
         config: mockConfig,
         originalPrompt: 'fix the bug',
-        sessionId: 'session-123',
         _mockClaudeResponse: '<task>Investigate and fix the authentication bug</task>',
       });
 
@@ -188,7 +181,6 @@ describe('Improver', () => {
       const result = await improvePrompt({
         config: mockConfig,
         originalPrompt: 'test',
-        sessionId: 'session-123',
         _mockClaudeResponse: 'Improved: test with more detail',
       });
 
@@ -205,7 +197,6 @@ describe('Improver', () => {
       const result = await improvePrompt({
         config: opusConfig,
         originalPrompt: 'complex architectural decision requiring deep analysis',
-        sessionId: 'session-opus',
         _mockClaudeResponse: 'Detailed architectural analysis with trade-offs...',
       });
 
@@ -220,14 +211,12 @@ describe('Improver', () => {
       const simpleResult = await improvePrompt({
         config: mockConfig,
         originalPrompt: 'help',
-        sessionId: 'session-123',
         _mockClaudeResponse: 'Improved help prompt',
       });
 
       const complexResult = await improvePrompt({
         config: mockConfig,
         originalPrompt: 'fix',
-        sessionId: 'session-456',
         _mockClaudeResponse: 'Improved complex prompt',
       });
 
@@ -242,7 +231,6 @@ describe('Improver', () => {
       const result = await improvePrompt({
         config: mockConfig,
         originalPrompt: 'fix the bug',
-        sessionId: 'session-123',
         context: {
           git: 'Branch: feature/auth',
         },
@@ -257,7 +245,6 @@ describe('Improver', () => {
       const result = await improvePrompt({
         config: mockConfig,
         originalPrompt: 'help',
-        sessionId: 'session-123',
         context: {
           git: 'Branch info',
           lsp: 'Error info',
@@ -391,7 +378,6 @@ LSP errors: Type mismatch in auth handler
       const result = await improvePrompt({
         config: mockConfig,
         originalPrompt: 'fix the bug',
-        sessionId: 'session-123',
         _mockClaudeResponse: '<task>Fix the authentication bug</task>',
       });
 
@@ -404,7 +390,6 @@ LSP errors: Type mismatch in auth handler
       const result = await improvePrompt({
         config: mockConfig,
         originalPrompt: 'help',
-        sessionId: 'session-123',
         _mockClaudeResponse: `<task>Help debug the issue</task>
 <context>Branch: main, Errors: type mismatches</context>
 <constraints>Preserve user intent</constraints>
@@ -422,7 +407,6 @@ This is expanded with lots of detail and context information.`,
       const result = await improvePrompt({
         config: mockConfig,
         originalPrompt: 'test',
-        sessionId: 'session-123',
         _mockClaudeResponse: '<task>Test with structure</task>',
       });
 
@@ -438,7 +422,6 @@ This is expanded with lots of detail and context information.`,
       const result = await improvePrompt({
         config: mockConfig,
         originalPrompt: 'fix the bug',
-        sessionId: 'session-123',
         _mockClaudeResponse: null, // Simulates timeout/failure
       });
 
@@ -476,7 +459,6 @@ This is expanded with lots of detail and context information.`,
     it('should strip a wrapping markdown code fence from the improved prompt', async () => {
       const result = await improvePrompt({
         originalPrompt: 'fix the bug',
-        sessionId: 'session-123',
         config: mockConfig,
         _mockClaudeResponse: '```xml\n<task>Fix the bug</task>\n```',
       });
@@ -487,7 +469,6 @@ This is expanded with lots of detail and context information.`,
     it('should leave unfenced output untouched', async () => {
       const result = await improvePrompt({
         originalPrompt: 'fix the bug',
-        sessionId: 'session-123',
         config: mockConfig,
         _mockClaudeResponse: '<task>Fix the bug</task>',
       });
@@ -498,7 +479,6 @@ This is expanded with lots of detail and context information.`,
     it('should strip fences with uppercase language tags and trailing whitespace', async () => {
       const result = await improvePrompt({
         originalPrompt: 'fix the bug',
-        sessionId: 'session-123',
         config: mockConfig,
         _mockClaudeResponse: '```XML\r\n<task>Fix the bug</task>\r\n```\n',
       });
@@ -510,7 +490,6 @@ This is expanded with lots of detail and context information.`,
       const body = '<task>Explain this snippet</task>\n<context>```js\nfoo()\n```</context>';
       const result = await improvePrompt({
         originalPrompt: 'explain snippet',
-        sessionId: 'session-123',
         config: mockConfig,
         _mockClaudeResponse: body,
       });
@@ -634,7 +613,6 @@ This is expanded with lots of detail and context information.`,
       const result = await improvePrompt({
         config: mockConfig,
         originalPrompt: 'fix the login bug',
-        sessionId: 'session-123',
         _mockClaudeResponse: 'Improved prompt',
       });
 
@@ -687,7 +665,6 @@ This is expanded with lots of detail and context information.`,
       const result = await improvePrompt({
         config: { ...mockConfig, exemplars: { fix: 'Config exemplar.' } },
         originalPrompt: 'fix the login bug',
-        sessionId: 'session-123',
         _mockClaudeResponse: 'Improved prompt',
       });
 

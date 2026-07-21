@@ -151,6 +151,53 @@ export function parseGitLog(output: string): GitCommit[] {
 }
 
 /**
+ * Extracts the file path from a porcelain status line body (after the XY code)
+ * Handles renamed files (R  old -> new) by taking the new path
+ */
+function parseStatusPath(pathPart: string): string {
+  const path = pathPart.trim(); // Trim leading spaces after the XY code
+
+  // Handle renamed files (R  old -> new)
+  if (path.includes(' -> ')) {
+    const parts = path.split(' -> ');
+    const newPath = parts[1];
+    const oldPath = parts[0];
+    return newPath ?? oldPath ?? path;
+  }
+
+  return path;
+}
+
+/**
+ * Maps a porcelain XY status code to a ChangedFile status
+ * Checks both index and worktree status
+ */
+function parseStatusCode(statusCode: string): ChangedFile['status'] {
+  if (statusCode === '??') {
+    return 'untracked';
+  }
+
+  const indexStatus = statusCode[0];
+  const worktreeStatus = statusCode[1];
+
+  const statusMap: ReadonlyArray<[string, ChangedFile['status']]> = [
+    ['R', 'renamed'],
+    ['C', 'copied'],
+    ['A', 'added'],
+    ['D', 'deleted'],
+    ['M', 'modified'],
+  ];
+
+  for (const [code, status] of statusMap) {
+    if (indexStatus === code || worktreeStatus === code) {
+      return status;
+    }
+  }
+
+  return 'modified'; // Default fallback
+}
+
+/**
  * Parses git status output into changed files
  */
 export function parseGitStatus(output: string): ChangedFile[] {
@@ -167,37 +214,8 @@ export function parseGitStatus(output: string): ChangedFile[] {
     // Git status --porcelain format: XY PATH or XY PATH -> NEWPATH
     // XY is 2 chars, followed by space(s), then path
     const statusCode = line.slice(0, 2);
-    let path = line.slice(2).trim(); // Start at position 2, trim leading spaces
-
-    // Handle renamed files (R  old -> new)
-    if (path.includes(' -> ')) {
-      const parts = path.split(' -> ');
-      const newPath = parts[1];
-      const oldPath = parts[0];
-      path = newPath ?? oldPath ?? path;
-    }
-
-    let status: ChangedFile['status'];
-
-    // Check both index and worktree status
-    const indexStatus = statusCode[0];
-    const worktreeStatus = statusCode[1];
-
-    if (statusCode === '??') {
-      status = 'untracked';
-    } else if (indexStatus === 'R' || worktreeStatus === 'R') {
-      status = 'renamed';
-    } else if (indexStatus === 'C' || worktreeStatus === 'C') {
-      status = 'copied';
-    } else if (indexStatus === 'A' || worktreeStatus === 'A') {
-      status = 'added';
-    } else if (indexStatus === 'D' || worktreeStatus === 'D') {
-      status = 'deleted';
-    } else if (indexStatus === 'M' || worktreeStatus === 'M') {
-      status = 'modified';
-    } else {
-      status = 'modified'; // Default fallback
-    }
+    const path = parseStatusPath(line.slice(2));
+    const status = parseStatusCode(statusCode);
 
     files.push({ path, status });
   }
@@ -233,9 +251,12 @@ export function parseBranchName(output: string): string {
 }
 
 /**
- * Gathers git context from the repository
+ * Runs the pre-gathering skip checks (disabled, not a repo, mock timeout)
+ * @returns a skip result if gathering should not proceed, undefined otherwise
  */
-export async function gatherGitContext(options: GitContextOptions): Promise<GitContextResult> {
+async function checkGatherPreconditions(
+  options: GitContextOptions
+): Promise<GitContextResult | undefined> {
   const { enabled = true } = options;
 
   // Check if disabled
@@ -269,6 +290,45 @@ export async function gatherGitContext(options: GitContextOptions): Promise<GitC
     }
   }
 
+  return undefined;
+}
+
+/**
+ * Assembles a GitContext from the raw command results
+ * (accounting for optional commands)
+ */
+function buildContextFromResults(
+  results: Array<{ success: boolean; output?: string; error?: string }>,
+  includeCommits: boolean,
+  includeDiff: boolean
+): GitContext {
+  const branchResult = results[0];
+  const statusResult = results[1];
+  const logResult = includeCommits ? results[2] : undefined;
+  const diffResult = includeDiff ? results[includeCommits ? 3 : 2] : undefined;
+
+  const branch = branchResult?.success ? branchResult.output || '' : '';
+  const changedFiles = statusResult?.success ? parseGitStatus(statusResult.output || '') : [];
+  const recentCommits = logResult?.success ? parseGitLog(logResult.output || '') : [];
+  const diffStats = diffResult?.success ? diffResult.output || '' : '';
+
+  return {
+    branch,
+    recentCommits,
+    changedFiles,
+    diffStats,
+  };
+}
+
+/**
+ * Gathers git context from the repository
+ */
+export async function gatherGitContext(options: GitContextOptions): Promise<GitContextResult> {
+  const skipResult = await checkGatherPreconditions(options);
+  if (skipResult) {
+    return skipResult;
+  }
+
   // Gather git information - only fetch what's needed
   const { includeCommits = false, includeDiff = false } = options;
 
@@ -287,24 +347,7 @@ export async function gatherGitContext(options: GitContextOptions): Promise<GitC
   }
 
   const results = await Promise.all(commands);
-
-  // Parse results (accounting for optional commands)
-  const branchResult = results[0];
-  const statusResult = results[1];
-  const logResult = includeCommits ? results[2] : undefined;
-  const diffResult = includeDiff ? results[includeCommits ? 3 : 2] : undefined;
-
-  const branch = branchResult?.success ? branchResult.output || '' : '';
-  const changedFiles = statusResult?.success ? parseGitStatus(statusResult.output || '') : [];
-  const recentCommits = logResult?.success ? parseGitLog(logResult.output || '') : [];
-  const diffStats = diffResult?.success ? diffResult.output || '' : '';
-
-  const context: GitContext = {
-    branch,
-    recentCommits,
-    changedFiles,
-    diffStats,
-  };
+  const context = buildContextFromResults(results, includeCommits, includeDiff);
 
   return {
     success: true,

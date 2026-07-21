@@ -2,9 +2,9 @@
  * T210-T213: Plugin Manifest Tests
  * Validates plugin.json structure and content
  */
-import { describe, it, expect, beforeAll } from 'bun:test';
-import { readFileSync, existsSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { beforeAll, describe, expect, it } from 'bun:test';
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 
 // Get the project root (parent of hooks directory)
 const projectRoot = dirname(dirname(__dirname));
@@ -41,7 +41,9 @@ describe('T210-T213: Plugin Manifest', () => {
     });
 
     it('T211.2: should have author object with url', () => {
-      expect((pluginJson.author as Record<string, unknown>).url).toBe('https://github.com/GaZmagik');
+      expect((pluginJson.author as Record<string, unknown>).url).toBe(
+        'https://github.com/GaZmagik'
+      );
     });
   });
 

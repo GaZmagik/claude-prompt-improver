@@ -18,8 +18,8 @@ import {
   loadConfig,
   loadConfigFromStandardPaths,
   parseExemplarsFromBody,
-  resolveProjectBaseDir,
   parseYamlFrontmatter,
+  resolveProjectBaseDir,
   validateConfig,
 } from './config-loader.ts';
 import type { Configuration } from './types.ts';
@@ -897,7 +897,10 @@ enabled: true
   describe('global config fallback', () => {
     it('loadConfigFromStandardPaths reads ~/.claude when no project config exists', async () => {
       const home = join(tmpdir(), `pi-home-${Date.now()}-${Math.random().toString(36).slice(2)}`);
-      const project = join(tmpdir(), `pi-proj-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      const project = join(
+        tmpdir(),
+        `pi-proj-${Date.now()}-${Math.random().toString(36).slice(2)}`
+      );
       mkdirSync(join(home, '.claude'), { recursive: true });
       mkdirSync(project, { recursive: true });
       writeFileSync(
@@ -915,7 +918,10 @@ enabled: true
 
     it('project config takes precedence over the global config', async () => {
       const home = join(tmpdir(), `pi-home2-${Date.now()}-${Math.random().toString(36).slice(2)}`);
-      const project = join(tmpdir(), `pi-proj2-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      const project = join(
+        tmpdir(),
+        `pi-proj2-${Date.now()}-${Math.random().toString(36).slice(2)}`
+      );
       mkdirSync(join(home, '.claude'), { recursive: true });
       mkdirSync(join(project, '.claude'), { recursive: true });
       writeFileSync(
@@ -937,7 +943,10 @@ enabled: true
 
     it('ensureConfigSetup reports local_exists when only the global config is present', async () => {
       const home = join(tmpdir(), `pi-home3-${Date.now()}-${Math.random().toString(36).slice(2)}`);
-      const project = join(tmpdir(), `pi-proj3-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      const project = join(
+        tmpdir(),
+        `pi-proj3-${Date.now()}-${Math.random().toString(36).slice(2)}`
+      );
       mkdirSync(join(home, '.claude'), { recursive: true });
       mkdirSync(project, { recursive: true });
       writeFileSync(join(home, '.claude', 'prompt-improver.local.md'), '---\nenabled: true\n---\n');
@@ -955,7 +964,7 @@ enabled: true
     const original = process.env.CLAUDE_PROJECT_DIR;
     afterEach(() => {
       if (original === undefined) {
-        delete process.env.CLAUDE_PROJECT_DIR;
+        process.env.CLAUDE_PROJECT_DIR = undefined;
       } else {
         process.env.CLAUDE_PROJECT_DIR = original;
       }
@@ -972,7 +981,7 @@ enabled: true
     });
 
     it('falls back to "." when nothing is available', () => {
-      delete process.env.CLAUDE_PROJECT_DIR;
+      process.env.CLAUDE_PROJECT_DIR = undefined;
       expect(resolveProjectBaseDir()).toBe('.');
     });
 

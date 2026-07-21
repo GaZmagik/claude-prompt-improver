@@ -444,11 +444,11 @@ describe('LSP Diagnostics Integration', () => {
       const result = parseTscOutput(output);
 
       expect(result).toHaveLength(1);
-      expect(result[0]!.filePath).toBe('src/index.ts');
-      expect(result[0]!.line).toBe(10);
-      expect(result[0]!.column).toBe(5);
-      expect(result[0]!.severity).toBe('error');
-      expect(result[0]!.message).toBe("Type 'string' is not assignable to type 'number'.");
+      expect(result[0]?.filePath).toBe('src/index.ts');
+      expect(result[0]?.line).toBe(10);
+      expect(result[0]?.column).toBe(5);
+      expect(result[0]?.severity).toBe('error');
+      expect(result[0]?.message).toBe("Type 'string' is not assignable to type 'number'.");
     });
 
     it('should parse warnings', () => {
@@ -456,23 +456,23 @@ describe('LSP Diagnostics Integration', () => {
       const result = parseTscOutput(output);
 
       expect(result).toHaveLength(1);
-      expect(result[0]!.severity).toBe('warning');
+      expect(result[0]?.severity).toBe('warning');
     });
 
     it('should handle paths with spaces', () => {
-      const output = `src/my file.ts(5,3): error TS1234: Some error`;
+      const output = 'src/my file.ts(5,3): error TS1234: Some error';
       const result = parseTscOutput(output);
 
       expect(result).toHaveLength(1);
-      expect(result[0]!.filePath).toBe('src/my file.ts');
+      expect(result[0]?.filePath).toBe('src/my file.ts');
     });
 
     it('should handle paths with parentheses in directory names', () => {
-      const output = `src/(components)/Button.ts(15,10): error TS2345: Argument error`;
+      const output = 'src/(components)/Button.ts(15,10): error TS2345: Argument error';
       const result = parseTscOutput(output);
 
       expect(result).toHaveLength(1);
-      expect(result[0]!.filePath).toBe('src/(components)/Button.ts');
+      expect(result[0]?.filePath).toBe('src/(components)/Button.ts');
     });
 
     it('should handle multiple diagnostics', () => {
@@ -503,7 +503,7 @@ Compilation finished.`;
       const result = parseTscOutput(output);
 
       expect(result).toHaveLength(1);
-      expect(result[0]!.message).toBe("Type: 'A' is not: assignable to: 'B'.");
+      expect(result[0]?.message).toBe("Type: 'A' is not: assignable to: 'B'.");
     });
   });
 });

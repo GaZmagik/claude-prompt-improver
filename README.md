@@ -13,7 +13,7 @@ A Claude Code plugin that automatically enhances and improves your prompts befor
   - LSP diagnostics (errors and warnings)
   - Specification awareness (.specify/ directory)
   - Memory plugin integration
-- **Bypass Mechanisms**: Skips processing for short prompts, #skip tagged prompts, low context, or forked sessions
+- **Bypass Mechanisms**: Skips processing for short prompts, #skip tagged prompts, low context, or the plugin's own improvement prompts (recursion prevention)
 - **Prose-First Structuring**: Rewrites complex prompts as natural prose (goal, scope, numbered questions, explicit deliverable); XML tags are kept only if the original prompt used them
 - **Genre-Conditional Templates**: A keyword classifier (no extra API call) types each prompt as fix / investigate / research / build / general, and the improver receives only the core guidelines plus that genre's block and worked example
 - **Personal Exemplar Library**: Add `## Exemplar: <genre>` sections to your local config and the improver teaches itself your house style instead of the built-in examples
@@ -75,6 +75,8 @@ enabled: true
 shortPromptThreshold: 10
 compactionThreshold: 5
 improverModel: haiku  # Model for all improvements: haiku, sonnet, or opus
+forceImprove: false  # Bypass all heuristic checks (for testing)
+defaultImprove: false  # When false, improvement requires the #improve tag
 # contextWindowTokens: 1000000  # Set on a 1M session; or export CLAUDE_CODE_MAX_CONTEXT_TOKENS. Default 200K
 
 integrations:
@@ -93,6 +95,7 @@ logging:
   maxLogSizeMB: 10
   maxLogAgeDays: 7
   displayImprovedPrompt: true
+  logLevel: INFO  # ERROR, INFO, or DEBUG
 ---
 
 # Your documentation here...
@@ -203,7 +206,7 @@ Check if any bypass condition is triggered:
 - Prompt has fewer than 10 tokens (whitespace-split)
 - Prompt contains `#skip`
 - Context availability is below 5%
-- Running in a forked session
+- Prompt is the plugin's own improvement template (recursion prevention; a `permission_mode` of `fork` is also treated defensively as a forked session)
 
 ### Timeout Values
 
@@ -244,8 +247,8 @@ bun test
 ### Test Coverage
 
 The plugin has comprehensive test coverage:
-- 619+ tests across 27+ files
-- 1191+ expect() assertions
+- 900+ tests across 38+ spec files
+- 1800+ expect() assertions
 - TDD methodology throughout
 - Unit tests for all components
 - Integration tests for context building

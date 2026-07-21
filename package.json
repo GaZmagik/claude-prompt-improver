@@ -1,8 +1,21 @@
 {
   "name": "claude-prompt-improver",
-  "version": "1.10.1",
+  "version": "1.10.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GaZmagik/claude-prompt-improver"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "@types/bun": "^1.1.0",
+    "typescript": "^5.7.0"
+  },
   "description": "Claude Code plugin that automatically improves prompts based on classification and context",
-  "type": "module",
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "keywords": ["claude", "claude-code", "plugin", "prompt-engineering", "prompt-improvement"],
+  "license": "MIT",
   "scripts": {
     "test": "bun test",
     "test:watch": "bun test --watch",
@@ -11,27 +24,5 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write ."
   },
-  "devDependencies": {
-    "@biomejs/biome": "^1.9.0",
-    "@types/bun": "^1.1.0",
-    "typescript": "^5.7.0"
-  },
-  "engines": {
-    "bun": ">=1.0.0"
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/GaZmagik/claude-prompt-improver"
-  },
-  "keywords": [
-    "claude",
-    "claude-code",
-    "plugin",
-    "prompt-engineering",
-    "prompt-improvement"
-  ],
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.74.0"
-  }
+  "type": "module"
 }

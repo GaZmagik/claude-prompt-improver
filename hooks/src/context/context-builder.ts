@@ -1,4 +1,10 @@
 import {
+  type DynamicContext,
+  type DynamicDiscoveryOptions,
+  formatDynamicContext,
+  gatherDynamicContext,
+} from '../integrations/dynamic-discovery.ts';
+import {
   type GitContext,
   type GitContextOptions,
   formatGitContext,
@@ -16,6 +22,18 @@ import {
   formatMemoryContext,
   gatherMemoryContext,
 } from '../integrations/memory-plugin.ts';
+import { scanEnhancePlugins, scanMcpServers } from '../integrations/plugin-scanner.ts';
+import {
+  type ProjectShapeContext,
+  type ProjectShapeOptions,
+  formatProjectShape,
+  gatherProjectShape,
+} from '../integrations/project-shape.ts';
+import {
+  type ResourceContext,
+  formatResourcesXml,
+  gatherResourceContext,
+} from '../integrations/resource-formatter.ts';
 import {
   type SessionContext,
   type SessionContextOptions,
@@ -28,27 +46,6 @@ import {
   formatSpecContext,
   gatherSpecContext,
 } from '../integrations/spec-awareness.ts';
-import {
-  type DynamicDiscoveryOptions,
-  type DynamicContext,
-  formatDynamicContext,
-  gatherDynamicContext,
-} from '../integrations/dynamic-discovery.ts';
-import {
-  type ResourceContext,
-  formatResourcesXml,
-  gatherResourceContext,
-} from '../integrations/resource-formatter.ts';
-import {
-  scanEnhancePlugins,
-  scanMcpServers,
-} from '../integrations/plugin-scanner.ts';
-import {
-  type ProjectShapeContext,
-  type ProjectShapeOptions,
-  formatProjectShape,
-  gatherProjectShape,
-} from '../integrations/project-shape.ts';
 import {
   type AgentDefinition,
   type SuggestedAgent,
@@ -283,6 +280,13 @@ function gatherSyncContext(
 }
 
 /**
+ * Type guard: options are provided and not explicitly disabled
+ */
+function isEnabled<T extends { readonly enabled?: boolean }>(options: T | undefined): options is T {
+  return options !== undefined && options.enabled !== false;
+}
+
+/**
  * Builds array of async tasks for parallel context gathering
  */
 function buildAsyncTasks(
@@ -309,7 +313,7 @@ function buildAsyncTasks(
 ): Promise<void>[] {
   const tasks: Promise<void>[] = [];
 
-  if (gitOptions && gitOptions.enabled !== false) {
+  if (isEnabled(gitOptions)) {
     tasks.push(
       createAsyncTask(
         () => gatherGitContext(gitOptions),
@@ -321,7 +325,7 @@ function buildAsyncTasks(
     );
   }
 
-  if (lspOptions && lspOptions.enabled !== false) {
+  if (isEnabled(lspOptions)) {
     tasks.push(
       createAsyncTask(
         () => gatherLspDiagnostics({ ...lspOptions, prompt }),
@@ -333,7 +337,7 @@ function buildAsyncTasks(
     );
   }
 
-  if (specOptions && specOptions.enabled !== false) {
+  if (isEnabled(specOptions)) {
     tasks.push(
       createAsyncTask(
         () => gatherSpecContext(specOptions),
@@ -345,7 +349,7 @@ function buildAsyncTasks(
     );
   }
 
-  if (memoryOptions && memoryOptions.enabled !== false) {
+  if (isEnabled(memoryOptions)) {
     tasks.push(
       createAsyncTask(
         () => gatherMemoryContext({ ...memoryOptions, prompt }),
@@ -357,7 +361,7 @@ function buildAsyncTasks(
     );
   }
 
-  if (sessionOptions && sessionOptions.enabled !== false) {
+  if (isEnabled(sessionOptions)) {
     tasks.push(
       createAsyncTask(
         () => gatherSessionContext({ ...sessionOptions, prompt }),
@@ -369,7 +373,7 @@ function buildAsyncTasks(
     );
   }
 
-  if (dynamicDiscoveryOptions && dynamicDiscoveryOptions.enabled !== false) {
+  if (isEnabled(dynamicDiscoveryOptions)) {
     tasks.push(
       createAsyncTask(
         () => gatherDynamicContext({ ...dynamicDiscoveryOptions, prompt }),
@@ -381,15 +385,12 @@ function buildAsyncTasks(
     );
   }
 
-  if (pluginResourcesOptions && pluginResourcesOptions.enabled !== false) {
+  if (isEnabled(pluginResourcesOptions)) {
     tasks.push(
       createAsyncTask(
         async () => {
           const cwd = pluginResourcesOptions.cwd || process.cwd();
-          const [plugins, mcpServers] = await Promise.all([
-            scanEnhancePlugins(),
-            scanMcpServers(),
-          ]);
+          const [plugins, mcpServers] = await Promise.all([scanEnhancePlugins(), scanMcpServers()]);
           const context = gatherResourceContext(
             cwd,
             plugins.map((p) => ({ name: p.name, version: p.version, description: p.description })),
@@ -409,7 +410,7 @@ function buildAsyncTasks(
     );
   }
 
-  if (projectShapeOptions && projectShapeOptions.enabled !== false) {
+  if (isEnabled(projectShapeOptions)) {
     tasks.push(
       createAsyncTask(
         () => gatherProjectShape(projectShapeOptions),
@@ -451,7 +452,12 @@ export function formatContextForInjection(context: BuiltContext): FormattedConte
     'pluginResources',
     formatResourcesXml
   );
-  const projectShape = formatField(context.projectShape, sources, 'projectShape', formatProjectShape);
+  const projectShape = formatField(
+    context.projectShape,
+    sources,
+    'projectShape',
+    formatProjectShape
+  );
 
   // Build result with conditional property inclusion (exactOptionalPropertyTypes)
   return {

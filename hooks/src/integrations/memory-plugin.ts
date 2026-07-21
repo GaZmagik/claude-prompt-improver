@@ -196,7 +196,6 @@ function scoreMemories(
   });
 }
 
-
 /**
  * Gathers memory context from the memory plugin
  */

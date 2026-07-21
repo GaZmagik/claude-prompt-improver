@@ -206,7 +206,7 @@ describe('XML Builder', () => {
       ];
 
       for (let i = 0; i < indices.length - 1; i++) {
-        expect(indices[i]).toBeLessThan(indices[i + 1]!);
+        expect(indices[i]).toBeLessThan(indices[i + 1] ?? -1);
       }
     });
   });

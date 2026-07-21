@@ -2,22 +2,25 @@
  * Resource Formatter Tests
  * Tests for language detection, speckit status, and XML formatting
  */
-import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
-import { mkdirSync, writeFileSync, rmSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
-  detectLanguage,
-  checkSpeckitStatus,
-  formatResourcesXml,
   type ResourceContext,
+  checkSpeckitStatus,
+  detectLanguage,
+  formatResourcesXml,
 } from './resource-formatter.ts';
 
 describe('resource-formatter', () => {
   let testDir: string;
 
   beforeEach(() => {
-    testDir = join(tmpdir(), `resource-formatter-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    testDir = join(
+      tmpdir(),
+      `resource-formatter-test-${Date.now()}-${Math.random().toString(36).slice(2)}`
+    );
     mkdirSync(testDir, { recursive: true });
   });
 

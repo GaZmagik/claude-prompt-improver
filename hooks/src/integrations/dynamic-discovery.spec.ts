@@ -4,21 +4,21 @@
  */
 import { describe, expect, it } from 'bun:test';
 import {
-  parseResourceMetadata,
+  type DiscoveredItem,
+  type DynamicContext,
+  type DynamicDiscoveryOptions,
+  MAX_SUGGESTIONS,
   discoverAgents,
-  matchAgentsToPrompt,
   formatAgentSuggestions,
-  formatSkillSuggestions,
   formatCommandSuggestions,
-  formatOutputStyleSuggestions,
-  gatherDynamicContext,
   formatDynamicContext,
+  formatOutputStyleSuggestions,
+  formatSkillSuggestions,
+  gatherDynamicContext,
   isDeliberationContext,
   isMemoryThinkPrompt,
-  type DiscoveredItem,
-  type DynamicDiscoveryOptions,
-  type DynamicContext,
-  MAX_SUGGESTIONS,
+  matchAgentsToPrompt,
+  parseResourceMetadata,
 } from './dynamic-discovery.ts';
 
 describe('parseResourceMetadata', () => {
@@ -79,7 +79,7 @@ description: Use for async/await patterns, performance optimisation, and API des
     });
 
     it('should fall back to filename when frontmatter missing', () => {
-      const content = `# Just markdown content without frontmatter`;
+      const content = '# Just markdown content without frontmatter';
       const result = parseResourceMetadata(
         content,
         '/path/to/security-expert.md',
@@ -198,8 +198,8 @@ description: Local version
     // Should only have one "expert" (local wins)
     const experts = result.filter((a) => a.name === 'expert');
     expect(experts.length).toBe(1);
-    expect(experts[0]!.description).toBe('Local version');
-    expect(experts[0]!.source).toBe('local');
+    expect(experts[0]?.description).toBe('Local version');
+    expect(experts[0]?.source).toBe('local');
   });
 
   it('should deduplicate by normalised name (case-insensitive)', async () => {
@@ -226,7 +226,7 @@ description: Local TS
 
     // Should dedupe (local wins)
     expect(result.length).toBe(1);
-    expect(result[0]!.source).toBe('local');
+    expect(result[0]?.source).toBe('local');
   });
 
   it('should handle missing global directory gracefully', async () => {
@@ -245,7 +245,7 @@ description: Only local
     const result = await discoverAgents({ _mockFileSystem: mockFs });
 
     expect(result.length).toBe(1);
-    expect(result[0]!.name).toBe('local-agent');
+    expect(result[0]?.name).toBe('local-agent');
   });
 
   it('should handle missing local directory gracefully', async () => {
@@ -264,7 +264,7 @@ description: Only global
     const result = await discoverAgents({ _mockFileSystem: mockFs });
 
     expect(result.length).toBe(1);
-    expect(result[0]!.name).toBe('global-agent');
+    expect(result[0]?.name).toBe('global-agent');
   });
 });
 
@@ -301,7 +301,7 @@ describe('matchAgentsToPrompt', () => {
     const result = matchAgentsToPrompt(testAgents, prompt);
 
     expect(result.length).toBeGreaterThan(0);
-    expect(result[0]!.item.name).toBe('typescript-expert');
+    expect(result[0]?.item.name).toBe('typescript-expert');
   });
 
   it('should return sorted by score (highest relevance first)', () => {
@@ -309,8 +309,8 @@ describe('matchAgentsToPrompt', () => {
     const result = matchAgentsToPrompt(testAgents, prompt);
 
     // rust-expert matches 'rust' and 'async', should be first
-    expect(result[0]!.item.name).toBe('rust-expert');
-    expect(result[0]!.score).toBeGreaterThanOrEqual(2);
+    expect(result[0]?.item.name).toBe('rust-expert');
+    expect(result[0]?.score).toBeGreaterThanOrEqual(2);
   });
 
   it('should limit to top 5 matches (MAX_SUGGESTIONS=5)', () => {
@@ -365,7 +365,14 @@ describe('formatAgentSuggestions', () => {
 
 describe('formatSkillSuggestions', () => {
   const testSkills: DiscoveredItem[] = [
-    { name: 'commit', description: 'Commit changes', keywords: ['git'], filePath: '/path', resourceType: 'skill', source: 'local' },
+    {
+      name: 'commit',
+      description: 'Commit changes',
+      keywords: ['git'],
+      filePath: '/path',
+      resourceType: 'skill',
+      source: 'local',
+    },
   ];
 
   it('should format skills with slash prefix', () => {
@@ -385,7 +392,14 @@ describe('formatSkillSuggestions', () => {
 
 describe('formatCommandSuggestions', () => {
   const testCommands: DiscoveredItem[] = [
-    { name: 'test', description: 'Run tests', keywords: ['test'], filePath: '/path', resourceType: 'command', source: 'global' },
+    {
+      name: 'test',
+      description: 'Run tests',
+      keywords: ['test'],
+      filePath: '/path',
+      resourceType: 'command',
+      source: 'global',
+    },
   ];
 
   it('should format commands with slash prefix', () => {
@@ -405,7 +419,14 @@ describe('formatCommandSuggestions', () => {
 
 describe('formatOutputStyleSuggestions', () => {
   const testStyles: DiscoveredItem[] = [
-    { name: 'concise', description: 'Brief responses', keywords: ['short'], filePath: '/path', resourceType: 'outputStyle', source: 'local' },
+    {
+      name: 'concise',
+      description: 'Brief responses',
+      keywords: ['short'],
+      filePath: '/path',
+      resourceType: 'outputStyle',
+      source: 'local',
+    },
   ];
 
   it('should format output styles without slash', () => {
@@ -583,7 +604,7 @@ description: Local deploy
     const result = await discoverCommands({ _mockFileSystem: mockFs });
 
     expect(result.length).toBe(1);
-    expect(result[0]!.description).toBe('Local deploy');
+    expect(result[0]?.description).toBe('Local deploy');
   });
 });
 
@@ -604,8 +625,8 @@ description: Dry humor and sarcasm
     const result = await discoverOutputStyles({ _mockFileSystem: mockFs });
 
     expect(result.length).toBe(1);
-    expect(result[0]!.name).toBe('Sardonic');
-    expect(result[0]!.description).toBe('Dry humor and sarcasm');
+    expect(result[0]?.name).toBe('Sardonic');
+    expect(result[0]?.description).toBe('Dry humor and sarcasm');
   });
 });
 
@@ -643,9 +664,9 @@ description: Professional tone
     });
 
     expect(result.success).toBe(true);
-    expect(result.context!.totalAgents).toBeGreaterThanOrEqual(1);
-    expect(result.context!.totalCommands).toBeGreaterThanOrEqual(1);
-    expect(result.context!.totalOutputStyles).toBeGreaterThanOrEqual(1);
+    expect(result.context?.totalAgents).toBeGreaterThanOrEqual(1);
+    expect(result.context?.totalCommands).toBeGreaterThanOrEqual(1);
+    expect(result.context?.totalOutputStyles).toBeGreaterThanOrEqual(1);
   });
 });
 
@@ -704,7 +725,7 @@ description: A skill without explicit name
     const result = await discoverSkills({ _mockFileSystem: mockFs });
 
     expect(result.length).toBe(1);
-    expect(result[0]!.name).toBe('my-skill');
+    expect(result[0]?.name).toBe('my-skill');
   });
 
   it('should skip directories without SKILL.md', async () => {
@@ -734,7 +755,7 @@ description: Has SKILL.md
     const result = await discoverSkills({ _mockFileSystem: mockFs });
 
     expect(result.length).toBe(1);
-    expect(result[0]!.name).toBe('valid-skill');
+    expect(result[0]?.name).toBe('valid-skill');
   });
 
   it('should give local skills precedence over global', async () => {
@@ -769,8 +790,8 @@ description: Local version
     const result = await discoverSkills({ _mockFileSystem: mockFs });
 
     expect(result.length).toBe(1);
-    expect(result[0]!.description).toBe('Local version');
-    expect(result[0]!.source).toBe('local');
+    expect(result[0]?.description).toBe('Local version');
+    expect(result[0]?.source).toBe('local');
   });
 
   it('should set resourceType to skill', async () => {
@@ -792,7 +813,7 @@ description: Test
 
     const result = await discoverSkills({ _mockFileSystem: mockFs });
 
-    expect(result[0]!.resourceType).toBe('skill');
+    expect(result[0]?.resourceType).toBe('skill');
   });
 
   it('should skip .disabled directories', async () => {
@@ -826,7 +847,7 @@ description: Disabled skill
     const result = await discoverSkills({ _mockFileSystem: mockFs });
 
     expect(result.length).toBe(1);
-    expect(result[0]!.name).toBe('active-skill');
+    expect(result[0]?.name).toBe('active-skill');
   });
 });
 
@@ -886,7 +907,7 @@ description: API design specialist
     });
 
     expect(result.success).toBe(true);
-    expect(result.context!.isMemoryThinkContext).toBe(true);
+    expect(result.context?.isMemoryThinkContext).toBe(true);
   });
 
   it('should set isMemoryThinkContext=false for regular prompts', async () => {
@@ -896,7 +917,7 @@ description: API design specialist
     });
 
     expect(result.success).toBe(true);
-    expect(result.context!.isMemoryThinkContext).toBe(false);
+    expect(result.context?.isMemoryThinkContext).toBe(false);
   });
 });
 

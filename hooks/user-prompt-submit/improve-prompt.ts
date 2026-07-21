@@ -1,3 +1,17 @@
+import type { AgentDefinition } from '../src/context/agent-suggester.ts';
+import {
+  type ContextBuilderInput,
+  type FormattedContext,
+  buildContext,
+  formatContextForInjection,
+} from '../src/context/context-builder.ts';
+import type { SkillRule } from '../src/context/skill-matcher.ts';
+import { type BypassCheckInput, detectBypass } from '../src/core/bypass-detector.ts';
+import {
+  ensureConfigSetup,
+  loadConfigFromStandardPaths,
+  resolveProjectBaseDir,
+} from '../src/core/config-loader.ts';
 /**
  * UserPromptSubmit hook entry point for Claude Prompt Improver Plugin
  * Handles stdin parsing, orchestration, and stdout output
@@ -12,17 +26,15 @@ import type {
   IntegrationToggles,
   VisibilityInfo,
 } from '../src/core/types.ts';
-import { detectBypass, type BypassCheckInput } from '../src/core/bypass-detector.ts';
-import { improvePrompt, type ImprovementContext } from '../src/services/improver.ts';
-import { buildContext, formatContextForInjection, type ContextBuilderInput, type FormattedContext } from '../src/context/context-builder.ts';
-import type { SkillRule } from '../src/context/skill-matcher.ts';
-import type { AgentDefinition } from '../src/context/agent-suggester.ts';
-import { ensureConfigSetup, loadConfigFromStandardPaths, resolveProjectBaseDir } from '../src/core/config-loader.ts';
-import { formatSystemMessage } from '../src/utils/message-formatter.ts';
-import { countTokens } from '../src/utils/token-counter.ts';
+import {
+  calculateContextFromTranscript,
+  resolveContextWindow,
+} from '../src/integrations/compaction-detector.ts';
+import { type ImprovementContext, improvePrompt } from '../src/services/improver.ts';
 import { createLogEntry, writeLogEntry } from '../src/utils/logger.ts';
 import { generateLogFilePath } from '../src/utils/logger.ts';
-import { calculateContextFromTranscript, resolveContextWindow } from '../src/integrations/compaction-detector.ts';
+import { formatSystemMessage } from '../src/utils/message-formatter.ts';
+import { countTokens } from '../src/utils/token-counter.ts';
 
 /**
  * Result of parsing hook input
@@ -163,9 +175,10 @@ export function createHookOutput(options: HookOutputOptions): HookOutput {
     tokensAfter: options.tokensAfter,
     latencyMs: options.latencyMs,
     ...(options.summary !== undefined && { summary: options.summary }),
-    ...(options.displayImprovedPrompt && options.improvedPrompt !== undefined && {
-      improvedPrompt: options.improvedPrompt
-    }),
+    ...(options.displayImprovedPrompt &&
+      options.improvedPrompt !== undefined && {
+        improvedPrompt: options.improvedPrompt,
+      }),
   };
 
   return {
@@ -232,30 +245,27 @@ export type ProcessPromptResult =
  * Builds bypass check input from process options
  */
 function buildBypassCheckInput(options: ProcessPromptOptions): BypassCheckInput {
-  const { prompt, sessionId, permissionMode, pluginDisabled, forceImprove, defaultImprove, shortPromptThreshold, contextUsage } = options;
+  const {
+    prompt,
+    sessionId,
+    permissionMode,
+    pluginDisabled,
+    forceImprove,
+    defaultImprove,
+    shortPromptThreshold,
+    contextUsage,
+  } = options;
 
-  const bypassInput: BypassCheckInput = { prompt, sessionId };
-
-  if (permissionMode !== undefined) {
-    (bypassInput as { permissionMode?: string }).permissionMode = permissionMode;
-  }
-  if (pluginDisabled !== undefined) {
-    (bypassInput as { pluginDisabled?: boolean }).pluginDisabled = pluginDisabled;
-  }
-  if (forceImprove !== undefined) {
-    (bypassInput as { forceImprove?: boolean }).forceImprove = forceImprove;
-  }
-  if (defaultImprove !== undefined) {
-    (bypassInput as { defaultImprove?: boolean }).defaultImprove = defaultImprove;
-  }
-  if (shortPromptThreshold !== undefined) {
-    (bypassInput as { shortPromptThreshold?: number }).shortPromptThreshold = shortPromptThreshold;
-  }
-  if (contextUsage !== undefined) {
-    (bypassInput as { contextUsage?: { used: number; max: number } }).contextUsage = contextUsage;
-  }
-
-  return bypassInput;
+  return {
+    prompt,
+    sessionId,
+    ...(permissionMode !== undefined && { permissionMode }),
+    ...(pluginDisabled !== undefined && { pluginDisabled }),
+    ...(forceImprove !== undefined && { forceImprove }),
+    ...(defaultImprove !== undefined && { defaultImprove }),
+    ...(shortPromptThreshold !== undefined && { shortPromptThreshold }),
+    ...(contextUsage !== undefined && { contextUsage }),
+  };
 }
 
 /**
@@ -284,8 +294,12 @@ function buildIntegrationOptions(
     ...(integrations.spec && { specOptions: { enabled: true, ...cwdOption } }),
     ...(integrations.memory && { memoryOptions: { enabled: true } }),
     ...(integrations.session && { sessionOptions: { enabled: true } }),
-    ...(integrations.dynamicDiscovery && { dynamicDiscoveryOptions: { enabled: true, ...cwdOption } }),
-    ...(integrations.pluginResources && { pluginResourcesOptions: { enabled: true, ...cwdOption } }),
+    ...(integrations.dynamicDiscovery && {
+      dynamicDiscoveryOptions: { enabled: true, ...cwdOption },
+    }),
+    ...(integrations.pluginResources && {
+      pluginResourcesOptions: { enabled: true, ...cwdOption },
+    }),
     ...(integrations.projectShape && { projectShapeOptions: { enabled: true, ...cwdOption } }),
   };
 }
@@ -315,9 +329,14 @@ function mapFormattedToImprovement(formatted: FormattedContext): ImprovementCont
 function hasEnabledIntegrations(integrations?: IntegrationToggles): boolean {
   if (!integrations) return false;
   return !!(
-    integrations.git || integrations.lsp || integrations.spec ||
-    integrations.memory || integrations.session || integrations.dynamicDiscovery ||
-    integrations.pluginResources || integrations.projectShape
+    integrations.git ||
+    integrations.lsp ||
+    integrations.spec ||
+    integrations.memory ||
+    integrations.session ||
+    integrations.dynamicDiscovery ||
+    integrations.pluginResources ||
+    integrations.projectShape
   );
 }
 
@@ -326,8 +345,16 @@ function hasEnabledIntegrations(integrations?: IntegrationToggles): boolean {
  */
 function hasFormattedContent(ctx: FormattedContext): boolean {
   return !!(
-    ctx.tools || ctx.skills || ctx.agents || ctx.git || ctx.lsp ||
-    ctx.spec || ctx.memory || ctx.session || ctx.dynamicDiscovery || ctx.pluginResources ||
+    ctx.tools ||
+    ctx.skills ||
+    ctx.agents ||
+    ctx.git ||
+    ctx.lsp ||
+    ctx.spec ||
+    ctx.memory ||
+    ctx.session ||
+    ctx.dynamicDiscovery ||
+    ctx.pluginResources ||
     ctx.projectShape
   );
 }
@@ -371,33 +398,37 @@ async function buildImprovementContext(
  */
 function buildImproveOptions(
   prompt: string,
-  sessionId: string,
   config: Configuration,
   improvementContext: ImprovementContext | undefined,
   cwd?: string,
   _mockImprovement?: string | null,
   _mockClassification?: string | null
 ): Parameters<typeof improvePrompt>[0] {
-  const improveOptions: Parameters<typeof improvePrompt>[0] = {
+  // Mocks: _mockImprovement wins; _mockClassification kept for backward compat
+  const mockResponse = _mockImprovement !== undefined ? _mockImprovement : _mockClassification;
+
+  return {
     originalPrompt: prompt,
-    sessionId,
     config,
-    ...(cwd && { cwd }), // Required for fork-session to find session files
+    ...(cwd && { cwd }),
+    ...(mockResponse !== undefined && { _mockClaudeResponse: mockResponse }),
+    ...(improvementContext && { context: improvementContext }),
   };
+}
 
-  // Handle mocks (combine both params for backward compat)
-  if (_mockImprovement !== undefined) {
-    (improveOptions as { _mockClaudeResponse?: string | null })._mockClaudeResponse = _mockImprovement;
-  } else if (_mockClassification !== undefined) {
-    // Backward compat - treat classification mock as improvement mock
-    (improveOptions as { _mockClaudeResponse?: string | null })._mockClaudeResponse = _mockClassification;
+/**
+ * Runs the improvement call with consistent error handling: thrown errors
+ * and failed results both collapse to an improvement_failed passthrough
+ */
+async function runImprovement(
+  improveOptions: Parameters<typeof improvePrompt>[0]
+): Promise<Awaited<ReturnType<typeof improvePrompt>> | ProcessPromptResult> {
+  try {
+    return await improvePrompt(improveOptions);
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    return { type: 'passthrough', bypassReason: 'improvement_failed', error: errorMsg };
   }
-
-  if (improvementContext) {
-    (improveOptions as { context?: ImprovementContext }).context = improvementContext;
-  }
-
-  return improveOptions;
 }
 
 /**
@@ -405,7 +436,16 @@ function buildImproveOptions(
  * Returns passthrough on bypass conditions or errors
  */
 export async function processPrompt(options: ProcessPromptOptions): Promise<ProcessPromptResult> {
-  const { prompt, sessionId, availableTools, skillRules, agentDefinitions, integrations, cwd, _mockClassification, _mockImprovement } = options;
+  const {
+    prompt,
+    availableTools,
+    skillRules,
+    agentDefinitions,
+    integrations,
+    cwd,
+    _mockClassification,
+    _mockImprovement,
+  } = options;
 
   // Check for bypass conditions (fast, synchronous check)
   const bypassInput = buildBypassCheckInput(options);
@@ -420,23 +460,14 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
   const promptToImprove = bypassResult.cleanedPrompt ?? prompt;
 
   // Build context from available sources (tools, skills, agents, git, lsp, spec, memory, session)
-  const contextOptions: BuildImprovementContextOptions = { prompt: promptToImprove };
-  if (availableTools) {
-    (contextOptions as { availableTools?: readonly string[] }).availableTools = availableTools;
-  }
-  if (skillRules) {
-    (contextOptions as { skillRules?: SkillRule[] }).skillRules = skillRules;
-  }
-  if (agentDefinitions) {
-    (contextOptions as { agentDefinitions?: AgentDefinition[] }).agentDefinitions = agentDefinitions;
-  }
-  if (integrations) {
-    (contextOptions as { integrations?: IntegrationToggles }).integrations = integrations;
-  }
-  if (cwd) {
-    (contextOptions as { cwd?: string }).cwd = cwd;
-  }
-  const improvementContext = await buildImprovementContext(contextOptions);
+  const improvementContext = await buildImprovementContext({
+    prompt: promptToImprove,
+    ...(availableTools && { availableTools }),
+    ...(skillRules && { skillRules }),
+    ...(agentDefinitions && { agentDefinitions }),
+    ...(integrations && { integrations }),
+    ...(cwd && { cwd }),
+  });
 
   // Config for model selection: prefer the entry-point's already-resolved
   // config (project/global aware); only fall back to a disk load for callers
@@ -447,25 +478,28 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
   const tokensBefore = countTokens(prompt);
 
   // Build improve options with mocks and context (use cleaned prompt)
-  const improveOptions = buildImproveOptions(promptToImprove, sessionId, config, improvementContext, cwd, _mockImprovement, _mockClassification);
+  const improveOptions = buildImproveOptions(
+    promptToImprove,
+    config,
+    improvementContext,
+    cwd,
+    _mockImprovement,
+    _mockClassification
+  );
 
   // Improve the prompt with consistent error handling
-  let improvement;
-  try {
-    improvement = await improvePrompt(improveOptions);
-  } catch (err) {
-    // Unexpected error during improvement - fallback to passthrough with reason
-    const errorMsg = err instanceof Error ? err.message : String(err);
-    return { type: 'passthrough', bypassReason: 'improvement_failed', error: errorMsg };
+  const improvement = await runImprovement(improveOptions);
+  if ('type' in improvement) {
+    return improvement;
   }
 
   // On improvement failure, fallback to passthrough with reason
   if (!improvement.success || improvement.fallbackToOriginal) {
-    const result: ProcessPromptResult = { type: 'passthrough', bypassReason: 'improvement_failed' };
-    if (improvement.error) {
-      (result as { error?: string }).error = improvement.error;
-    }
-    return result;
+    return {
+      type: 'passthrough',
+      bypassReason: 'improvement_failed',
+      ...(improvement.error && { error: improvement.error }),
+    };
   }
 
   // Count tokens after improvement
@@ -481,6 +515,114 @@ export async function processPrompt(options: ProcessPromptOptions): Promise<Proc
     contextSources: improvement.contextSources,
     ...(improvement.summary !== undefined && { summary: improvement.summary }),
   };
+}
+
+/**
+ * Resolves context usage: prefer stdin-provided usage, fall back to
+ * calculating from the transcript file
+ */
+async function resolveContextUsage(
+  config: Configuration,
+  context: HookInput['context']
+): Promise<{ used: number; max: number } | undefined> {
+  if (context.context_usage) {
+    return { used: context.context_usage.used, max: context.context_usage.max };
+  }
+
+  if (!context.transcript_path) {
+    return undefined;
+  }
+
+  // Claude Code doesn't provide context_usage to UserPromptSubmit hooks
+  // Calculate it from the transcript file instead.
+  // Resolve the window from config, then CLAUDE_CODE_MAX_CONTEXT_TOKENS
+  // (visible to the hook), then a best-effort model id. Claude Code does not
+  // send context_usage or the model to UserPromptSubmit hooks, so without a
+  // configured or env value a 1M session is measured against the 200K default.
+  const contextWindow = resolveContextWindow({
+    ...(config.contextWindowTokens !== undefined && { configured: config.contextWindowTokens }),
+    ...(process.env.CLAUDE_CODE_MAX_CONTEXT_TOKENS !== undefined && {
+      envValue: process.env.CLAUDE_CODE_MAX_CONTEXT_TOKENS,
+    }),
+    ...(context.session_settings?.model !== undefined && {
+      model: context.session_settings.model,
+    }),
+  });
+  const transcriptUsage = await calculateContextFromTranscript(
+    context.transcript_path,
+    contextWindow
+  );
+  return transcriptUsage ? { used: transcriptUsage.used, max: transcriptUsage.total } : undefined;
+}
+
+/**
+ * Logs the processing result when logging is enabled
+ */
+function logResult(
+  config: Configuration,
+  result: ProcessPromptResult,
+  prompt: string,
+  conversationId: string,
+  totalLatency: number
+): void {
+  if (!config.logging.enabled) {
+    return;
+  }
+
+  const logFilePath = generateLogFilePath(
+    config.logging.logFilePath,
+    config.logging.useTimestampedLogs
+  );
+
+  const logEntry =
+    result.type === 'improved'
+      ? createLogEntry({
+          originalPrompt: prompt,
+          improvedPrompt: result.improvedPrompt,
+          bypassReason: null,
+          modelUsed: result.modelUsed,
+          totalLatency,
+          improvementLatency: result.latencyMs,
+          contextSources: result.contextSources,
+          conversationId,
+          level: 'INFO',
+          phase: 'complete',
+        })
+      : createLogEntry({
+          originalPrompt: prompt,
+          improvedPrompt: null,
+          bypassReason: result.bypassReason ?? null,
+          modelUsed: null,
+          totalLatency,
+          contextSources: [],
+          conversationId,
+          level: result.bypassReason === 'improvement_failed' ? 'ERROR' : 'INFO',
+          phase: result.bypassReason ? 'bypass' : 'complete',
+          ...(result.error && { error: result.error }),
+        });
+
+  writeLogEntry(logEntry, logFilePath, config.logging.logLevel);
+}
+
+/**
+ * Creates hook output for a processing result
+ */
+function createResultOutput(config: Configuration, result: ProcessPromptResult): HookOutput {
+  if (result.type === 'improved') {
+    return createHookOutput({
+      type: 'improved',
+      improvedPrompt: result.improvedPrompt,
+      tokensBefore: result.tokensBefore,
+      tokensAfter: result.tokensAfter,
+      latencyMs: result.latencyMs,
+      displayImprovedPrompt: config.logging.displayImprovedPrompt,
+      ...(result.summary !== undefined && { summary: result.summary }),
+    });
+  }
+  return createHookOutput({
+    type: 'passthrough',
+    ...(result.bypassReason !== undefined && { bypassReason: result.bypassReason }),
+  });
 }
 
 /**
@@ -517,6 +659,9 @@ async function main(): Promise<void> {
 
   const { prompt, context } = parseResult.input;
 
+  // Get context usage - prefer from stdin, fallback to transcript calculation
+  const contextUsage = await resolveContextUsage(config, context);
+
   // Build process options, only including optional fields when defined
   const processOptions: ProcessPromptOptions = {
     prompt,
@@ -525,64 +670,14 @@ async function main(): Promise<void> {
     forceImprove: config.forceImprove,
     shortPromptThreshold: config.shortPromptThreshold,
     config, // thread the resolved config through so processPrompt doesn't reload
+    ...(config.defaultImprove !== undefined && { defaultImprove: config.defaultImprove }),
+    ...(context.permission_mode && { permissionMode: context.permission_mode }),
+    ...(contextUsage && { contextUsage }),
+    ...(config.integrations && { integrations: config.integrations }),
+    ...(context.cwd && { cwd: context.cwd }),
+    ...(context.available_tools &&
+      context.available_tools.length > 0 && { availableTools: context.available_tools }),
   };
-
-  if (config.defaultImprove !== undefined) {
-    (processOptions as { defaultImprove?: boolean }).defaultImprove = config.defaultImprove;
-  }
-
-  if (context.permission_mode) {
-    (processOptions as { permissionMode?: string }).permissionMode = context.permission_mode;
-  }
-
-  // Get context usage - prefer from stdin, fallback to transcript calculation
-  if (context.context_usage) {
-    (processOptions as { contextUsage?: { used: number; max: number } }).contextUsage = {
-      used: context.context_usage.used,
-      max: context.context_usage.max,
-    };
-  } else if (context.transcript_path) {
-    // Claude Code doesn't provide context_usage to UserPromptSubmit hooks
-    // Calculate it from the transcript file instead.
-    // Resolve the window from config, then CLAUDE_CODE_MAX_CONTEXT_TOKENS
-    // (visible to the hook), then a best-effort model id. Claude Code does not
-    // send context_usage or the model to UserPromptSubmit hooks, so without a
-    // configured or env value a 1M session is measured against the 200K default.
-    const contextWindow = resolveContextWindow({
-      ...(config.contextWindowTokens !== undefined && { configured: config.contextWindowTokens }),
-      ...(process.env.CLAUDE_CODE_MAX_CONTEXT_TOKENS !== undefined && {
-        envValue: process.env.CLAUDE_CODE_MAX_CONTEXT_TOKENS,
-      }),
-      ...(context.session_settings?.model !== undefined && {
-        model: context.session_settings.model,
-      }),
-    });
-    const transcriptUsage = await calculateContextFromTranscript(
-      context.transcript_path,
-      contextWindow
-    );
-    if (transcriptUsage) {
-      (processOptions as { contextUsage?: { used: number; max: number } }).contextUsage = {
-        used: transcriptUsage.used,
-        max: transcriptUsage.total,
-      };
-    }
-  }
-
-  // Add integration toggles from config
-  if (config.integrations) {
-    (processOptions as { integrations?: IntegrationToggles }).integrations = config.integrations;
-  }
-
-  // Add cwd for integrations that need it (git, spec)
-  if (context.cwd) {
-    (processOptions as { cwd?: string }).cwd = context.cwd;
-  }
-
-  // Add available tools from stdin (Claude Code provides this)
-  if (context.available_tools && context.available_tools.length > 0) {
-    (processOptions as { availableTools?: readonly string[] }).availableTools = context.available_tools;
-  }
 
   // Process the prompt through improvement with all context sources
   const result = await processPrompt(processOptions);
@@ -590,59 +685,10 @@ async function main(): Promise<void> {
   // Calculate total latency
   const totalLatency = performance.now() - startTime;
 
-  // Log the result if logging is enabled
-  if (config.logging.enabled) {
-    const logFilePath = generateLogFilePath(config.logging.logFilePath, config.logging.useTimestampedLogs);
-
-    if (result.type === 'improved') {
-      const logEntry = createLogEntry({
-        originalPrompt: prompt,
-        improvedPrompt: result.improvedPrompt,
-        bypassReason: null,
-        modelUsed: result.modelUsed,
-        totalLatency,
-        improvementLatency: result.latencyMs,
-        contextSources: result.contextSources,
-        conversationId: context.conversation_id,
-        level: 'INFO',
-        phase: 'complete',
-      });
-      writeLogEntry(logEntry, logFilePath, config.logging.logLevel);
-    } else {
-      const logEntry = createLogEntry({
-        originalPrompt: prompt,
-        improvedPrompt: null,
-        bypassReason: result.bypassReason ?? null,
-        modelUsed: null,
-        totalLatency,
-        contextSources: [],
-        conversationId: context.conversation_id,
-        level: result.bypassReason === 'improvement_failed' ? 'ERROR' : 'INFO',
-        phase: result.bypassReason ? 'bypass' : 'complete',
-        ...(result.error && { error: result.error }),
-      });
-      writeLogEntry(logEntry, logFilePath, config.logging.logLevel);
-    }
-  }
+  logResult(config, result, prompt, context.conversation_id, totalLatency);
 
   // Create output based on processing result
-  let output: HookOutput;
-  if (result.type === 'improved') {
-    output = createHookOutput({
-      type: 'improved',
-      improvedPrompt: result.improvedPrompt,
-      tokensBefore: result.tokensBefore,
-      tokensAfter: result.tokensAfter,
-      latencyMs: result.latencyMs,
-      displayImprovedPrompt: config.logging.displayImprovedPrompt,
-      ...(result.summary !== undefined && { summary: result.summary }),
-    });
-  } else {
-    output = createHookOutput({
-      type: 'passthrough',
-      ...(result.bypassReason !== undefined && { bypassReason: result.bypassReason }),
-    });
-  }
+  let output: HookOutput = createResultOutput(config, result);
 
   // Append setup message if config needs user attention
   if (setupMessage) {

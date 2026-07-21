@@ -4,24 +4,24 @@
  * T121: Test compaction detector skips processing when <5% available
  * T122: Test compaction detector parses context_usage from stdin
  */
-import { describe, expect, it, beforeAll, afterAll } from 'bun:test';
-import { mkdirSync, writeFileSync, rmSync, existsSync } from 'fs';
-import { join } from 'path';
-import { tmpdir } from 'os';
+import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
-  type ContextUsage,
-  calculateAvailableContext,
-  parseContextUsage,
-  shouldSkipProcessing,
-  extractTokenUsageFromLine,
-  calculateContextFromTranscript,
-  detectContextWindow,
-  resolveContextWindow,
-  getUsableContextWindow,
-  isContextLowFromTranscript,
+  AUTOCOMPACT_BUFFER_PERCENT,
   CLAUDE_CONTEXT_WINDOW_TOKENS,
   CLAUDE_CONTEXT_WINDOW_TOKENS_1M,
-  AUTOCOMPACT_BUFFER_PERCENT,
+  type ContextUsage,
+  calculateAvailableContext,
+  calculateContextFromTranscript,
+  detectContextWindow,
+  extractTokenUsageFromLine,
+  getUsableContextWindow,
+  isContextLowFromTranscript,
+  parseContextUsage,
+  resolveContextWindow,
+  shouldSkipProcessing,
 } from './compaction-detector.ts';
 
 describe('Compaction Detector', () => {
@@ -347,7 +347,8 @@ describe('Compaction Detector', () => {
         const usage = await calculateContextFromTranscript(file, CLAUDE_CONTEXT_WINDOW_TOKENS_1M);
         expect(usage).toBeDefined();
         // usable 1M window ~= 775K; 200K used leaves well over the 5% floor
-        const available = ((usage!.total - usage!.used) / usage!.total) * 100;
+        const total = usage?.total ?? 0;
+        const available = ((total - (usage?.used ?? 0)) / total) * 100;
         expect(available).toBeGreaterThan(50);
       } finally {
         rmSync(dir, { recursive: true, force: true });
@@ -373,12 +374,14 @@ describe('Compaction Detector', () => {
       const usable = getUsableContextWindow();
 
       // Default 200K with autocompact buffer
-      expect(usable).toBe(Math.round(CLAUDE_CONTEXT_WINDOW_TOKENS * (1 - AUTOCOMPACT_BUFFER_PERCENT)));
+      expect(usable).toBe(
+        Math.round(CLAUDE_CONTEXT_WINDOW_TOKENS * (1 - AUTOCOMPACT_BUFFER_PERCENT))
+      );
     });
   });
 
   describe('calculateContextFromTranscript - calculates context from file', () => {
-    const testDir = join(tmpdir(), 'compaction-detector-test-' + Date.now());
+    const testDir = join(tmpdir(), `compaction-detector-test-${Date.now()}`);
     const testTranscript = join(testDir, 'test-session.jsonl');
 
     beforeAll(() => {
@@ -475,7 +478,7 @@ describe('Compaction Detector', () => {
   });
 
   describe('isContextLowFromTranscript - convenience check', () => {
-    const testDir = join(tmpdir(), 'compaction-low-test-' + Date.now());
+    const testDir = join(tmpdir(), `compaction-low-test-${Date.now()}`);
     const testTranscript = join(testDir, 'test-session.jsonl');
 
     beforeAll(() => {

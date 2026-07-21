@@ -3,7 +3,7 @@
  * TDD: Write tests first, verify they fail, then implement
  */
 import { describe, expect, it } from 'bun:test';
-import { scanDirectory, type DirectoryScannerOptions } from './directory-scanner.ts';
+import { type DirectoryScannerOptions, scanDirectory } from './directory-scanner.ts';
 
 describe('scanDirectory', () => {
   describe('basic scanning with mock filesystem', () => {

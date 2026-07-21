@@ -30,10 +30,9 @@ export interface ImprovementContext {
  */
 export interface ImprovePromptOptions {
   readonly originalPrompt: string;
-  readonly sessionId: string;
   readonly config: Configuration;
   readonly context?: ImprovementContext;
-  /** Project directory - required for fork-session to find session files */
+  /** Project directory the improver CLI runs from */
   readonly cwd?: string;
   /** For testing - mock the Claude response */
   readonly _mockClaudeResponse?: string | null;
@@ -62,9 +61,15 @@ export interface ImprovementResult {
 function getTimeoutForModel(model: ClaudeModel): number {
   // Must stay under the 120s hook budget in hooks/hooks.json
   switch (model) {
-    case 'opus': return 100_000;
-    case 'sonnet': return 90_000;
-    case 'haiku': return 60_000;
+    case 'opus':
+      return 100_000;
+    case 'sonnet':
+      return 90_000;
+    case 'haiku':
+      return 60_000;
+    default:
+      // Unreachable while ClaudeModel stays exhaustive; guards new aliases
+      return 60_000;
   }
 }
 
@@ -188,10 +193,14 @@ function buildContextSection(context?: ImprovementContext): string {
     sections.push(`<session_context>\n${escapeXmlContent(context.session)}\n</session_context>`);
   }
   if (context.dynamicDiscovery) {
-    sections.push(`<discovered_resources>\n${escapeXmlContent(context.dynamicDiscovery)}\n</discovered_resources>`);
+    sections.push(
+      `<discovered_resources>\n${escapeXmlContent(context.dynamicDiscovery)}\n</discovered_resources>`
+    );
   }
   if (context.pluginResources) {
-    sections.push(`<plugin_resources>\n${escapeXmlContent(context.pluginResources)}\n</plugin_resources>`);
+    sections.push(
+      `<plugin_resources>\n${escapeXmlContent(context.pluginResources)}\n</plugin_resources>`
+    );
   }
   if (context.projectShape) {
     sections.push(`<project_shape>\n${escapeXmlContent(context.projectShape)}\n</project_shape>`);
@@ -391,7 +400,7 @@ ${escapedPrompt}
  * Falls back to original prompt on any error
  */
 export async function improvePrompt(options: ImprovePromptOptions): Promise<ImprovementResult> {
-  const { originalPrompt, sessionId, config, context, cwd, _mockClaudeResponse } = options;
+  const { originalPrompt, config, context, cwd, _mockClaudeResponse } = options;
   const startTime = Date.now();
 
   // Get model from config
@@ -441,9 +450,8 @@ export async function improvePrompt(options: ImprovePromptOptions): Promise<Impr
   const result = await executeClaudeCommand({
     prompt: improvementPrompt,
     model,
-    sessionId,
     timeoutMs: getTimeoutForModel(model),
-    ...(cwd && { cwd }), // Required for fork-session to find session files
+    ...(cwd && { cwd }),
   });
 
   const latencyMs = Date.now() - startTime;

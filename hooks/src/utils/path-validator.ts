@@ -46,7 +46,8 @@ export function isValidDiscoveryPath(path: string | undefined): boolean {
   }
 
   // Reject zero-width and special unicode characters
-  // eslint-disable-next-line no-control-regex
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: deliberately rejects control characters in paths
+  // biome-ignore lint/suspicious/noMisleadingCharacterClass: zero-width characters are matched individually by design
   if (/[\u0000-\u001F\u007F\u200B-\u200D\u2028\u2029\uFEFF]/.test(path)) {
     return false;
   }
@@ -88,7 +89,8 @@ export function validateDiscoveryPath(path: string | undefined): PathValidationR
     }
   }
 
-  // eslint-disable-next-line no-control-regex
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: deliberately rejects control characters in paths
+  // biome-ignore lint/suspicious/noMisleadingCharacterClass: zero-width characters are matched individually by design
   if (/[\u0000-\u001F\u007F\u200B-\u200D\u2028\u2029\uFEFF]/.test(path)) {
     return { valid: false, error: 'Path contains dangerous unicode character' };
   }

@@ -1,6 +1,6 @@
 /**
  * T028-T030: Claude Client tests
- * T028: Test Claude client executes `claude --fork-session --print`
+ * T028: Test Claude client executes `claude --print` (fork-session deliberately not used)
  * T029: Test Claude client timeout enforcement (model-based: haiku 30s, sonnet 60s, opus 90s)
  * T030: Test Claude client model selection (haiku vs sonnet)
  */
@@ -17,12 +17,11 @@ const SONNET_TIMEOUT_MS = 60_000;
 const OPUS_TIMEOUT_MS = 90_000;
 
 describe('Claude Client', () => {
-  describe('T028: buildClaudeCommand - executes claude --fork-session --print', () => {
+  describe('T028: buildClaudeCommand - executes claude --print', () => {
     it('should build command with --print flag', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
         model: 'haiku',
-        sessionId: 'session-123',
       };
 
       const { args } = buildClaudeCommand(options);
@@ -34,7 +33,6 @@ describe('Claude Client', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
         model: 'haiku',
-        sessionId: 'session-123',
       };
 
       const { args } = buildClaudeCommand(options);
@@ -43,25 +41,23 @@ describe('Claude Client', () => {
       expect(args).toContain('--debug');
     });
 
-    it('should NOT include --output-format json (causes hangs with fork-session)', () => {
+    it('should NOT include --output-format json (causes hangs)', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
         model: 'haiku',
-        sessionId: 'session-123',
       };
 
       const { args } = buildClaudeCommand(options);
 
-      // --output-format json causes fork-session to hang
+      // --output-format json causes the CLI to hang
       expect(args).not.toContain('--output-format');
       expect(args).not.toContain('json');
     });
 
-    it('should NOT use fork-session even when sessionId is available', () => {
+    it('should NOT use fork-session', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
         model: 'haiku',
-        sessionId: 'session-123',
       };
 
       const { args } = buildClaudeCommand(options);
@@ -73,11 +69,10 @@ describe('Claude Client', () => {
       expect(args).not.toContain('session-123');
     });
 
-    it('should not include session-related arguments when sessionId is provided', () => {
+    it('should not include session-related arguments', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
         model: 'haiku',
-        sessionId: 'session-123',
       };
 
       const { args } = buildClaudeCommand(options);
@@ -92,7 +87,6 @@ describe('Claude Client', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Classify this prompt',
         model: 'haiku',
-        sessionId: 'session-123',
       };
 
       const { args } = buildClaudeCommand(options);
@@ -104,7 +98,6 @@ describe('Claude Client', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test "quotes" and $variables',
         model: 'haiku',
-        sessionId: 'session-123',
       };
 
       const { args } = buildClaudeCommand(options);
@@ -113,31 +106,29 @@ describe('Claude Client', () => {
       expect(args).toContain('Test "quotes" and $variables');
     });
 
-    it('should not include --fork-session when sessionId is empty', () => {
+    it('should never include --fork-session', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
         model: 'haiku',
-        sessionId: '',
       };
 
       const { args } = buildClaudeCommand(options);
 
-      // No fork-session when sessionId is not available
+      // fork-session is deliberately disabled
       expect(args).not.toContain('--fork-session');
       expect(args).not.toContain('--resume');
     });
 
-    it('should use project cwd when provided (required for fork-session)', () => {
+    it('should use project cwd when provided', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
         model: 'haiku',
-        sessionId: 'session-123',
         cwd: '/home/user/project',
       };
 
       const { cwd } = buildClaudeCommand(options);
 
-      // Must run from project dir for fork-session to find session files
+      // Runs from the project dir when provided
       expect(cwd).toBe('/home/user/project');
     });
 
@@ -145,7 +136,6 @@ describe('Claude Client', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test prompt',
         model: 'haiku',
-        sessionId: 'session-123',
       };
 
       const { cwd } = buildClaudeCommand(options);
@@ -160,7 +150,6 @@ describe('Claude Client', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Improve',
         model: 'haiku',
-        sessionId: 'session-123',
         timeoutMs: HAIKU_TIMEOUT_MS,
       };
 
@@ -171,7 +160,6 @@ describe('Claude Client', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Improve',
         model: 'sonnet',
-        sessionId: 'session-123',
         timeoutMs: SONNET_TIMEOUT_MS,
       };
 
@@ -182,7 +170,6 @@ describe('Claude Client', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Improve complex',
         model: 'opus',
-        sessionId: 'session-123',
         timeoutMs: OPUS_TIMEOUT_MS,
       };
 
@@ -194,7 +181,6 @@ describe('Claude Client', () => {
       const result = await executeClaudeCommand({
         prompt: 'Test',
         model: 'haiku',
-        sessionId: 'session-123',
         timeoutMs: 1, // 1ms timeout - will always timeout
         _mockExecution: async () => {
           await new Promise((resolve) => setTimeout(resolve, 100));
@@ -210,7 +196,6 @@ describe('Claude Client', () => {
       const result = await executeClaudeCommand({
         prompt: 'Test',
         model: 'haiku',
-        sessionId: 'session-123',
         timeoutMs: 5000,
         _mockExecution: async () => {
           return { output: 'COMPLEX: This is vague', exitCode: 0 };
@@ -227,7 +212,6 @@ describe('Claude Client', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test',
         model: 'haiku',
-        sessionId: 'session-123',
       };
 
       const { args } = buildClaudeCommand(options);
@@ -240,7 +224,6 @@ describe('Claude Client', () => {
       const options: ClaudeClientOptions = {
         prompt: 'Test',
         model: 'sonnet',
-        sessionId: 'session-123',
       };
 
       const { args } = buildClaudeCommand(options);
@@ -253,19 +236,16 @@ describe('Claude Client', () => {
       const haikuOptions: ClaudeClientOptions = {
         prompt: 'Test',
         model: 'haiku',
-        sessionId: 'session-123',
       };
 
       const sonnetOptions: ClaudeClientOptions = {
         prompt: 'Test',
         model: 'sonnet',
-        sessionId: 'session-123',
       };
 
       const opusOptions: ClaudeClientOptions = {
         prompt: 'Test',
         model: 'opus',
-        sessionId: 'session-123',
       };
 
       const { args: haikuArgs } = buildClaudeCommand(haikuOptions);
@@ -284,7 +264,6 @@ describe('Claude Client', () => {
       const result = await executeClaudeCommand({
         prompt: 'Test',
         model: 'haiku',
-        sessionId: 'session-123',
         timeoutMs: 5000,
         _mockExecution: async () => {
           return { output: 'API error', exitCode: 1 };
@@ -299,7 +278,6 @@ describe('Claude Client', () => {
       const result = await executeClaudeCommand({
         prompt: 'Test',
         model: 'haiku',
-        sessionId: 'session-123',
         timeoutMs: 5000,
         _mockExecution: async () => {
           throw new Error('Command not found');
@@ -314,7 +292,6 @@ describe('Claude Client', () => {
       const result = await executeClaudeCommand({
         prompt: 'Test',
         model: 'haiku',
-        sessionId: 'session-123',
         timeoutMs: 5000,
         _mockExecution: async () => {
           return { output: 'Classification result here', exitCode: 0 };

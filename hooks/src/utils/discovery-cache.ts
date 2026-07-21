@@ -51,7 +51,7 @@ export function createDiscoveryCache<T>(): DiscoveryCache<T> {
     }
 
     let lruKey: string | null = null;
-    let lruTime = Infinity;
+    let lruTime = Number.POSITIVE_INFINITY;
 
     for (const [key, entry] of cache.entries()) {
       if (entry.lastAccessed < lruTime) {

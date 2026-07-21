@@ -1,16 +1,16 @@
 /**
  * Plugin Scanner Tests
  */
-import { describe, it, expect } from 'bun:test';
+import { describe, expect, it } from 'bun:test';
 import {
-  detectDeliberationKeywords,
-  suggestMemoryThink,
-  scanEnhancePlugins,
-  scanMcpServers,
-  normaliseComponentPath,
-  normaliseComponentPaths,
   type OutputStyleInfo,
   type PluginInfo,
+  detectDeliberationKeywords,
+  normaliseComponentPath,
+  normaliseComponentPaths,
+  scanEnhancePlugins,
+  scanMcpServers,
+  suggestMemoryThink,
 } from './plugin-scanner.ts';
 
 describe('plugin-scanner', () => {

@@ -2,9 +2,9 @@
  * Plugin Scanner - Scans ~/.claude/plugins/cache/enhance/ for installed plugins
  * and detects deliberation keywords for memory think suggestions
  */
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, basename } from 'node:path';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
+import { basename, join } from 'node:path';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -94,7 +94,10 @@ function parseFrontmatter(content: string): Record<string, string> {
 
     const key = line.slice(0, colonIndex).trim();
     let value = line.slice(colonIndex + 1).trim();
-    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
       value = value.slice(1, -1);
     }
     result[key] = value;
@@ -180,12 +183,14 @@ export function normaliseComponentPaths(pathValue: unknown, defaultPath: string)
 
 function getLatestVersionDir(pluginPath: string): string | null {
   if (!existsSync(pluginPath)) return null;
-  const versions = readdirSync(pluginPath).filter((v) => statSync(join(pluginPath, v)).isDirectory());
+  const versions = readdirSync(pluginPath).filter((v) =>
+    statSync(join(pluginPath, v)).isDirectory()
+  );
   if (versions.length === 0) return null;
 
   versions.sort((a, b) => {
-    const partsA = a.split('.').map((n) => parseInt(n, 10) || 0);
-    const partsB = b.split('.').map((n) => parseInt(n, 10) || 0);
+    const partsA = a.split('.').map((n) => Number.parseInt(n, 10) || 0);
+    const partsB = b.split('.').map((n) => Number.parseInt(n, 10) || 0);
     for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
       const diff = (partsB[i] || 0) - (partsA[i] || 0);
       if (diff !== 0) return diff;
@@ -262,7 +267,10 @@ function scanPluginCommands(pluginPath: string): CommandInfo[] {
       });
     } catch (error) {
       if (process.env.DEBUG) {
-        console.warn(`[plugin-scanner] Failed to parse command at ${join(commandsDir, entry)}:`, error);
+        console.warn(
+          `[plugin-scanner] Failed to parse command at ${join(commandsDir, entry)}:`,
+          error
+        );
       }
     }
   }
@@ -283,11 +291,59 @@ function scanPluginOutputStyles(pluginPath: string): OutputStyleInfo[] {
       });
     } catch (error) {
       if (process.env.DEBUG) {
-        console.warn(`[plugin-scanner] Failed to parse output style at ${join(outputStylesDir, entry)}:`, error);
+        console.warn(
+          `[plugin-scanner] Failed to parse output style at ${join(outputStylesDir, entry)}:`,
+          error
+        );
       }
     }
   }
   return outputStyles;
+}
+
+function hasPathTraversal(pluginName: string): boolean {
+  return pluginName.includes('..') || pluginName.includes('/') || pluginName.includes('\\');
+}
+
+function buildPluginInfo(
+  pluginJson: Record<string, unknown>,
+  pluginName: string,
+  versionDir: string
+): PluginInfo {
+  const name = typeof pluginJson.name === 'string' ? pluginJson.name : pluginName;
+  const version = typeof pluginJson.version === 'string' ? pluginJson.version : 'unknown';
+  const description = typeof pluginJson.description === 'string' ? pluginJson.description : '';
+  return {
+    name,
+    version,
+    description,
+    skills: scanPluginSkills(versionDir, name),
+    agents: scanPluginAgents(versionDir),
+    commands: scanPluginCommands(versionDir),
+    outputStyles: scanPluginOutputStyles(versionDir),
+  };
+}
+
+function readPluginInfo(pluginName: string, pluginPath: string): PluginInfo | null {
+  const versionDir = getLatestVersionDir(pluginPath);
+  if (!versionDir) return null;
+
+  const pluginJsonPath = join(versionDir, '.claude-plugin', 'plugin.json');
+  if (!existsSync(pluginJsonPath)) return null;
+
+  try {
+    const pluginJson = JSON.parse(readFileSync(pluginJsonPath, 'utf-8'));
+    // Validate JSON structure
+    if (typeof pluginJson !== 'object' || pluginJson === null) {
+      return null;
+    }
+    return buildPluginInfo(pluginJson, pluginName, versionDir);
+  } catch (error) {
+    if (process.env.DEBUG) {
+      console.warn(`[plugin-scanner] Failed to parse plugin.json at ${pluginJsonPath}:`, error);
+    }
+    return null;
+  }
 }
 
 export async function scanEnhancePlugins(enhanceDir?: string): Promise<PluginInfo[]> {
@@ -297,40 +353,14 @@ export async function scanEnhancePlugins(enhanceDir?: string): Promise<PluginInf
   const plugins: PluginInfo[] = [];
   for (const pluginName of readdirSync(dir)) {
     // Skip entries with path traversal sequences
-    if (pluginName.includes('..') || pluginName.includes('/') || pluginName.includes('\\')) {
-      continue;
-    }
+    if (hasPathTraversal(pluginName)) continue;
+
     const pluginPath = join(dir, pluginName);
     if (!statSync(pluginPath).isDirectory()) continue;
 
-    const versionDir = getLatestVersionDir(pluginPath);
-    if (!versionDir) continue;
-
-    const pluginJsonPath = join(versionDir, '.claude-plugin', 'plugin.json');
-    if (!existsSync(pluginJsonPath)) continue;
-
-    try {
-      const pluginJson = JSON.parse(readFileSync(pluginJsonPath, 'utf-8'));
-      // Validate JSON structure
-      if (typeof pluginJson !== 'object' || pluginJson === null) {
-        continue;
-      }
-      const name = typeof pluginJson.name === 'string' ? pluginJson.name : pluginName;
-      const version = typeof pluginJson.version === 'string' ? pluginJson.version : 'unknown';
-      const description = typeof pluginJson.description === 'string' ? pluginJson.description : '';
-      plugins.push({
-        name,
-        version,
-        description,
-        skills: scanPluginSkills(versionDir, name),
-        agents: scanPluginAgents(versionDir),
-        commands: scanPluginCommands(versionDir),
-        outputStyles: scanPluginOutputStyles(versionDir),
-      });
-    } catch (error) {
-      if (process.env.DEBUG) {
-        console.warn(`[plugin-scanner] Failed to parse plugin.json at ${pluginJsonPath}:`, error);
-      }
+    const pluginInfo = readPluginInfo(pluginName, pluginPath);
+    if (pluginInfo) {
+      plugins.push(pluginInfo);
     }
   }
   return plugins;
@@ -339,6 +369,43 @@ export async function scanEnhancePlugins(enhanceDir?: string): Promise<PluginInf
 // ─────────────────────────────────────────────────────────────────────────────
 // MCP Server Scanning
 // ─────────────────────────────────────────────────────────────────────────────
+
+function buildMcpServerInfo(name: string, config: unknown): McpServerInfo {
+  const cfg = config as Record<string, unknown>;
+  const desc = typeof cfg.description === 'string' ? cfg.description : undefined;
+  return {
+    name,
+    type: (cfg.type as 'sse' | 'stdio' | 'http') || (cfg.command ? 'stdio' : 'sse'),
+    ...(desc ? { description: desc } : {}),
+  };
+}
+
+function collectMcpServersFromConfig(
+  mcpPath: string,
+  seenNames: Set<string>,
+  servers: McpServerInfo[]
+): void {
+  try {
+    const content = JSON.parse(readFileSync(mcpPath, 'utf-8'));
+    // Validate JSON structure
+    if (typeof content !== 'object' || content === null) {
+      return;
+    }
+    const mcpServers = content.mcpServers;
+    if (typeof mcpServers !== 'object' || mcpServers === null) {
+      return;
+    }
+    for (const [name, config] of Object.entries(mcpServers)) {
+      if (seenNames.has(name)) continue;
+      seenNames.add(name);
+      servers.push(buildMcpServerInfo(name, config));
+    }
+  } catch (error) {
+    if (process.env.DEBUG) {
+      console.warn(`[plugin-scanner] Failed to parse MCP config at ${mcpPath}:`, error);
+    }
+  }
+}
 
 export async function scanMcpServers(mcpPaths?: string[]): Promise<McpServerInfo[]> {
   const paths = mcpPaths || [
@@ -351,32 +418,7 @@ export async function scanMcpServers(mcpPaths?: string[]): Promise<McpServerInfo
 
   for (const mcpPath of paths) {
     if (!existsSync(mcpPath)) continue;
-    try {
-      const content = JSON.parse(readFileSync(mcpPath, 'utf-8'));
-      // Validate JSON structure
-      if (typeof content !== 'object' || content === null) {
-        continue;
-      }
-      const mcpServers = content.mcpServers;
-      if (typeof mcpServers !== 'object' || mcpServers === null) {
-        continue;
-      }
-      for (const [name, config] of Object.entries(mcpServers)) {
-        if (seenNames.has(name)) continue;
-        seenNames.add(name);
-        const cfg = config as Record<string, unknown>;
-        const desc = typeof cfg.description === 'string' ? cfg.description : undefined;
-        servers.push({
-          name,
-          type: (cfg.type as 'sse' | 'stdio' | 'http') || (cfg.command ? 'stdio' : 'sse'),
-          ...(desc ? { description: desc } : {}),
-        });
-      }
-    } catch (error) {
-      if (process.env.DEBUG) {
-        console.warn(`[plugin-scanner] Failed to parse MCP config at ${mcpPath}:`, error);
-      }
-    }
+    collectMcpServersFromConfig(mcpPath, seenNames, servers);
   }
   return servers;
 }
